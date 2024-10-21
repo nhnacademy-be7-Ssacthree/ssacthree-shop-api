@@ -54,4 +54,6 @@ jobs:
         script_stop: true
         script: "./startup.sh"
 
-        
+    - uses: actions/labeler@v2
+      with:
+        repo-token: "${{ secrets.TOKEN }}"
