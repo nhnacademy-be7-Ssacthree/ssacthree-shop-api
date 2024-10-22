@@ -1,8 +1,8 @@
-package com.nhnacademy.ssacthree_shop_api.order.orderdetail.domain;
+package com.nhnacademy.ssacthree_shop_api.orderset.orderdetail.domain.domain;
 
 import com.nhnacademy.ssacthree_shop_api.bookset.book.domain.Book;
 import com.nhnacademy.ssacthree_shop_api.couponset.membercoupon.domain.MemberCoupon;
-import com.nhnacademy.ssacthree_shop_api.order.domain.Order;
+import com.nhnacademy.ssacthree_shop_api.orderset.order.domain.Order;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;

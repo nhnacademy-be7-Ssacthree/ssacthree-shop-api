@@ -1,9 +1,7 @@
 package com.nhnacademy.ssacthree_shop_api.memberset.pointreview.domain;
 
 
-import com.nhnacademy.ssacthree_shop_api.bookset.book.domain.Book;
 import com.nhnacademy.ssacthree_shop_api.memberset.pointhistory.domain.PointHistory;
-import com.nhnacademy.ssacthree_shop_api.order.domain.Order;
 import com.nhnacademy.ssacthree_shop_api.review.domain.Review;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;

@@ -1,4 +1,4 @@
-package com.nhnacademy.ssacthree_shop_api.order.domain;
+package com.nhnacademy.ssacthree_shop_api.orderset.order.domain;
 
 import com.nhnacademy.ssacthree_shop_api.couponset.membercoupon.domain.MemberCoupon;
 import com.nhnacademy.ssacthree_shop_api.customer.domain.Customer;

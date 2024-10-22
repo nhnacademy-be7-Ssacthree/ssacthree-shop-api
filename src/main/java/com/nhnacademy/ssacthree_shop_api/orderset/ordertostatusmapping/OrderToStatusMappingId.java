@@ -1,7 +1,6 @@
-package com.nhnacademy.ssacthree_shop_api.order.ordertostatusmapping;
+package com.nhnacademy.ssacthree_shop_api.orderset.ordertostatusmapping;
 
 
-import com.nhnacademy.ssacthree_shop_api.order.orderdetail.domain.OrderDetailId;
 import jakarta.persistence.Embeddable;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;

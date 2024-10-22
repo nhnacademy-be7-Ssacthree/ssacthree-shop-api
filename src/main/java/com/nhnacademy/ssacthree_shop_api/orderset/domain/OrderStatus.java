@@ -1,6 +1,6 @@
-package com.nhnacademy.ssacthree_shop_api.order.orderstatus.domain;
+package com.nhnacademy.ssacthree_shop_api.orderset.domain;
 
-import com.nhnacademy.ssacthree_shop_api.order.ordertostatusmapping.OrderStatusEnum;
+import com.nhnacademy.ssacthree_shop_api.orderset.ordertostatusmapping.OrderStatusEnum;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
