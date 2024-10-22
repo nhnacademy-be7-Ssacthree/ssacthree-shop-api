@@ -1,5 +1,7 @@
 package com.nhnacademy.ssacthree_shop_api.order.domain;
 
+import com.nhnacademy.ssacthree_shop_api.couponset.membercoupon.domain.MemberCoupon;
+import com.nhnacademy.ssacthree_shop_api.customer.domain.Customer;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -20,12 +22,14 @@ public class Order {
 
 
     @NotNull
-    @Column(name = "customer_id")
-    private Long customer_id;
+    @ManyToOne
+    @JoinColumn(name = "customer_id")
+    private Customer customer;
 
 
-    @Column(name = "member_coupon_id")
-    private Long member_coupon_id;
+    @OneToOne
+    @JoinColumn(name = "member_coupon_id")
+    private MemberCoupon memberCoupon;
 
     @NotNull
     @Column(name = "ordered_date")
