@@ -54,21 +54,9 @@ public class Book {
     private int bookViewCount;
     private int bookDiscount;
 
-    @OneToMany(mappedBy = "book", cascade = CascadeType.ALL)
-    private List<BookAuthor> bookAuthors;
-
-    @OneToMany(mappedBy = "book", cascade = CascadeType.ALL)
-    private List<BookCategory> bookCategories;
-
-    @OneToMany(mappedBy = "book", cascade = CascadeType.ALL)
-    private List<BookTag> bookTags;
-
     @ManyToOne
     @JoinColumn(name = "publisher_id")
     @NotNull
     private  Publisher publisher;
-
-    @OneToMany(mappedBy = "book", cascade = CascadeType.ALL)
-    private List<Discount> discounts;
 
 }
