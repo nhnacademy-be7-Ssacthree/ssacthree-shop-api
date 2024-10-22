@@ -1,7 +1,7 @@
-package com.nhnacademy.ssacthree_shop_api.member_set.point.domain;
+package com.nhnacademy.ssacthree_shop_api.memberset.point.domain;
 
-import com.nhnacademy.ssacthree_shop_api.member_set.member.domain.Member;
-import com.nhnacademy.ssacthree_shop_api.member_set.point_save_rule.domain.PointSaveRule;
+import com.nhnacademy.ssacthree_shop_api.memberset.member.domain.Member;
+import com.nhnacademy.ssacthree_shop_api.memberset.pointsaverule.domain.PointSaveRule;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Null;

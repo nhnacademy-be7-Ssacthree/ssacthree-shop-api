@@ -1,6 +1,6 @@
-package com.nhnacademy.ssacthree_shop_api.member_set.address.domain;
+package com.nhnacademy.ssacthree_shop_api.memberset.address.domain;
 
-import com.nhnacademy.ssacthree_shop_api.member_set.member.domain.Member;
+import com.nhnacademy.ssacthree_shop_api.memberset.member.domain.Member;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Null;

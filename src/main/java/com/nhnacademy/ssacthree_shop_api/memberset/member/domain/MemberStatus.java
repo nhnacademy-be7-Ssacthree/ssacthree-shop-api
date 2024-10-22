@@ -1,4 +1,4 @@
-package com.nhnacademy.ssacthree_shop_api.member_set.member.domain;
+package com.nhnacademy.ssacthree_shop_api.memberset.member.domain;
 
 
 
