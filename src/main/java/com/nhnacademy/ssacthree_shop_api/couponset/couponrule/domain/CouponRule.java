@@ -45,6 +45,4 @@ public class CouponRule {
     @NotNull
     private LocalDateTime couponRuleCreatedAt;
 
-    @OneToMany(mappedBy = "couponRule", cascade = CascadeType.ALL)
-    List<Coupon> coupons = new ArrayList<>();
 }
