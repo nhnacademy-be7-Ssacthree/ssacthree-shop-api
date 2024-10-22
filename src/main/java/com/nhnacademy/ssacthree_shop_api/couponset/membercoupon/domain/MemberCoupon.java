@@ -1,6 +1,7 @@
 package com.nhnacademy.ssacthree_shop_api.couponset.membercoupon.domain;
 
 import com.nhnacademy.ssacthree_shop_api.couponset.coupon.domain.Coupon;
+import com.nhnacademy.ssacthree_shop_api.memberset.member.domain.Member;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
@@ -33,11 +34,11 @@ public class MemberCoupon {
     @JoinColumn(name="couponId")
     private Coupon coupon;
 
-    //todo: member와 연결
-//    @NotNull
-//    @ManyToOne
-//    @JoinColumn(name="customerId")
-//    private Member customer;
+    @NotNull
+    @ManyToOne
+    @JoinColumn(name="customerId")
+    private Member customer;
 
     //todo: orderDetail과 OneToOne 연결
+
 }

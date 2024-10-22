@@ -1,4 +1,4 @@
-package com.nhnacademy.ssacthree_shop_api.member_set.member_grade.domain;
+package com.nhnacademy.ssacthree_shop_api.memberset.member_grade.domain;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;

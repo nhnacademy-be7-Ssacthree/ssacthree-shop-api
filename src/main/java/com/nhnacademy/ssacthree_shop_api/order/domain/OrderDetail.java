@@ -1,5 +1,6 @@
 package com.nhnacademy.ssacthree_shop_api.order.domain;
 
+import com.nhnacademy.ssacthree_shop_api.bookset.book.domain.Book;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;

@@ -1,8 +1,7 @@
-package com.nhnacademy.ssacthree_shop_api.member_set.point_save_rule.domain;
+package com.nhnacademy.ssacthree_shop_api.memberset.point_save_rule.domain;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Null;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
