@@ -1,4 +1,4 @@
-package com.nhnacademy.ssacthree_shop_api.memberset.point.domain;
+package com.nhnacademy.ssacthree_shop_api.memberset.pointhistory.domain;
 
 import com.nhnacademy.ssacthree_shop_api.memberset.member.domain.Member;
 import com.nhnacademy.ssacthree_shop_api.memberset.pointsaverule.domain.PointSaveRule;
