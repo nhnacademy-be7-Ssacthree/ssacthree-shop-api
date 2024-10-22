@@ -1,4 +1,4 @@
-package com.nhnacademy.ssacthree_shop_api.order.domain;
+package com.nhnacademy.ssacthree_shop_api.order.orderdetail.domain;
 
 import jakarta.persistence.Embeddable;
 import lombok.AllArgsConstructor;
