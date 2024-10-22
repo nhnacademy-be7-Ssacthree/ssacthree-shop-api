@@ -1,4 +1,4 @@
-package com.nhnacademy.ssacthree_shop_api.orderset.domain;
+package com.nhnacademy.ssacthree_shop_api.orderset.orderstatus.domain;
 
 import com.nhnacademy.ssacthree_shop_api.orderset.ordertostatusmapping.OrderStatusEnum;
 import jakarta.persistence.*;

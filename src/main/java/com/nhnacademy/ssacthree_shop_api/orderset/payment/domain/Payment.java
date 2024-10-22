@@ -1,4 +1,4 @@
-package com.nhnacademy.ssacthree_shop_api.orderset.domain;
+package com.nhnacademy.ssacthree_shop_api.orderset.payment.domain;
 
 import com.nhnacademy.ssacthree_shop_api.orderset.order.domain.Order;
 import jakarta.persistence.*;

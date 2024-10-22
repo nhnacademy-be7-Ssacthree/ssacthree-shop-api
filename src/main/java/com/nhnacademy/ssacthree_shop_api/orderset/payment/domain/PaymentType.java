@@ -1,4 +1,4 @@
-package com.nhnacademy.ssacthree_shop_api.orderset.domain;
+package com.nhnacademy.ssacthree_shop_api.orderset.payment.domain;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
