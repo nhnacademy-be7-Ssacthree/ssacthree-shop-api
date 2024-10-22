@@ -22,10 +22,6 @@ public class OrderDetail {
     @JoinColumn(name = "order_id")
     private Order order;
 
-
-
-
-
     @OneToOne()
     @JoinColumn(name="member_coupon_id")
     private MemberCoupon memberCoupon;

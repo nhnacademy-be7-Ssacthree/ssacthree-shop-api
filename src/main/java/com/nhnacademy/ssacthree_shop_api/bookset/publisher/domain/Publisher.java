@@ -28,7 +28,4 @@ public class Publisher {
     @NotNull
     private boolean publisherIsUsed;
 
-    @OneToMany(mappedBy = "publisher", cascade = CascadeType.ALL)
-    private List<Book> books;
-
 }

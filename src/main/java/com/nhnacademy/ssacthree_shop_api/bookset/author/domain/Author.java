@@ -29,7 +29,4 @@ public class Author {
     @Size(max = 255)
     private String authorInfo;
 
-    @OneToMany(mappedBy = "author", cascade = CascadeType.ALL)
-    private List<BookAuthor> bookAuthors;
-
 }
