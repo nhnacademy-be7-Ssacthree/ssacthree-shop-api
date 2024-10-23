@@ -8,28 +8,41 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import lombok.Setter;
 
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Entity
-@Table(name="member_grade")
+@Table(name = "member_grade")
 public class MemberGrade {
 
-    @NotNull
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long memberGradeId;
 
-    @NotNull
+
+    public MemberGrade(String memberGradeName, boolean memberGradeIsUsed, float memberGradeScore) {
+        this.memberGradeName = memberGradeName;
+        this.memberGradeIsUsed = memberGradeIsUsed;
+        this.memberGradePointSave = memberGradeScore;
+    }
+
+    // table은 jpa로 생성하나요?
+    // ddl로 미리 테이블은 안만드는 건가요?
     @Size(min = 1, max = 20)
+    @Setter
     private String memberGradeName;
 
-    @NotNull
+    @Setter
     private boolean memberGradeIsUsed;
 
-    @NotNull
-    private LocalDateTime memberGradeCreatedAt = LocalDateTime.now();
 
+    private LocalDateTime memberGradeCreateAt = LocalDateTime.now();
+
+    @Setter
     private float memberGradePointSave;
+
+
 }
