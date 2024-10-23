@@ -23,10 +23,10 @@ public class MemberGrade {
     private long memberGradeId;
 
 
-    public MemberGrade(String memberGradeName, boolean memberGradeIsUsed, float memberGradeScore) {
+    public MemberGrade(String memberGradeName, boolean memberGradeIsUsed, float memberGradePointSave) {
         this.memberGradeName = memberGradeName;
         this.memberGradeIsUsed = memberGradeIsUsed;
-        this.memberGradePointSave = memberGradeScore;
+        this.memberGradePointSave = memberGradePointSave;
     }
 
     // table은 jpa로 생성하나요?

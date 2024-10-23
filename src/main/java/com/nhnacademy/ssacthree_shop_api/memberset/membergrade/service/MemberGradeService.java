@@ -20,9 +20,11 @@ public class MemberGradeService {
     private final MemberGradeRepository memberGradeRepository;
 
     public void createMemberGrade(MemberGradeCreateRequest memberGradeCreateRequest) {
+
         MemberGrade memberGrade = new MemberGrade(memberGradeCreateRequest.getMemberGradeName(),
             memberGradeCreateRequest.isMemberGradeIsUsed(),
             memberGradeCreateRequest.getMemberGradePointSave());
+
         memberGradeRepository.save(memberGrade);
 
     }
