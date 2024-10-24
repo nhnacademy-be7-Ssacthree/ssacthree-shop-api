@@ -1,0 +1,35 @@
+### 멤버 등급 생성
+POST http://localhost:8080/api/memberGrades
+Content-Type: application/json
+
+{
+  "memberGradeName": "test",
+  "memberGradeIsUsed": "true",
+  "memberGradePointSave" : "0.01"
+}
+
+
+### 멤버 등급 전체 조회
+GET http://localhost:8080/api/memberGrades
+Content-Type: application/json
+
+### 멤버 등급 하나 조회
+GET http://localhost:8080/api/memberGrades/1
+Content-Type: application/json
+
+
+### 멤버 등급 삭제
+DELETE http://localhost:8080/api/memberGrades/1
+Content-Type: application/json
+
+
+### 멤버 등급 수정
+### 멤버 등급 생성
+PUT http://localhost:8080/api/memberGrades/1
+Content-Type: application/json
+
+{
+  "memberGradeName": "test2",
+  "memberGradeIsUsed": "true",
+  "memberGradePointSave" : "0.01"
+}
