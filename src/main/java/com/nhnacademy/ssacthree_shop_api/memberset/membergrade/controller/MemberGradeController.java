@@ -8,6 +8,7 @@ import com.nhnacademy.ssacthree_shop_api.memberset.membergrade.service.MemberGra
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.aspectj.bridge.Message;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -30,7 +31,7 @@ public class MemberGradeController {
         memberGradeService.createMemberGrade(memberGradeCreateRequest);
 
         MessageResponse createResponse = new MessageResponse("생성 성공");
-        return ResponseEntity.ok().body(createResponse);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createResponse);
     }
 
     @GetMapping("/{memberGradeId}")
