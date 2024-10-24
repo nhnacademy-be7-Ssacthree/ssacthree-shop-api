@@ -9,6 +9,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class BookTagId {
-    private Long bookId;
-    private Long tagId;
+    private long bookId;
+    private long tagId;
 }
