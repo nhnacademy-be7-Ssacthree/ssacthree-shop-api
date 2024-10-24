@@ -7,6 +7,7 @@ import com.nhnacademy.ssacthree_shop_api.memberset.membergrade.dto.MemberGradeUp
 import com.nhnacademy.ssacthree_shop_api.memberset.membergrade.exception.MemberGradeNotFoundException;
 import com.nhnacademy.ssacthree_shop_api.memberset.membergrade.repository.MemberGradeRepository;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -31,11 +32,11 @@ public class MemberGradeService {
 
     public void updateMemberGrade(Long memberGradeId,
         MemberGradeUpdateResponse memberGradeUpdateResponse) {
-        if (memberGradeId == null) {
-            throw new IllegalArgumentException("memberGradeId가 널입니다.");
+        if (memberGradeId <= 0) {
+            throw new IllegalArgumentException("memberGradeId는 0이하일 수 없습니다.");
         }
 
-        if (!exist(memberGradeId)) {
+        if (!memberGradeRepository.existsById(memberGradeId)) {
             throw new MemberGradeNotFoundException(memberGradeId + "를 찾을 수 없습니다.");
         }
         // 찾은 엔티티의 값을 변경해줌
@@ -47,28 +48,14 @@ public class MemberGradeService {
         memberGradeRepository.save(memberGrade);
     }
 
-    public MemberGrade getMemberGradeById(Long memberGradeId) {
-        if (memberGradeId == null) {
-            throw new IllegalArgumentException("memberGradeId가 널입니다.");
+    public MemberGradeGetResponse getMemberGradeById(Long memberGradeId) {
+        if (memberGradeId <= 0) {
+            throw new IllegalArgumentException("memberGradeId는 0이하일 수 없습니다.");
         }
-        if (!exist(memberGradeId)) {
+        if (!memberGradeRepository.existsById(memberGradeId)) {
             throw new MemberGradeNotFoundException(memberGradeId + "를 찾을 수 없습니다.");
         }
-        return memberGradeRepository.findById(memberGradeId).orElse(null);
-    }
-
-    public boolean exist(Long memberGradeId) {
-        if (memberGradeId == null) {
-            throw new IllegalArgumentException("memberGradeId가 널입니다.");
-        }
-        return memberGradeRepository.existsById(memberGradeId);
-    }
-
-    public MemberGradeGetResponse getMemberGradeDetail(Long memberGradeId) {
-        if (memberGradeId == null) {
-            throw new IllegalArgumentException("memberGradeId가 널입니다.");
-        }
-        MemberGrade foundMemberGrade = getMemberGradeById(memberGradeId);
+        MemberGrade foundMemberGrade = memberGradeRepository.findById(memberGradeId).orElse(null);
         return new MemberGradeGetResponse(
             foundMemberGrade.getMemberGradeId(),
             foundMemberGrade.getMemberGradeName(),
@@ -78,11 +65,14 @@ public class MemberGradeService {
         );
     }
 
+
+
+
     public void deleteMemberGradeById(Long memberGradeId) {
-        if (memberGradeId == null) {
-            throw new IllegalArgumentException("memberGradeId가 널입니다.");
+        if (memberGradeId <=0) {
+            throw new IllegalArgumentException("memberGradeId는 0이하일 수 없습니다.");
         }
-        if (!exist(memberGradeId)) {
+        if (!memberGradeRepository.existsById(memberGradeId)) {
             throw new MemberGradeNotFoundException(memberGradeId + "를 찾을 수 없습니다.");
         }
         memberGradeRepository.deleteById(memberGradeId);

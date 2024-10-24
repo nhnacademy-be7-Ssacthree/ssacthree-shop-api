@@ -11,7 +11,6 @@ import lombok.Setter;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-@Setter
 public class MemberGradeGetResponse {
 
     private long memberGradeId;

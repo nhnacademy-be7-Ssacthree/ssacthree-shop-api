@@ -36,8 +36,7 @@ public class MemberGradeController {
     @GetMapping("/{memberGradeId}")
     public ResponseEntity<MemberGradeGetResponse> getMemberGrade(@PathVariable Long memberGradeId) {
 
-        MemberGradeGetResponse memberGradeGetResponse = memberGradeService.getMemberGradeDetail(
-            memberGradeId);
+        MemberGradeGetResponse memberGradeGetResponse = memberGradeService.getMemberGradeById(memberGradeId);
         return ResponseEntity.ok().body(memberGradeGetResponse);
     }
 

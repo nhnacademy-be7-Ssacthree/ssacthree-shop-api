@@ -8,7 +8,6 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
-@Setter
 public class MemberGradeUpdateResponse {
 
     private String memberGradeName;
