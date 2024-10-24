@@ -10,14 +10,14 @@ import org.springframework.http.ResponseEntity;
 
 public interface CustomerService {
 
-    ResponseEntity<MessageResponse> createCustomer(
+    void createCustomer(
         CustomerCreateRequest customerCreateRequest);
 
     void updateCustomer(
         Long customerId,
         CustomerUpdateRequest customerUpdateRequest);
 
-    ResponseEntity<MessageResponse> deleteCustomerById(Long customerId);
+    void deleteCustomerById(Long customerId);
 
-    ResponseEntity<CustomerGetResponse> getCustomerById(Long customerId);
+    CustomerGetResponse getCustomerById(Long customerId);
 }

@@ -65,11 +65,8 @@ public class MemberGradeService {
         );
     }
 
-
-
-
     public void deleteMemberGradeById(Long memberGradeId) {
-        if (memberGradeId <=0) {
+        if (memberGradeId <= 0) {
             throw new IllegalArgumentException("memberGradeId는 0이하일 수 없습니다.");
         }
         if (!memberGradeRepository.existsById(memberGradeId)) {
