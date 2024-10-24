@@ -15,10 +15,12 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import lombok.Setter;
 
 @Entity
 @Table(name = "book")
 @Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class Book {
