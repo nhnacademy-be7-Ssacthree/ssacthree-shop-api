@@ -10,6 +10,7 @@ import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 
 @AllArgsConstructor
@@ -24,23 +25,19 @@ public class Customer {
         this.customerPhoneNumber = customerPhoneNumber;
     }
 
-    @NotNull
-    @Id
-    @Column(name="customer_id")
+
+    @Column(name = "customer_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
     private long customerId;
 
-
-    @NotNull
-    @Size(min = 1, max = 20)
+    @Setter
     private String customerName;
 
-    @NotNull
-    @Size(min = 13, max = 13)
+    @Setter
     private String customerEmail;
 
-    @NotNull
-    @Size(min = 1, max = 50)
+    @Setter
     private String customerPhoneNumber;
 
 
