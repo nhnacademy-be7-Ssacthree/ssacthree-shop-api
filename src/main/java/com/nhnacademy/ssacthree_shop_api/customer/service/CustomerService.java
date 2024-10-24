@@ -2,6 +2,7 @@ package com.nhnacademy.ssacthree_shop_api.customer.service;
 
 
 import com.nhnacademy.ssacthree_shop_api.commons.dto.MessageResponse;
+import com.nhnacademy.ssacthree_shop_api.customer.domain.Customer;
 import com.nhnacademy.ssacthree_shop_api.customer.dto.CustomerCreateRequest;
 import com.nhnacademy.ssacthree_shop_api.customer.dto.CustomerGetResponse;
 import com.nhnacademy.ssacthree_shop_api.customer.dto.CustomerUpdateRequest;
@@ -10,7 +11,7 @@ import org.springframework.http.ResponseEntity;
 
 public interface CustomerService {
 
-    void createCustomer(
+    Customer createCustomer(
         CustomerCreateRequest customerCreateRequest);
 
     void updateCustomer(
