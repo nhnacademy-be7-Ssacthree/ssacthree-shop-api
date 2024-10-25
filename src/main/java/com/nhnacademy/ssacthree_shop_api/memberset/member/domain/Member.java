@@ -27,9 +27,9 @@ public class Member {
         String birthdate
     ) {
         this.customer = customer;
-        this.loginId = loginId;
-        this.password = password;
-        this.birthdate = birthdate;
+        this.memberLoginId = loginId;
+        this.memberLoginPassword = password;
+        this.memberBirthdate = birthdate;
     }
 
     @Id
@@ -47,25 +47,25 @@ public class Member {
     private MemberGrade memberGrade;
 
 
-    private String loginId;
+    private String memberLoginId;
 
 
-    private String password;
+    private String memberLoginPassword;
 
 
-    private String birthdate;
+    private String memberBirthdate;
 
 
-    private LocalDateTime createdAt = LocalDateTime.now();
+    private LocalDateTime memberCreatedAt = LocalDateTime.now();
 
 
-    private LocalDateTime last_login_at;
+    private LocalDateTime memberLastLoginAt;
 
 
     @Enumerated(EnumType.STRING)
-    private MemberStatus status = MemberStatus.ACTIVE;
+    private MemberStatus memberStatus = MemberStatus.ACTIVE;
 
-    private int point = 0;
+    private int memberPoint = 0;
 
 
 }

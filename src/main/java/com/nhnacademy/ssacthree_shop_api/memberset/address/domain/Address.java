@@ -18,7 +18,7 @@ public class Address {
     @NotNull
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long addressId;
+    private long registeredAddressId;
 
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY)
