@@ -1,0 +1,23 @@
+### 카테고리 생성(최상위 카테고리)
+POST http://localhost:8080/api/category
+Content-Type: application/json
+
+{
+  "categoryName": "문학",
+  "superCategory": null,
+  "categoryIsUsed": true
+}
+
+### 하위 카테고리 생성 (상위 카테고리: 문학)
+POST http://localhost:8080/api/category
+Content-Type: application/json
+
+{
+  "categoryName": "소설",
+  "superCategory": {
+    "categoryId": 1
+  },
+  "categoryIsUsed": true
+}
+
+###
