@@ -46,6 +46,7 @@ public class Member {
     @Setter
     private MemberGrade memberGrade;
 
+<<<<<<< HEAD
     @Column(name = "member_login_id")
     private String loginId;
 
@@ -68,6 +69,27 @@ public class Member {
     private MemberStatus status = MemberStatus.ACTIVE;
 
     @Column(name = "member_point")
+=======
+
+    private String loginId;
+
+
+    private String password;
+
+
+    private String birthdate;
+
+
+    private LocalDateTime createdAt = LocalDateTime.now();
+
+
+    private LocalDateTime last_login_at;
+
+
+    @Enumerated(EnumType.STRING)
+    private MemberStatus status = MemberStatus.ACTIVE;
+
+>>>>>>> 28babe7f9d4e1ff19543a64c7f015fd13a36f58c
     private int point = 0;
 
 

@@ -11,6 +11,7 @@ Content-Type: application/json
   "birth" : "19990514"
 }
 
+<<<<<<< HEAD
 ### 8개 필요
 ### member_grade_id
 ### customerName -> customer
@@ -18,3 +19,5 @@ Content-Type: application/json
 ### customerEmail -> customer
 ### birth
 ### 자동? created at, status, point
+=======
+>>>>>>> 28babe7f9d4e1ff19543a64c7f015fd13a36f58c
