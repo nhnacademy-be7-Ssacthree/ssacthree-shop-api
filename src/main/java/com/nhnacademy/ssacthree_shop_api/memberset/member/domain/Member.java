@@ -68,26 +68,6 @@ public class Member {
     private MemberStatus status = MemberStatus.ACTIVE;
 
     @Column(name = "member_point")
-
-    private String loginId;
-
-
-    private String password;
-
-
-    private String birthdate;
-
-
-    private LocalDateTime createdAt = LocalDateTime.now();
-
-
-    private LocalDateTime last_login_at;
-
-
-    @Enumerated(EnumType.STRING)
-    private MemberStatus status = MemberStatus.ACTIVE;
-
     private int point = 0;
-
 
 }
