@@ -8,7 +8,6 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
-@Setter
 // request에 setter가 왜 필요해용? 불필요한 어노테이션이 많아요
 // - 천보성
 public class MemberGradeCreateRequest {

@@ -2,12 +2,15 @@ package com.nhnacademy.ssacthree_shop_api.customer.domain;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 
 @AllArgsConstructor
@@ -16,21 +19,25 @@ import lombok.NoArgsConstructor;
 @Entity
 public class Customer {
 
-    @NotNull
+    public Customer(String customerName, String customerEmail, String customerPhoneNumber) {
+        this.customerName = customerName;
+        this.customerEmail = customerEmail;
+        this.customerPhoneNumber = customerPhoneNumber;
+    }
+
+
+    @Column(name = "customer_id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
-    @Column(name="customer_id")
     private long customerId;
 
-    @NotNull
-    @Size(min = 1, max = 20)
+    @Setter
     private String customerName;
 
-    @NotNull
-    @Size(min = 13, max = 13)
+    @Setter
     private String customerEmail;
 
-    @NotNull
-    @Size(min = 1, max = 50)
+    @Setter
     private String customerPhoneNumber;
 
 
