@@ -35,7 +35,9 @@ public class Book {
     private String bookInfo;
     @NotNull
     @Size(max = 20)
+    @Column(name = "book_isbn")
     private String isbn;
+
     @NotNull
     private LocalDateTime publicationDate;
     @NotNull

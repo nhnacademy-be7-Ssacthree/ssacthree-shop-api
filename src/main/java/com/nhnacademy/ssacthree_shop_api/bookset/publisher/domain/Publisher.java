@@ -23,6 +23,7 @@ public class Publisher {
 
     @NotNull
     @Size(max = 30)
+    @Column(name = "publisher_name")
     private String name;
 
     @NotNull

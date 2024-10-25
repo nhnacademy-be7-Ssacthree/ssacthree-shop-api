@@ -20,8 +20,8 @@ import java.util.List;
 public class CouponRule {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name="coupon_rule")
-    private long couponRule;
+    @Column(name="coupon_rule_id")
+    private long id;
 
     @NotNull
     private CouponType couponType;
@@ -32,6 +32,7 @@ public class CouponRule {
     @NotNull
     private int maxDiscountPrice;
 
+    @Column(name = "coupon_discount_price")
     @NotNull
     private int couponDiscountPrice;
 

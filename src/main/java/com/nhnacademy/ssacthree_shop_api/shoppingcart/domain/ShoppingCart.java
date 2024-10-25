@@ -12,6 +12,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
+@Table(name = "shoppingcart")
 public class ShoppingCart {
     @EmbeddedId
     private ShoppingCartId shoppingCartId;
@@ -28,5 +29,7 @@ public class ShoppingCart {
 
     @NotNull
     private int bookQuantity;
+
+
 
 }
