@@ -1,6 +1,8 @@
 package com.nhnacademy.ssacthree_shop_api.review.domain;
 
+import com.nhnacademy.ssacthree_shop_api.bookset.book.domain.Book;
 import com.nhnacademy.ssacthree_shop_api.customer.domain.Customer;
+import com.nhnacademy.ssacthree_shop_api.orderset.order.domain.Order;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Null;
@@ -20,6 +22,16 @@ public class Review {
     @EmbeddedId
     private ReviewId reviewId;
 
+    @NotNull
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "orders_id", insertable = false, updatable = false) // orders_id 컬럼을 통해 Order 엔티티에 매핑
+    private Order order; // Order 엔티티 필드 추가
+
+    @NotNull
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "book_id", insertable = false, updatable = false) // book_id 컬럼을 통해 Book 엔티티에 매핑
+    private Book book; // Book 엔티티 필드 추가
+
 
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY)
@@ -38,7 +50,7 @@ public class Review {
     private String reviewContent;
 
     @NotNull
-    private LocalDateTime reviewDate = LocalDateTime.now();
+    private LocalDateTime reviewCreatedAt = LocalDateTime.now();
 
     @Null
     private String reviewImageUrl;

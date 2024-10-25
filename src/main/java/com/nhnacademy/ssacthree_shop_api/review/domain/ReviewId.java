@@ -16,9 +16,10 @@ import java.io.Serializable;
 @Embeddable
 public class ReviewId implements Serializable {
 
-    @Column(name="order_id")
+    @Column(name="orders_id")
     private long orderId;
 
     @Column(name="book_id")
     private long bookId;
+
 }

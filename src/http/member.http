@@ -11,3 +11,10 @@ Content-Type: application/json
   "birth" : "19990514"
 }
 
+### 8개 필요
+### member_grade_id
+### customerName -> customer
+### customerPhone -> customer
+### customerEmail -> customer
+### birth
+### 자동? created at, status, point

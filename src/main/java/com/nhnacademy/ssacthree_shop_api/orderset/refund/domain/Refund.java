@@ -29,7 +29,7 @@ public class Refund {
     @NotNull
     @ManyToOne
     @JoinColumns({
-            @JoinColumn(name = "order_id", referencedColumnName = "order_id"),
+            @JoinColumn(name = "orders_id", referencedColumnName = "orders_id"),
             @JoinColumn(name = "book_id", referencedColumnName = "book_id")
     })
     private OrderDetail orderDetail; // order_detail 참조
