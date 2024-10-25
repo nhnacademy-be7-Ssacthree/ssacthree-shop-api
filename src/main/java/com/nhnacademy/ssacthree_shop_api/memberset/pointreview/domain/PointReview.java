@@ -16,11 +16,8 @@ import lombok.NoArgsConstructor;
 @Table(name="point_review")
 public class PointReview {
 
-    @NotNull
-    @Id
-    private long id;
 
-    @MapsId
+    @Id
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="point_history_id")
     private PointHistory pointHistory;
@@ -28,7 +25,7 @@ public class PointReview {
     @NotNull
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumns({
-            @JoinColumn(name="order_id"),
+            @JoinColumn(name="orders_id"),
             @JoinColumn(name="book_id")
     })
     private Review review;

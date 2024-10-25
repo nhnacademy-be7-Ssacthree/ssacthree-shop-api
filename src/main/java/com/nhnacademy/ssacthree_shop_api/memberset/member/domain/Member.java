@@ -11,53 +11,63 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import lombok.Setter;
 
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Entity
+@Table(name = "member")
 public class Member {
 
+    public Member(
+        Customer customer,
+        String loginId,
+        String password,
+        String birthdate
+    ) {
+        this.customer = customer;
+        this.loginId = loginId;
+        this.password = password;
+        this.birthdate = birthdate;
+    }
 
     @Id
-    @NotNull
     private long id;
 
     @MapsId
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "customer_id")
-    @NotNull
     private Customer customer;
 
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="member_grade_id")
-    @NotNull
+    @JoinColumn(name = "member_grade_id")
+    @Setter
     private MemberGrade memberGrade;
 
-    @NotNull
-    @Size(min = 8, max = 20)
+    @Column(name = "member_login_id")
     private String loginId;
 
-    @NotNull
-    @Size(max = 255)
+    @Column(name = "member_password")
     private String password;
 
-    @NotNull
-    @Size(min=8, max=8)
+    @Column(name = "member_birthdate")
     private String birthdate;
 
-    @NotNull
+
+    @Column(name = "member_created_at")
     private LocalDateTime createdAt = LocalDateTime.now();
 
-    @Null
+    @Column(name = "member_last_login_at")
     private LocalDateTime last_login_at;
 
-    @NotNull
+
+    @Column(name = "member_status")
     @Enumerated(EnumType.STRING)
     private MemberStatus status = MemberStatus.ACTIVE;
 
-    @NotNull
+    @Column(name = "member_point")
     private int point = 0;
 
 

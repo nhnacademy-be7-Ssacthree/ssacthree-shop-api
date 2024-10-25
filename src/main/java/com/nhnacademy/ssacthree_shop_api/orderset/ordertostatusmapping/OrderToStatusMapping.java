@@ -20,7 +20,7 @@ public class OrderToStatusMapping {
 
     @MapsId("order_id")
     @ManyToOne
-    @JoinColumn(name = "order_id")
+    @JoinColumn(name = "orders_id")
     private Order order;
 
     @MapsId("order_status_id")

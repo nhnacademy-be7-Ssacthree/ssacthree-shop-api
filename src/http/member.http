@@ -1,0 +1,20 @@
+###회원 생성
+POST http://localhost:8080/api/members
+Content-Type: application/json
+
+{
+  "loginId": "kim",
+  "loginPassword": "test1234",
+  "customerName" : "mang mang 2",
+  "customerPhoneNumber" : "010-3622-0514",
+  "customerEmail" : "xxx@naver.com",
+  "birth" : "19990514"
+}
+
+### 8개 필요
+### member_grade_id
+### customerName -> customer
+### customerPhone -> customer
+### customerEmail -> customer
+### birth
+### 자동? created at, status, point

@@ -1,5 +1,6 @@
 package com.nhnacademy.ssacthree_shop_api.orderset.orderdetail.domain.domain;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
@@ -11,7 +12,11 @@ import java.util.Objects;
 @NoArgsConstructor
 @Embeddable
 public class OrderDetailId implements Serializable {
-    private Long order_id;
+
+    @Column(name = "orders_id")  // 이 부분은 그대로 두어야 합니다.
+    private Long order_id;  // Order의 id와 매핑됨
+
+    @Column(name = "book_id")
     private Long book_id;
 
     @Override

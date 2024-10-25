@@ -21,7 +21,7 @@ public class Payment {
 
     @NotNull
     @OneToOne
-    @JoinColumn(name = "order_id", referencedColumnName = "order_id", nullable = false)
+    @JoinColumn(name = "orders_id", referencedColumnName = "orders_id", nullable = false)
     private Order order; // 주문 ID와 연결
 
     @NotNull

@@ -19,7 +19,7 @@ public class OrderToStatusMappingId {
         if (this == o) return true;
         if (!(o instanceof OrderToStatusMappingId)) return false;
         OrderToStatusMappingId that = (OrderToStatusMappingId) o;
-        return Objects.equals(order_id, that.order_status_id) &&
+        return Objects.equals(order_id, that.order_id) &&
                 Objects.equals(order_status_id, that.order_status_id);
     }
 
