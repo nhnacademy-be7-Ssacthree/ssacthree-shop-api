@@ -12,6 +12,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -73,6 +75,11 @@ public class CategoryServiceImpl implements CategoryService {
         Category category = categoryRepository.findById(CategoryId).orElseThrow(() -> new CategoryNotExistsException(CategoryId));
 
         return false;
+    }
+
+    @Override
+    public List<CategoryInfoResponse> findBySuperCategoryIsNull() {
+        return List.of();
     }
 
     // 최상위 카테고리 검색
