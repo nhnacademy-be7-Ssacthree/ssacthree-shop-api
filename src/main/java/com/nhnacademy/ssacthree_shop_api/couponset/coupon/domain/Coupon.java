@@ -45,7 +45,4 @@ public class Coupon {
     @ManyToOne
     @JoinColumn(name = "couponRuleId")
     private CouponRule couponRule;
-
-    @OneToMany(mappedBy = "coupon", cascade = CascadeType.ALL)
-    private List<MemberCoupon> memberCoupons;
 }

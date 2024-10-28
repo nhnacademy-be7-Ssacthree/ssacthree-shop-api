@@ -25,6 +25,7 @@ public class Publisher {
 
     private String publisherName;
 
+
     private boolean publisherIsUsed;
 
 }

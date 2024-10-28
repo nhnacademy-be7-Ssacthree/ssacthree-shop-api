@@ -1,5 +1,6 @@
 package com.nhnacademy.ssacthree_shop_api.couponset.categorycoupon.domain;
 
+import com.nhnacademy.ssacthree_shop_api.bookset.category.domain.Category;
 import com.nhnacademy.ssacthree_shop_api.couponset.coupon.domain.Coupon;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -16,9 +17,9 @@ public class CategoryCoupon {
     @JoinColumn(name="couponId")
     private Coupon coupon;
 
-    //todo: category랑 연결
-//    @OneToOne(cascade = CascadeType.ALL)
-//    @JoinColumn(name="categoryId")
-//    private Category category;
+    
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name="categoryId")
+    private Category category;
 
 }
