@@ -8,7 +8,6 @@ import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.stereotype.Component;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -19,8 +18,7 @@ public class Address {
     @NotNull
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "registered_address_id")
-    private long addressId;
+    private long registeredAddressId;
 
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY)

@@ -9,6 +9,7 @@ import com.nhnacademy.ssacthree_shop_api.customer.dto.CustomerUpdateRequest;
 import com.nhnacademy.ssacthree_shop_api.customer.repository.CustomerRepository;
 import org.springframework.http.ResponseEntity;
 
+
 public interface CustomerService {
 
     Customer createCustomer(
