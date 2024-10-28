@@ -10,23 +10,22 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
+import lombok.Setter;
 
 @Entity
 @Getter
+@Setter
 @AllArgsConstructor
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor
 public class Publisher {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="publisher_id")
     private long publisherId;
 
-    @NotNull
-    @Size(max = 30)
-    @Column(name = "publisher_name")
-    private String name;
+    private String publisherName;
 
-    @NotNull
+
     private boolean publisherIsUsed;
 
 }

@@ -10,23 +10,20 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
+import lombok.Setter;
 
 @Entity
 @Getter
+@Setter
 @AllArgsConstructor
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor
 public class Author {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "author_id")
     private long authorId;
-
-    @Size(max = 20)
-    @NotNull
     private String authorName;
-
-    @NotNull
-    @Size(max = 255)
     private String authorInfo;
+
 
 }
