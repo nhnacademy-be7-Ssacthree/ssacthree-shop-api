@@ -314,6 +314,15 @@ public class CategoryServiceImpl implements CategoryService {
             category.setSuperCategory(null);
         }
 
+        // 자신의 하위 카테고리 아래에서 이름 중복 확인
+        List<Category> childrenCategories = categoryRepository.findAllDescendants(categoryId);
+
+        for (Category child : childrenCategories) {
+            if (!category.getCategoryName().equals(request.getCategoryName())&& child.getCategoryName().equals(request.getCategoryName())) {
+                throw new DuplicateCategoryNameException("하위 카테고리 중에 같은 이름의 카테고리가 존재합니다.");
+            }
+        }
+
         // 카테고리 이름과 사용 여부 업데이트
         category.setCategoryName(request.getCategoryName());
 

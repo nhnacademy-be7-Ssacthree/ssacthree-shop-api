@@ -1,5 +1,5 @@
 ### 최상위 카테고리 생성 - 국내도서
-POST http://localhost:8081/api/category
+POST http://localhost:8083/api/category
 Content-Type: application/json
 
 {
@@ -9,7 +9,7 @@ Content-Type: application/json
 }
 
 ### 최상위 카테고리 생성 - 해외도서
-POST http://localhost:8081/api/category
+POST http://localhost:8083/api/category
 Content-Type: application/json
 
 {
@@ -19,7 +19,7 @@ Content-Type: application/json
 }
 
 ### 국내도서 하위 카테고리 생성 - 문학
-POST http://localhost:8081/api/category
+POST http://localhost:8083/api/category
 Content-Type: application/json
 
 {
@@ -31,7 +31,7 @@ Content-Type: application/json
 }
 
 ### 국내도서 하위 카테고리 생성 - 에세이
-POST http://localhost:8081/api/category
+POST http://localhost:8083/api/category
 Content-Type: application/json
 
 {
@@ -43,7 +43,7 @@ Content-Type: application/json
 }
 
 ### 문학 하위 카테고리 생성 - 시
-POST http://localhost:8081/api/category
+POST http://localhost:8083/api/category
 Content-Type: application/json
 
 {
@@ -55,7 +55,7 @@ Content-Type: application/json
 }
 
 ### 문학 하위 카테고리 생성 - 소설
-POST http://localhost:8081/api/category
+POST http://localhost:8083/api/category
 Content-Type: application/json
 
 {
@@ -67,39 +67,39 @@ Content-Type: application/json
 }
 
 ### 전체 카테고리 트리 조회
-GET http://localhost:8081/api/category
+GET http://localhost:8083/api/category
 Content-Type: application/json
 
 ### 특정 ID를 가진 카테고리 조회 (예: 국내도서 ID가 1인 경우)
-GET http://localhost:8081/api/category/1
+GET http://localhost:8083/api/category/1
 Content-Type: application/json
 
 ### 특정 카테고리의 자식 카테고리 조회 (예: 문학 ID가 3인 경우)
-GET http://localhost:8081/api/category/3/children
+GET http://localhost:8083/api/category/3/children
 Content-Type: application/json
 
 ### root 카테고리 조회
-GET http://localhost:8081/api/category/root
+GET http://localhost:8083/api/category/root
 Content-Type: application/json
 
 ### 특정 카테고리의 최상위 경로 조회 (예: 시 ID가 5인 경우)
-GET http://localhost:8081/api/category/5/path
+GET http://localhost:8083/api/category/5/path
 Content-Type: application/json
 
 ### 카테고리 이름으로 검색 (예: 소설)
-GET http://localhost:8081/api/category/search?name=소설
+GET http://localhost:8083/api/category/search?name=소설
 Content-Type: application/json
 
 ### 특정 카테고리의 지정 깊이의 하위 카테고리 조회 (예: 카테고리 ID가 1이고, 깊이 2)
-GET http://localhost:8081/api/category/1/children/depth/2
+GET http://localhost:8083/api/category/1/children/depth/2
 Accept: application/json
 
 ### 특정 카테고리의 모든 하위 카테고리 조회 (예: 카테고리 ID가 1인 경우)
-GET http://localhost:8081/api/category/1/descendants
+GET http://localhost:8083/api/category/1/descendants
 Accept: application/json
 
 ### 특정 카테고리 업데이트 (예: 에세이 ID가 4인 경우)
-PUT http://localhost:8081/api/category/4
+PUT http://localhost:8083/api/category/4
 Content-Type: application/json
 
 {
@@ -110,6 +110,6 @@ Content-Type: application/json
 
 
 ### 특정 카테고리 소프트 삭제 (예: 소설 ID가 6인 경우)
-DELETE http://localhost:8081/api/category/6
+DELETE http://localhost:8083/api/category/6
 Content-Type: application/json
 
