@@ -27,6 +27,7 @@ public class CategoryInfoResponse {
     @JsonManagedReference // 순환 참조 방지
     private List<CategoryInfoResponse> children = new ArrayList<>();
 
+
     public CategoryInfoResponse(Category category) {
         this.categoryName = category.getCategoryName();
         this.categoryIsUsed = category.getCategoryIsUsed();

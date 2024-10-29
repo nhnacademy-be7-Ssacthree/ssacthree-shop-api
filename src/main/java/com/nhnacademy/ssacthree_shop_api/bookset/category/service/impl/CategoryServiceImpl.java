@@ -7,7 +7,7 @@ import com.nhnacademy.ssacthree_shop_api.bookset.category.dto.response.CategoryI
 import com.nhnacademy.ssacthree_shop_api.bookset.category.exception.*;
 import com.nhnacademy.ssacthree_shop_api.bookset.category.repository.CategoryRepository;
 import com.nhnacademy.ssacthree_shop_api.bookset.category.service.CategoryService;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -103,6 +103,7 @@ public class CategoryServiceImpl implements CategoryService {
      * @return 카테고리 트리 리스트
      */
     @Override
+    @Transactional(readOnly = true)
     public List<CategoryInfoResponse> getAllCategories() {
         List<CategoryInfoResponse> categoryTree = new ArrayList<>();
 
@@ -146,6 +147,7 @@ public class CategoryServiceImpl implements CategoryService {
      * @return 조회된 카테고리
      */
     @Override
+    @Transactional(readOnly = true)
     public CategoryInfoResponse getCategoryById(long categoryId) {
         Category category = categoryRepository.findById(categoryId)
                 .orElseThrow(() -> new CategoryNotFoundException(categoryId));
@@ -159,6 +161,7 @@ public class CategoryServiceImpl implements CategoryService {
      * @return 자식 카테고리 목록
      */
     @Override
+    @Transactional(readOnly = true)
     public List<CategoryInfoResponse> getChildCategories(long parentCategoryId) {
         Category parent = categoryRepository.findById(parentCategoryId)
                 .orElseThrow(() -> new CategoryNotFoundException(parentCategoryId));
@@ -174,6 +177,7 @@ public class CategoryServiceImpl implements CategoryService {
      * @return 최상위 카테고리 목록
      */
     @Override
+    @Transactional(readOnly = true)
     public List<CategoryInfoResponse> getRootCategories() {
         return categoryRepository.findBySuperCategoryIsNull().stream()
                 .map(CategoryInfoResponse::new)
@@ -188,6 +192,7 @@ public class CategoryServiceImpl implements CategoryService {
      * @return 검색된 카테고리 목록
      */
     @Override
+    @Transactional(readOnly = true)
     public List<CategoryInfoResponse> searchCategoriesByName(String name) {
         List<Category> categories = categoryRepository.findCategoriesByName(name);
         if (categories.isEmpty()) {
@@ -207,6 +212,7 @@ public class CategoryServiceImpl implements CategoryService {
      * @return 최상위 카테고리까지의 경로 목록
      */
     @Override
+    @Transactional(readOnly = true)
     public List<CategoryInfoResponse> getCategoryPath(long categoryId) {
         return categoryRepository.findCategoryPath(categoryId).stream()
                 .map(CategoryInfoResponse::new)
@@ -221,6 +227,7 @@ public class CategoryServiceImpl implements CategoryService {
      * @return 조회 깊이의 하위 카테고리 목록
      */
     @Override
+    @Transactional(readOnly = true)
     public List<CategoryInfoResponse> getCategoryWithChildren(long categoryId, int depth) {
         if (depth < 0 || depth > MAX_DEPTH) {
             throw new InvalidCategoryDepthException(depth, MAX_DEPTH);
@@ -261,6 +268,7 @@ public class CategoryServiceImpl implements CategoryService {
      * @return 모든 하위 카테고리 목록
      */
     @Override
+    @Transactional(readOnly = true)
     public List<CategoryInfoResponse> getAllDescendants(long categoryId) {
         return categoryRepository.findAllDescendants(categoryId).stream()
                 .map(CategoryInfoResponse::new)

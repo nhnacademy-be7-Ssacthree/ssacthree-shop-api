@@ -129,4 +129,30 @@ public class CategoryController {
         boolean result = categoryService.deleteCategory(categoryId);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
+
+    /**
+     * 특정 카테고리의 지정 깊이의 하위 카테고리 조회
+     *
+     * @param categoryId 조회할 카테고리 ID
+     * @param depth      조회 깊이
+     * @return 지정 깊이의 하위 카테고리 목록
+     */
+    @GetMapping("/{categoryId}/children/depth/{depth}")
+    public ResponseEntity<List<CategoryInfoResponse>> getCategoryWithChildren(
+            @PathVariable long categoryId, @PathVariable int depth) {
+        List<CategoryInfoResponse> categories = categoryService.getCategoryWithChildren(categoryId, depth);
+        return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(categories);
+    }
+
+    /**
+     * 특정 카테고리의 모든 하위 카테고리 조회
+     *
+     * @param categoryId 조회할 카테고리 ID
+     * @return 모든 하위 카테고리 목록
+     */
+    @GetMapping("/{categoryId}/descendants")
+    public ResponseEntity<List<CategoryInfoResponse>> getAllDescendants(@PathVariable long categoryId) {
+        List<CategoryInfoResponse> descendants = categoryService.getAllDescendants(categoryId);
+        return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(descendants);
+    }
 }
