@@ -1,24 +1,31 @@
 package com.nhnacademy.ssacthree_shop_api.orderset.deliveryrule.service.Impl;
 
 import com.nhnacademy.ssacthree_shop_api.orderset.deliveryrule.domain.DeliveryRule;
+import com.nhnacademy.ssacthree_shop_api.orderset.deliveryrule.domain.QDeliveryRule;
 import com.nhnacademy.ssacthree_shop_api.orderset.deliveryrule.dto.DeliveryRuleCreateRequest;
 import com.nhnacademy.ssacthree_shop_api.orderset.deliveryrule.dto.DeliveryRuleGetResponse;
 import com.nhnacademy.ssacthree_shop_api.orderset.deliveryrule.dto.DeliveryRuleUpdateRequest;
 import com.nhnacademy.ssacthree_shop_api.orderset.deliveryrule.exception.DeliveryRuleNotFoundException;
 import com.nhnacademy.ssacthree_shop_api.orderset.deliveryrule.repository.DeliveryRuleRepository;
 import com.nhnacademy.ssacthree_shop_api.orderset.deliveryrule.service.DeliveryRuleService;
+import com.querydsl.core.types.Projections;
+import com.querydsl.jpa.impl.JPAQueryFactory;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 @Transactional
 public class DeliveryRuleServiceImpl implements DeliveryRuleService {
+
+    @PersistenceContext
+    private EntityManager entityManager;
 
     private final DeliveryRuleRepository deliveryRuleRepository;
 
@@ -41,11 +48,8 @@ public class DeliveryRuleServiceImpl implements DeliveryRuleService {
             throw new IllegalArgumentException("deliveryRuleId는 0 이하일 수 없습니다.");
         }
 
-        if (!deliveryRuleRepository.existsById(deliveryRuleId)) {
-            throw new DeliveryRuleNotFoundException(deliveryRuleId + "를 찾을 수 없습니다.");
-        }
-
-        DeliveryRule foundDeliveryRule = deliveryRuleRepository.findById(deliveryRuleId).orElse(null);
+        DeliveryRule foundDeliveryRule = deliveryRuleRepository.findById(deliveryRuleId)
+                .orElseThrow(() -> new DeliveryRuleNotFoundException(deliveryRuleId + "를 찾을 수 없습니다."));
 
         return new DeliveryRuleGetResponse(
             foundDeliveryRule.getId(),
@@ -63,16 +67,14 @@ public class DeliveryRuleServiceImpl implements DeliveryRuleService {
             throw new IllegalArgumentException("deliveryRuleId는 0 이하일 수 없습니다.");
         }
 
-        if (!deliveryRuleRepository.existsById(deliveryRuleId)) {
-            throw new DeliveryRuleNotFoundException(deliveryRuleId + "를 찾을 수 없습니다.");
-        }
+        DeliveryRule deliveryRule = deliveryRuleRepository.findById(deliveryRuleId)
+                .orElseThrow(() -> new DeliveryRuleNotFoundException(deliveryRuleId + "를 찾을 수 없습니다."));
 
-        DeliveryRule deliveryRule = deliveryRuleRepository.findById(deliveryRuleId).orElse(null);
         deliveryRule.setDeliveryRuleName(deliveryRuleUPdateRequest.getDeliveryRuleName());
         deliveryRule.setDeliveryFee(deliveryRuleUPdateRequest.getDeliveryFee());
         deliveryRule.setDeliveryDiscountCost(deliveryRuleUPdateRequest.getDeliveryDiscountCost());
         deliveryRule.setDeliveryRuleIsSelected(deliveryRuleUPdateRequest.isDeliveryRuleIsSelected());
-        deliveryRule.setDeliveryRuleCreatedAt(LocalDateTime.now());
+        deliveryRule.setDeliveryRuleCreatedAt(deliveryRuleUPdateRequest.getDeliveryRuleCreatedAt());
 
         deliveryRuleRepository.save(deliveryRule);
     }
@@ -92,19 +94,20 @@ public class DeliveryRuleServiceImpl implements DeliveryRuleService {
 
     @Override
     public List<DeliveryRuleGetResponse> getAllDeliveryRules() {
-        List<DeliveryRule> deliveryRuleList = deliveryRuleRepository.findAll();
+        QDeliveryRule deliveryRule = QDeliveryRule.deliveryRule;
 
-        List<DeliveryRuleGetResponse> deliveryRuleGetResponseList = deliveryRuleList.stream()
-            .map(deliveryRule -> new DeliveryRuleGetResponse(
-                deliveryRule.getId(),
-                deliveryRule.getDeliveryRuleName(),
-                deliveryRule.getDeliveryFee(),
-                deliveryRule.getDeliveryDiscountCost(),
-                deliveryRule.isDeliveryRuleIsSelected(),
-                deliveryRule.getDeliveryRuleCreatedAt()
-            ))
-            .collect(Collectors.toList());
-
-        return deliveryRuleGetResponseList;
+        return new JPAQueryFactory(entityManager)
+                .select(Projections.constructor(
+                        DeliveryRuleGetResponse.class,
+                        deliveryRule.id,
+                        deliveryRule.deliveryRuleName,
+                        deliveryRule.deliveryFee,
+                        deliveryRule.deliveryDiscountCost,
+                        deliveryRule.deliveryRuleIsSelected,
+                        deliveryRule.deliveryRuleCreatedAt
+                ))
+                .from(deliveryRule)
+                .fetch();
     }
+
 }

@@ -11,8 +11,8 @@ public class DeliveryRuleGetResponse {
 
     private long deliveryRuleId;
     private String deliveryRuleName;
-    private long deliveryFee;
-    private long deliveryDiscountCost;
+    private int deliveryFee;
+    private int deliveryDiscountCost;
     private boolean deliveryRuleIsSelected;
     private LocalDateTime deliveryRuleCreatedAt;
 }
