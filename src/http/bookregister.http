@@ -1,3 +1,12 @@
-### 책을 DB에 등록
-POST localhost:8081/api/upload-csv?filePath=D:/shoppingmall/csvfile/book_api_data.csv
+### 출판사를 DB에 등록
+POST localhost:8081/api/upload/publishers?filePath={파일 위치}
 Content-Type: application/json
+
+### 작가를 DB에 등록
+POST localhost:8081/api/upload/authors/?filePath={파일 위치}
+Content-Type: application/json
+
+### 책을 DB에 등록
+POST localhost:8081/api/upload/books?filePath={파일 위치}
+Content-Type: application/json
+
