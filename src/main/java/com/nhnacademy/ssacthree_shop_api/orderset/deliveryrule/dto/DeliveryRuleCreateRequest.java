@@ -14,8 +14,8 @@ import java.time.LocalDateTime;
 public class DeliveryRuleCreateRequest {
 
     private String deliveryRuleName;
-    private int deliveryRuleFee;
-    private int deliveryRuleDiscountCost;
+    private int deliveryFee;
+    private int deliveryDiscountCost;
     private boolean deliveryRuleIsSelected;
     private LocalDateTime deliveryRuleCreatedAt;
 }

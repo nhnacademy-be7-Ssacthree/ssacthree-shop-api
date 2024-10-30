@@ -25,8 +25,8 @@ public class DeliveryRuleServiceImpl implements DeliveryRuleService {
     public DeliveryRule createDeliveryRule(DeliveryRuleCreateRequest deliveryRuleCreateRequest) {
         DeliveryRule deliveryRule = new DeliveryRule(
             deliveryRuleCreateRequest.getDeliveryRuleName(),
-            deliveryRuleCreateRequest.getDeliveryRuleFee(),
-            deliveryRuleCreateRequest.getDeliveryRuleDiscountCost(),
+            deliveryRuleCreateRequest.getDeliveryFee(),
+            deliveryRuleCreateRequest.getDeliveryDiscountCost(),
             deliveryRuleCreateRequest.isDeliveryRuleIsSelected(),
             deliveryRuleCreateRequest.getDeliveryRuleCreatedAt()
         );
