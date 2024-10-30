@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -28,7 +29,7 @@ public class DeliveryRuleServiceImpl implements DeliveryRuleService {
             deliveryRuleCreateRequest.getDeliveryFee(),
             deliveryRuleCreateRequest.getDeliveryDiscountCost(),
             deliveryRuleCreateRequest.isDeliveryRuleIsSelected(),
-            deliveryRuleCreateRequest.getDeliveryRuleCreatedAt()
+            LocalDateTime.now()
         );
         return deliveryRuleRepository.save(deliveryRule);
     }
@@ -71,7 +72,7 @@ public class DeliveryRuleServiceImpl implements DeliveryRuleService {
         deliveryRule.setDeliveryFee(deliveryRuleUPdateRequest.getDeliveryFee());
         deliveryRule.setDeliveryDiscountCost(deliveryRuleUPdateRequest.getDeliveryDiscountCost());
         deliveryRule.setDeliveryRuleIsSelected(deliveryRuleUPdateRequest.isDeliveryRuleIsSelected());
-        deliveryRule.setDeliveryRuleCreatedAt(deliveryRuleUPdateRequest.getDeliveryRuleCreatedAt());
+        deliveryRule.setDeliveryRuleCreatedAt(LocalDateTime.now());
 
         deliveryRuleRepository.save(deliveryRule);
     }

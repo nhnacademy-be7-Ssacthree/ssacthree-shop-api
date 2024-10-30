@@ -4,6 +4,7 @@ import com.nhnacademy.ssacthree_shop_api.commons.dto.MessageResponse;
 import com.nhnacademy.ssacthree_shop_api.orderset.deliveryrule.dto.DeliveryRuleCreateRequest;
 import com.nhnacademy.ssacthree_shop_api.orderset.deliveryrule.dto.DeliveryRuleGetResponse;
 import com.nhnacademy.ssacthree_shop_api.orderset.deliveryrule.service.DeliveryRuleService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,7 +26,7 @@ public class DeliveryRuleController {
 
     @PostMapping("/create")
     public ResponseEntity<MessageResponse> createDeliveryRule(
-            @RequestBody DeliveryRuleCreateRequest deliveryRuleCreateRequest) {
+            @Valid @RequestBody DeliveryRuleCreateRequest deliveryRuleCreateRequest) {
 
         deliveryRuleService.createDeliveryRule(deliveryRuleCreateRequest);
         MessageResponse messageResponse = new MessageResponse("생성 성공");
