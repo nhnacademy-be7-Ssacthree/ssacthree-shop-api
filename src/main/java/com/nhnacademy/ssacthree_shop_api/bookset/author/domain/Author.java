@@ -3,6 +3,7 @@ package com.nhnacademy.ssacthree_shop_api.bookset.author.domain;
 import com.nhnacademy.ssacthree_shop_api.bookset.bookauthor.domain.BookAuthor;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Null;
 import jakarta.validation.constraints.Size;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -23,6 +24,7 @@ public class Author {
     @Column(name = "author_id")
     private long authorId;
     private String authorName;
+    @Column(nullable = true)
     private String authorInfo;
 
 

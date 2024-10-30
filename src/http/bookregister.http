@@ -1,0 +1,3 @@
+### 책을 DB에 등록
+POST localhost:8081/api/upload-csv?filePath=D:/shoppingmall/csvfile/book_api_data.csv
+Content-Type: application/json

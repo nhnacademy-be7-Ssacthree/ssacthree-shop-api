@@ -11,6 +11,8 @@ import com.nhnacademy.ssacthree_shop_api.memberset.membergrade.domain.MemberGrad
 import com.nhnacademy.ssacthree_shop_api.memberset.membergrade.exception.MemberGradeNotFoundException;
 import com.nhnacademy.ssacthree_shop_api.memberset.membergrade.repository.MemberGradeRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -22,6 +24,14 @@ public class MemberServiceImpl implements MemberService {
     private final CustomerService customerService;
     private final MemberGradeRepository memberGradeRepository;
     private final PasswordEncoder passwordEncoder;
+
+    @Autowired
+    public MemberServiceImpl(MemberRepository memberRepository, CustomerService customerService, MemberGradeRepository memberGradeRepository) {
+        this.memberRepository = memberRepository;
+        this.customerService = customerService;
+        this.memberGradeRepository = memberGradeRepository;
+        this.passwordEncoder = new BCryptPasswordEncoder();
+    }
 
     @Override
     public void registerMember(MemberRegisterRequest memberRegisterRequest) {
