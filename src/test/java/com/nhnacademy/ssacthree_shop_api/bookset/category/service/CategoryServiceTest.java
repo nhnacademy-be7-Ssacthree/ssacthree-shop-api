@@ -70,9 +70,6 @@ public class CategoryServiceTest {
         savedCategory2.setCategoryIsUsed(true);
         savedCategory2.setSuperCategory(savedCategory);
 
-        // 상위 카테고리를 찾기 위한 findById 호출에 대한 스터빙 추가
-        //when(categoryRepository.findById(savedCategory.getCategoryId())).thenReturn(Optional.of(savedCategory));
-
         when(categoryRepository.save(any(Category.class))).thenReturn(savedCategory2);
 
         CategoryInfoResponse response2 = categoryService.saveCategory(request2);
