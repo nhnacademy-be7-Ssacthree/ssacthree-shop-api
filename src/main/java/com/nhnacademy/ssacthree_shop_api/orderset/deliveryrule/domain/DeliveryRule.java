@@ -23,17 +23,14 @@ public class DeliveryRule {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "delivery_rule_id")
-    private Long id;
+    private long id;
 
-    @Setter
     @Column(name = "delivery_rule_name")
     private String deliveryRuleName;
 
-    @Setter
     @Column(name = "delivery_fee")
     private int deliveryFee;
 
-    @Setter
     @Column(name = "delivery_discount_cost")
     private int deliveryDiscountCost;
 
@@ -41,7 +38,6 @@ public class DeliveryRule {
     @Column(name="delivery_rule_is_selected")
     private boolean deliveryRuleIsSelected = false;
 
-    @Setter
     @Column(name = "delivery_rule_created_at")
     private LocalDateTime deliveryRuleCreatedAt = LocalDateTime.now();
 }
