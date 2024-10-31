@@ -65,13 +65,13 @@ public class PublisherService {
 
             if(!publishersToSave.isEmpty()){
                 publisherRepository.saveAll(publishersToSave);
-                log.info("New publishers saved to database: " + publishersToSave);
+                log.info("출판사 저장에 성공했습니다.:" + publishersToSave);
             }else{
-                log.info("No new publishers saved to database");
+                log.info("출판사 저장에 실패했습니다.");
             }
 
         }catch (IOException | CsvValidationException e) {
-                throw new CsvProcessingException("Failed to process CSV file" + e.getMessage());
+                throw new CsvProcessingException("csv 파일 업로드에 실패했습니다." + e.getMessage());
         }
 
     }

@@ -1,6 +1,5 @@
 package com.nhnacademy.ssacthree_shop_api.bookset.book.controller;
 
-import com.nhnacademy.ssacthree_shop_api.bookset.author.service.AuthorService;
 import com.nhnacademy.ssacthree_shop_api.bookset.book.service.CsvParserService;
 import com.nhnacademy.ssacthree_shop_api.bookset.publisher.service.PublisherService;
 import lombok.extern.slf4j.Slf4j;
@@ -21,29 +20,16 @@ public class BookCsvController {
     private CsvParserService csvParserService;
 
     @Autowired
-    private AuthorService authorService;
-
-    @Autowired
     private PublisherService publisherService;
 
 
-    @PostMapping("/books")
+    @PostMapping("/bookauthors")
     public ResponseEntity<String> saveBooksDB(@RequestParam String filePath){
         try{
             csvParserService.saveBooksFromCsv(filePath);
-            return ResponseEntity.ok("CSV uploaded successfully");
+            return ResponseEntity.ok("도서와 작가가 업로드 되었습니다.");
         }catch(Exception e){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("CSV upload failed:" + e.getMessage());
-        }
-    }
-
-    @PostMapping("/authors")
-    public ResponseEntity<String> saveAuthorsDB(@RequestParam String filePath){
-        try{
-            authorService.saveAuthorsFromCsv(filePath);
-            return ResponseEntity.ok("CSV uploaded successfully");
-        }catch(Exception e){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("CSV upload failed: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("도서와 작가 업로드에 실패했습니다.:" + e.getMessage());
         }
     }
 
@@ -51,9 +37,9 @@ public class BookCsvController {
     public ResponseEntity<String> savePublishersDB(@RequestParam String filePath){
         try{
             publisherService.savePublisherFromCsv(filePath);
-            return ResponseEntity.ok("CSV file uploaded successfully");
+            return ResponseEntity.ok("출판사가 업로드 되었습니다.");
         }catch(Exception e){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("CSV file upload failed" + e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("출판사 업로드에 실패" + e.getMessage());
         }
     }
 }

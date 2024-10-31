@@ -30,4 +30,9 @@ public class BookAuthor {
     @JoinColumn(name="bookId")
     @NotNull
     private Book book;
+
+    public BookAuthor(Book book, Author author){
+        this.book = book;
+        this.author = author;
+    }
 }
