@@ -2,6 +2,7 @@ package com.nhnacademy.ssacthree_shop_api.bookset.publisher.service;
 
 import com.nhnacademy.ssacthree_shop_api.bookset.book.exception.CsvProcessingException;
 import com.nhnacademy.ssacthree_shop_api.bookset.publisher.domain.Publisher;
+import com.nhnacademy.ssacthree_shop_api.bookset.publisher.dto.PublisherDto;
 import com.nhnacademy.ssacthree_shop_api.bookset.publisher.repository.PublisherRepository;
 import com.opencsv.CSVParserBuilder;
 import com.opencsv.CSVReader;
@@ -28,7 +29,7 @@ public class PublisherService {
 
     public void savePublisherFromCsv(String filePath){
         Set<String> publisherNamesInCsv = new HashSet<>();
-        List<Publisher> publishersToSave = new ArrayList<>();
+        List<PublisherDto> publishersToSave = new ArrayList<>();
 
 
         try{
@@ -54,26 +55,37 @@ public class PublisherService {
                     .map(Publisher::getPublisherName)
                     .collect(Collectors.toSet());
 
-            for(String publisherName : normalizedPublisherNames){
-                if(!existingPublisherNames.contains(publisherName)){
-                    Publisher publisher = new Publisher();
-                    publisher.setPublisherName(publisherName);
-                    publisher.setPublisherIsUsed(true);
-                    publishersToSave.add(publisher);
+            for (String publisherName : normalizedPublisherNames) {
+                if (!existingPublisherNames.contains(publisherName)) {
+                    PublisherDto publisherDto = new PublisherDto();
+                    publisherDto.setPublisherName(publisherName);
+                    publisherDto.setPublisherIsUsed(true);
+                    publishersToSave.add(publisherDto);
                 }
             }
 
-            if(!publishersToSave.isEmpty()){
-                publisherRepository.saveAll(publishersToSave);
+            if (!publishersToSave.isEmpty()) {
+                List<Publisher> publishers = publishersToSave.stream()
+                        .map(this::convertToPublisherEntity)
+                        .collect(Collectors.toList());
+                publisherRepository.saveAll(publishers);
                 log.info("출판사 저장에 성공했습니다.:" + publishersToSave);
-            }else{
-                log.info("출판사 저장에 실패했습니다.");
+            } else {
+                log.info("저장할 새로운 출판사가 없습니다.");
             }
 
         }catch (IOException | CsvValidationException e) {
                 throw new CsvProcessingException("csv 파일 업로드에 실패했습니다." + e.getMessage());
         }
 
+    }
+
+    private Publisher convertToPublisherEntity(PublisherDto publisherdto){
+        return new Publisher(
+                publisherdto.getPublisherId(),
+                publisherdto.getPublisherName(),
+                publisherdto.isPublisherIsUsed()
+        );
     }
 
 }

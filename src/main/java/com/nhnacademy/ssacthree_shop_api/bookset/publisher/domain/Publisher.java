@@ -27,4 +27,8 @@ public class Publisher {
 
     private boolean publisherIsUsed;
 
+    public Publisher(String publisherName){
+        this.publisherName = publisherName;
+    }
+
 }

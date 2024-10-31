@@ -1,13 +1,16 @@
 package com.nhnacademy.ssacthree_shop_api.bookset.book.service;
 
 import com.nhnacademy.ssacthree_shop_api.bookset.author.domain.Author;
+import com.nhnacademy.ssacthree_shop_api.bookset.author.dto.AuthorDto;
 import com.nhnacademy.ssacthree_shop_api.bookset.author.repository.AuthorRepository;
 import com.nhnacademy.ssacthree_shop_api.bookset.book.domain.Book;
+import com.nhnacademy.ssacthree_shop_api.bookset.book.dto.BookDto;
 import com.nhnacademy.ssacthree_shop_api.bookset.book.exception.CsvProcessingException;
 import com.nhnacademy.ssacthree_shop_api.bookset.book.repository.BookRepository;
 import com.nhnacademy.ssacthree_shop_api.bookset.bookauthor.domain.BookAuthor;
 import com.nhnacademy.ssacthree_shop_api.bookset.bookauthor.repository.BookAuthorRepository;
 import com.nhnacademy.ssacthree_shop_api.bookset.publisher.domain.Publisher;
+import com.nhnacademy.ssacthree_shop_api.bookset.publisher.dto.PublisherDto;
 import com.nhnacademy.ssacthree_shop_api.bookset.publisher.repository.PublisherRepository;
 import com.opencsv.CSVParserBuilder;
 import com.opencsv.CSVReader;
@@ -52,51 +55,51 @@ public class CsvParserService {
 
             String[] nextLine;
             while ((nextLine = csvReader.readNext()) != null) {
-                Book book = new Book();
-                book.setBookId(Long.parseLong(nextLine[0].replace("'", "").trim()));
-                book.setBookName(nextLine[1]);
-                book.setBookIndex("목차 정보가 없습니다.");
-                book.setBookInfo(nextLine[7]);
-                book.setBookIsbn(nextLine[8]);
+                BookDto bookDto = new BookDto();
+                bookDto.setBookId(Long.parseLong(nextLine[0].replace("'", "").trim()));
+                bookDto.setBookName(nextLine[1]);
+                bookDto.setBookIndex("목차 정보가 없습니다.");
+                bookDto.setBookInfo(nextLine[7]);
+                bookDto.setBookIsbn(nextLine[8]);
 
 
                 String publicationDateString = nextLine[4].replace("'", "").trim();
                 try {
                     LocalDate publicationDate = LocalDate.parse(publicationDateString, dateFormatter);
-                    book.setPublicationDate(publicationDate.atStartOfDay());
+                    bookDto.setPublicationDate(publicationDate.atStartOfDay());
                 } catch (DateTimeParseException e) {
-                    log.error("boot id의 잘못된 날짜 형식 {}: {}", book.getBookId(), publicationDateString);
+                    log.error("boot id의 잘못된 날짜 형식 {}: {}", bookDto.getBookId(), publicationDateString);
                     continue;
                 }
 
-                book.setRegularPrice(Integer.parseInt(nextLine[5].replace("'","").trim()));
-                book.setSalePrice(Integer.parseInt(nextLine[6].replace("'","").trim()));
-                book.setPacked(true);
-                book.setStock(10);
-                book.setBookThumbnailImageUrl(nextLine[10]);
+                bookDto.setRegularPrice(Integer.parseInt(nextLine[5].replace("'","").trim()));
+                bookDto.setSalePrice(Integer.parseInt(nextLine[6].replace("'","").trim()));
+                bookDto.setPacked(true);
+                bookDto.setStock(10);
+                bookDto.setBookThumbnailImageUrl(nextLine[10]);
 
 
+                // Author 처리
                 String authorName = distinguishAuthors(nextLine[2].trim());
+                AuthorDto authorDto = new AuthorDto();
+                authorDto.setAuthorName(authorName);
+                authorDto.setAuthorInfo(""); // 필요한 경우 추가 정보 설정
+
                 Author author = authorRepository.findByAuthorName(authorName)
+                        .map(existingAuthor -> existingAuthor) // 기존 저자를 찾으면 그대로 사용
                         .orElseGet(() -> {
-                            Author newAuthor = new Author();
-                            newAuthor.setAuthorName(authorName);
-                            newAuthor.setAuthorInfo("");
-                            return authorRepository.save(newAuthor);
+                            Author newAuthor = new Author(authorDto.getAuthorName(), authorDto.getAuthorInfo());
+                            return authorRepository.save(newAuthor); // 새 저자를 저장
                         });
 
                 String publisherName = nextLine[3].trim();
-                Optional<Publisher> optionalPublisher = publisherRepository.findByPublisherName(publisherName);
-                if (optionalPublisher.isPresent()) {
-                    book.setPublisher(optionalPublisher.get());
-                } else {
-                    log.warn("Publisher not found for name: {}", publisherName);
-                    continue;
-                }
+                Publisher publisher = publisherRepository.findByPublisherName(publisherName)
+                        .orElseGet(() -> publisherRepository.save(new Publisher(publisherName)));
 
-                Book bookResult = bookRepository.save(book);
+                bookDto.setPublisher(publisher);
+
+                Book bookResult = bookRepository.save(bookDto.convertToEntity());
                 bookAuthorRepository.save(new BookAuthor(bookResult, author));
-
             }
         }catch (IOException | CsvValidationException e) {
             throw new CsvProcessingException("Failed to process CSV file" + e.getMessage());
@@ -107,5 +110,4 @@ public class CsvParserService {
         String[] authorsParts = input.split(",");
         return authorsParts[0].replaceAll("\\(.*?\\)","").trim();
     }
-
 }

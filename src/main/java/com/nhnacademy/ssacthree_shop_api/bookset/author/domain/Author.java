@@ -26,5 +26,9 @@ public class Author {
     private String authorName; 
     private String authorInfo;
 
+    public Author(String authorName, String authorInfo) {
+        this.authorName = authorName;
+        this.authorInfo = authorInfo;
+    }
 
 }
