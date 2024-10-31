@@ -13,11 +13,10 @@ import java.time.LocalDateTime;
 @Table(name = "delivery_rule")
 public class DeliveryRule {
 
-    public DeliveryRule(String name, int fee, int discount_cost, boolean is_selected, LocalDateTime created_at) {
+    public DeliveryRule(String name, int fee, int discount_cost, LocalDateTime created_at) {
         this.deliveryRuleName = name;
         this.deliveryFee = fee;
         this.deliveryDiscountCost = discount_cost;
-        this.deliveryRuleIsSelected = is_selected;
         this.deliveryRuleCreatedAt = created_at;
     }
 
@@ -40,7 +39,7 @@ public class DeliveryRule {
 
     @Setter
     @Column(name="delivery_rule_is_selected")
-    private boolean deliveryRuleIsSelected;
+    private boolean deliveryRuleIsSelected = false;
 
     @Setter
     @Column(name = "delivery_rule_created_at")
