@@ -9,14 +9,18 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+
 import org.springframework.context.annotation.Import;
 import org.springframework.beans.factory.annotation.Qualifier;
 
 import java.util.List;
+import org.springframework.test.context.ActiveProfiles;
+
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DataJpaTest
+@ActiveProfiles("test")
 @Import({CategoryCustomRepositoryImpl.class, QuerydslConfig.class}) // 실제 구현체 등록
 class CategoryCustomRepositoryTest {
 
