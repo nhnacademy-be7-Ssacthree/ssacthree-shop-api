@@ -26,7 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/shop/hello")
 public class HelloController {
 
-    @Value("${server.port}")
+    @Value("${server.port")
     private String port;
 
     @GetMapping

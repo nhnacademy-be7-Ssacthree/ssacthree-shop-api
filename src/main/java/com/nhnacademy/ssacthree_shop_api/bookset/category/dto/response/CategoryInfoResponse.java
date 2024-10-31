@@ -1,6 +1,9 @@
 package com.nhnacademy.ssacthree_shop_api.bookset.category.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.nhnacademy.ssacthree_shop_api.bookset.category.domain.Category;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -16,7 +19,11 @@ import java.util.List;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
+@JsonSerialize(using = CategoryInfoResponseSerializer.class) // 맞춤 Serializer 적용
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "categoryName")
 public class CategoryInfoResponse {
+
+    private long categoryId;
 
     private String categoryName;
 
@@ -24,7 +31,7 @@ public class CategoryInfoResponse {
 
     // 하위 카테고리들을 담을 리스트 (계층 구조를 위한 필드)
     @Setter
-    @JsonManagedReference // 순환 참조 방지
+//    @JsonManagedReference // 순환 참조 방지
     private List<CategoryInfoResponse> children = new ArrayList<>();
 
 

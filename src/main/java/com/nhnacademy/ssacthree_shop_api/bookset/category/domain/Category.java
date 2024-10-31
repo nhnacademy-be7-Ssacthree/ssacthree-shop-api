@@ -1,5 +1,9 @@
 package com.nhnacademy.ssacthree_shop_api.bookset.category.domain;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.*;
@@ -12,6 +16,7 @@ import java.util.List;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "categoryId")
 public class Category {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -36,9 +41,11 @@ public class Category {
     @Setter
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "super_category_id")
+    //@JsonBackReference // 순환 참조 방지
     private Category superCategory;
 
     @OneToMany(mappedBy = "superCategory", cascade = CascadeType.ALL)
+    //@JsonManagedReference // 순환 참조 방지
     private List<Category> categories = new ArrayList<>();
 
     public Category(String categoryName, Category superCategory) {
