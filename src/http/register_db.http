@@ -1,0 +1,12 @@
+### 출판사를 DB에 등록
+POST localhost:8081/api/shop/upload/publishers?filePath={파일 위치}
+Content-Type: application/json
+
+### 작가를 DB에 등록
+POST localhost:8081/api/shop/upload/authors/?filePath={파일 위치}
+Content-Type: application/json
+
+### 책을 DB에 등록
+POST localhost:8081/api/shop/upload/books?filePath={파일 위치}
+Content-Type: application/json
+

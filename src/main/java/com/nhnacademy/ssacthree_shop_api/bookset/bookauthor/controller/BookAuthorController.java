@@ -9,17 +9,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/books-authors")
 public class BookAuthorController {
-
-    @Autowired
-    private BookAuthorService bookAuthorService;
-
-    @PostMapping("/add")
-    public ResponseEntity<String> addBookAuthorRelation(@RequestParam long bookId, @RequestParam long authorId){
-        bookAuthorService.addBookAuthorRelation(bookId, authorId);
-        return ResponseEntity.ok("Book-Author relation added successfully.");
-    }
 
 
 

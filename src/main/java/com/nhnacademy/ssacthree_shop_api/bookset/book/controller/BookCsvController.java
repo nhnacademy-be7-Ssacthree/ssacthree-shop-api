@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/upload")
+@RequestMapping("/api/shop/upload")
 @Slf4j
 public class BookCsvController {
 
@@ -56,10 +56,4 @@ public class BookCsvController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("CSV file upload failed" + e.getMessage());
         }
     }
-
-
-
-
-
-
 }
