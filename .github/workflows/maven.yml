@@ -40,7 +40,7 @@ jobs:
         username: ${{ secrets.SSH_ID }}
         key: ${{ secrets.SSH_KEY }}
         port: ${{ secrets.SSH_PORT }}
-        source: "target/*.jar"
+        source: "target/ssacthree_shop_api-0.0.1-SNAPSHOT.jar"
         target: "~/"
         rm: false
         
@@ -52,7 +52,12 @@ jobs:
         key: ${{ secrets.SSH_KEY }}
         port: ${{ secrets.SSH_PORT }}
         script_stop: true
-        script: "./startup.sh"
+        script: |
+         # 8082,8083 포트 프로세스 종료 및 재시작
+          fuser -k 8082/tcp || echo "No process on 8082"
+          fuser -k 8083/tcp || echo "No process on 8083"
+          chmod +x ./shop_startup.sh
+          ./shop_startup.sh
 
     - name: Run SonarQube
       run: mvn sonar:sonar -Dsonar.projectKey=ssacthree-shop-api -Dsonar.host.url=${{secrets.SONAR_HOST}} -Dsonar.token=${{secrets.SONAR_TOKEN}}
