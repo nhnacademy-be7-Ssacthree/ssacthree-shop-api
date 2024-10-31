@@ -9,7 +9,6 @@ import lombok.NoArgsConstructor;
 @Getter
 public class CustomerUpdateRequest {
 
-    private String customerId;
     private String customerName;
     private String customerPhoneNumber;
     private String customerEmail;
