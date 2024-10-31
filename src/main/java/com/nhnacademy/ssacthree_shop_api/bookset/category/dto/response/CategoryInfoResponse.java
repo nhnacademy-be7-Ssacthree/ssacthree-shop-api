@@ -23,7 +23,7 @@ import java.util.List;
 @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "categoryName")
 public class CategoryInfoResponse {
 
-    private long categoryId;
+    private Long categoryId;
 
     private String categoryName;
 

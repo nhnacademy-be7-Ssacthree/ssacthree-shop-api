@@ -148,7 +148,7 @@ public class CategoryServiceImpl implements CategoryService {
      */
     @Override
     @Transactional(readOnly = true)
-    public CategoryInfoResponse getCategoryById(long categoryId) {
+    public CategoryInfoResponse getCategoryById(Long categoryId) {
         Category category = categoryRepository.findById(categoryId)
                 .orElseThrow(() -> new CategoryNotFoundException(categoryId));
         return new CategoryInfoResponse(category);
@@ -162,7 +162,7 @@ public class CategoryServiceImpl implements CategoryService {
      */
     @Override
     @Transactional(readOnly = true)
-    public List<CategoryInfoResponse> getChildCategories(long parentCategoryId) {
+    public List<CategoryInfoResponse> getChildCategories(Long parentCategoryId) {
         Category parent = categoryRepository.findById(parentCategoryId)
                 .orElseThrow(() -> new CategoryNotFoundException(parentCategoryId));
         return categoryRepository.findBySuperCategory(parent).stream()
@@ -213,7 +213,7 @@ public class CategoryServiceImpl implements CategoryService {
      */
     @Override
     @Transactional(readOnly = true)
-    public List<CategoryInfoResponse> getCategoryPath(long categoryId) {
+    public List<CategoryInfoResponse> getCategoryPath(Long categoryId) {
         return categoryRepository.findCategoryPath(categoryId).stream()
                 .map(CategoryInfoResponse::new)
                 .collect(Collectors.toList());
@@ -228,7 +228,7 @@ public class CategoryServiceImpl implements CategoryService {
      */
     @Override
     @Transactional(readOnly = true)
-    public List<CategoryInfoResponse> getCategoryWithChildren(long categoryId, int depth) {
+    public List<CategoryInfoResponse> getCategoryWithChildren(Long categoryId, int depth) {
         if (depth < 0 || depth > MAX_DEPTH) {
             throw new InvalidCategoryDepthException(depth, MAX_DEPTH);
         }
@@ -269,7 +269,7 @@ public class CategoryServiceImpl implements CategoryService {
      */
     @Override
     @Transactional(readOnly = true)
-    public List<CategoryInfoResponse> getAllDescendants(long categoryId) {
+    public List<CategoryInfoResponse> getAllDescendants(Long categoryId) {
         return categoryRepository.findAllDescendants(categoryId).stream()
                 .map(CategoryInfoResponse::new)
                 .collect(Collectors.toList());
@@ -344,7 +344,7 @@ public class CategoryServiceImpl implements CategoryService {
      * @return 상태 변경이 성공하면 true, 사용 중인 하위 카테고리가 있어 실패하면 예외 발생
      */
     @Override
-    public boolean deleteCategory(long categoryId) {
+    public boolean deleteCategory(Long categoryId) {
         // 삭제할 카테고리 조회
         Category category = categoryRepository.findById(categoryId)
                 .orElseThrow(() -> new CategoryNotFoundException(categoryId));

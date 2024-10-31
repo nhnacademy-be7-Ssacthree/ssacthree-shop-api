@@ -139,7 +139,7 @@ public class CategoryController {
      */
     @GetMapping("/categories/{categoryId}/children/depth/{depth}")
     public ResponseEntity<List<CategoryInfoResponse>> getCategoryWithChildren(
-            @PathVariable long categoryId, @PathVariable int depth) {
+            @PathVariable Long categoryId, @PathVariable int depth) {
         List<CategoryInfoResponse> categories = categoryService.getCategoryWithChildren(categoryId, depth);
         return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(categories);
     }
@@ -151,7 +151,7 @@ public class CategoryController {
      * @return 모든 하위 카테고리 목록
      */
     @GetMapping("/categories/{categoryId}/descendants")
-    public ResponseEntity<List<CategoryInfoResponse>> getAllDescendants(@PathVariable long categoryId) {
+    public ResponseEntity<List<CategoryInfoResponse>> getAllDescendants(@PathVariable Long categoryId) {
         List<CategoryInfoResponse> descendants = categoryService.getAllDescendants(categoryId);
         return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(descendants);
     }

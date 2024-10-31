@@ -17,6 +17,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.lang.reflect.Field;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -70,7 +71,7 @@ public class CategoryServiceTest {
         savedCategory2.setSuperCategory(savedCategory);
 
         // 상위 카테고리를 찾기 위한 findById 호출에 대한 스터빙 추가
-        when(categoryRepository.findById(savedCategory.getCategoryId())).thenReturn(Optional.of(savedCategory));
+        //when(categoryRepository.findById(savedCategory.getCategoryId())).thenReturn(Optional.of(savedCategory));
 
         when(categoryRepository.save(any(Category.class))).thenReturn(savedCategory2);
 
@@ -82,10 +83,11 @@ public class CategoryServiceTest {
     }
 
     @Test
-    void saveCategory_ShouldThrowException_WhenSuperCategoryNotUsable() {
+    void saveCategory_ShouldThrowException_WhenSuperCategoryNotUsable() throws Exception {
 
         // 상위 카테고리
         Category superCategory = new Category();
+        setCategoryId(superCategory, 1L);
         superCategory.setCategoryName("상위 카테고리");
         superCategory.setCategoryIsUsed(false); // 사용 불가능 상태로 설정
 
@@ -98,10 +100,18 @@ public class CategoryServiceTest {
         assertThrows(SuperCategoryNotUsableException.class, () -> categoryService.saveCategory(request));
     }
 
+    // 리플렉션을 통해 ID를 설정하는 메서드
+    private void setCategoryId(Category category, Long id) throws Exception {
+        Field field = Category.class.getDeclaredField("categoryId");
+        field.setAccessible(true);
+        field.set(category, id);
+    }
+
     @Test
-    void saveCategory_ShouldThrowException_WhenCategoryNameIsSameWithSuperCategory() {
+    void saveCategory_ShouldThrowException_WhenCategoryNameIsSameWithSuperCategory() throws Exception {
         // 상위 카테고리
         Category superCategory = new Category();
+        setCategoryId(superCategory, 1L);
         superCategory.setCategoryName("문학");
         superCategory.setCategoryIsUsed(true);
 
@@ -115,9 +125,10 @@ public class CategoryServiceTest {
     }
 
     @Test
-    void saveCategory_ShouldThrowException_WhenCategoryNameIsSameWithSameLevelCategory(){
+    void saveCategory_ShouldThrowException_WhenCategoryNameIsSameWithSameLevelCategory() throws Exception {
         // 상위 카테고리
         Category superCategory = new Category();
+        setCategoryId(superCategory, 1L);
         superCategory.setCategoryName("국내 도서");
         superCategory.setCategoryIsUsed(true);
 
@@ -351,13 +362,15 @@ public class CategoryServiceTest {
     }
 
     @Test
-    void updateCategory_ShouldUpdateCategorySuccessfully() {
+    void updateCategory_ShouldUpdateCategorySuccessfully() throws Exception {
         // 기존 카테고리 및 상위 카테고리 설정
         Category category = new Category();
+        setCategoryId(category, 1L);
         category.setCategoryName("기존 카테고리");
         category.setCategoryIsUsed(true);
 
         Category superCategory = new Category();
+        setCategoryId(superCategory, 2L);
         superCategory.setCategoryName("상위 카테고리");
         superCategory.setCategoryIsUsed(true);
 

@@ -34,7 +34,7 @@ class CategoryControllerTest {
     @Test
     void createCategory() throws Exception {
         CategorySaveRequest request = new CategorySaveRequest("문학", null, true);
-        CategoryInfoResponse response = new CategoryInfoResponse(1,"문학", true, new ArrayList<>());
+        CategoryInfoResponse response = new CategoryInfoResponse(1L,"문학", true, new ArrayList<>());
 
         when(categoryService.saveCategory(any(CategorySaveRequest.class))).thenReturn(response);
 
@@ -49,8 +49,8 @@ class CategoryControllerTest {
 
     @Test
     void getAllCategories() throws Exception {
-        CategoryInfoResponse category1 = new CategoryInfoResponse(1,"국내도서", true, new ArrayList<>());
-        CategoryInfoResponse category2 = new CategoryInfoResponse(2,"해외도서", true, new ArrayList<>());
+        CategoryInfoResponse category1 = new CategoryInfoResponse(1L,"국내도서", true, new ArrayList<>());
+        CategoryInfoResponse category2 = new CategoryInfoResponse(2L,"해외도서", true, new ArrayList<>());
 
         when(categoryService.getAllCategories()).thenReturn(List.of(category1, category2));
 
@@ -64,7 +64,7 @@ class CategoryControllerTest {
 
     @Test
     void getCategoryById() throws Exception {
-        CategoryInfoResponse category = new CategoryInfoResponse(1,"문학", true, new ArrayList<>());
+        CategoryInfoResponse category = new CategoryInfoResponse(1L,"문학", true, new ArrayList<>());
 
         when(categoryService.getCategoryById(anyLong())).thenReturn(category);
 
@@ -77,7 +77,7 @@ class CategoryControllerTest {
 
     @Test
     void getRootCategories() throws Exception {
-        CategoryInfoResponse rootCategory = new CategoryInfoResponse(1,"국내도서", true, new ArrayList<>());
+        CategoryInfoResponse rootCategory = new CategoryInfoResponse(1L,"국내도서", true, new ArrayList<>());
 
         when(categoryService.getRootCategories()).thenReturn(List.of(rootCategory));
 
@@ -91,8 +91,8 @@ class CategoryControllerTest {
     @Test
     void getChildCategories() throws Exception {
         // 자식 카테고리 정보 설정
-        CategoryInfoResponse childCategory1 = new CategoryInfoResponse(1,"자식카테고리1", true, new ArrayList<>());
-        CategoryInfoResponse childCategory2 = new CategoryInfoResponse(2,"자식카테고리2", true, new ArrayList<>());
+        CategoryInfoResponse childCategory1 = new CategoryInfoResponse(1L,"자식카테고리1", true, new ArrayList<>());
+        CategoryInfoResponse childCategory2 = new CategoryInfoResponse(2L,"자식카테고리2", true, new ArrayList<>());
 
         // Mock 설정
         when(categoryService.getChildCategories(anyLong())).thenReturn(List.of(childCategory1, childCategory2));
@@ -109,7 +109,7 @@ class CategoryControllerTest {
 
     @Test
     void searchCategoriesByName() throws Exception {
-        CategoryInfoResponse category = new CategoryInfoResponse(1,"소설", true, new ArrayList<>());
+        CategoryInfoResponse category = new CategoryInfoResponse(1L,"소설", true, new ArrayList<>());
 
         when(categoryService.searchCategoriesByName(anyString())).thenReturn(List.of(category));
 
@@ -125,7 +125,7 @@ class CategoryControllerTest {
     @Test
     void updateCategory() throws Exception {
         CategoryUpdateRequest updateRequest = new CategoryUpdateRequest("문학", null, true);
-        CategoryInfoResponse response = new CategoryInfoResponse(1,"문학", true, new ArrayList<>());
+        CategoryInfoResponse response = new CategoryInfoResponse(1L,"문학", true, new ArrayList<>());
 
         when(categoryService.updateCategory(anyLong(), any(CategoryUpdateRequest.class))).thenReturn(response);
 
@@ -152,8 +152,8 @@ class CategoryControllerTest {
     @Test
     void getCategoryWithChildren() throws Exception {
         // 특정 깊이의 하위 카테고리 설정
-        CategoryInfoResponse childCategory1 = new CategoryInfoResponse(1,"자식카테고리1", true, new ArrayList<>());
-        CategoryInfoResponse childCategory2 = new CategoryInfoResponse(2,"자식카테고리2", true, new ArrayList<>());
+        CategoryInfoResponse childCategory1 = new CategoryInfoResponse(1L,"자식카테고리1", true, new ArrayList<>());
+        CategoryInfoResponse childCategory2 = new CategoryInfoResponse(2L,"자식카테고리2", true, new ArrayList<>());
 
         // Mock 설정
         when(categoryService.getCategoryWithChildren(anyLong(), anyInt())).thenReturn(List.of(childCategory1, childCategory2));
@@ -170,8 +170,8 @@ class CategoryControllerTest {
     @Test
     void getAllDescendants() throws Exception {
         // 모든 하위 카테고리 설정
-        CategoryInfoResponse descendant1 = new CategoryInfoResponse(1,"하위카테고리1", true, new ArrayList<>());
-        CategoryInfoResponse descendant2 = new CategoryInfoResponse(2,"하위카테고리2", true, new ArrayList<>());
+        CategoryInfoResponse descendant1 = new CategoryInfoResponse(1L,"하위카테고리1", true, new ArrayList<>());
+        CategoryInfoResponse descendant2 = new CategoryInfoResponse(2L,"하위카테고리2", true, new ArrayList<>());
 
         // Mock 설정
         when(categoryService.getAllDescendants(anyLong())).thenReturn(List.of(descendant1, descendant2));
@@ -188,9 +188,9 @@ class CategoryControllerTest {
     @Test
     void getCategoryPath() throws Exception {
         // 최상위 카테고리까지의 경로 설정
-        CategoryInfoResponse rootCategory = new CategoryInfoResponse(1,"루트카테고리", true, new ArrayList<>());
-        CategoryInfoResponse middleCategory = new CategoryInfoResponse(2,"중간카테고리", true, new ArrayList<>());
-        CategoryInfoResponse targetCategory = new CategoryInfoResponse(3,"대상카테고리", true, new ArrayList<>());
+        CategoryInfoResponse rootCategory = new CategoryInfoResponse(1L,"루트카테고리", true, new ArrayList<>());
+        CategoryInfoResponse middleCategory = new CategoryInfoResponse(2L,"중간카테고리", true, new ArrayList<>());
+        CategoryInfoResponse targetCategory = new CategoryInfoResponse(3L,"대상카테고리", true, new ArrayList<>());
 
         // Mock 설정
         when(categoryService.getCategoryPath(anyLong())).thenReturn(List.of(rootCategory, middleCategory, targetCategory));
