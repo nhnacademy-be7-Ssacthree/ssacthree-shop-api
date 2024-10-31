@@ -31,7 +31,6 @@ public class CategoryInfoResponse {
 
     // 하위 카테고리들을 담을 리스트 (계층 구조를 위한 필드)
     @Setter
-//    @JsonManagedReference // 순환 참조 방지
     private List<CategoryInfoResponse> children = new ArrayList<>();
 
 

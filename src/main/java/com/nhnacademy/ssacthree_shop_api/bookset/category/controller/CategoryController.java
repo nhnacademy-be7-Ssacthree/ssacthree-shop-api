@@ -29,7 +29,7 @@ public class CategoryController {
      * @param request 카테고리 생성 요청 데이터
      * @return 생성된 카테고리 정보
      */
-    @PostMapping("/admin/category")
+    @PostMapping("/admin/categories")
     public ResponseEntity<CategoryInfoResponse> createCategory(@RequestBody CategorySaveRequest request){
         return ResponseEntity.status(HttpStatus.CREATED).contentType(MediaType.APPLICATION_JSON)
                 .body(categoryService.saveCategory(request));
@@ -40,7 +40,7 @@ public class CategoryController {
      *
      * @return 전체 카테고리 트리 정보
      */
-    @GetMapping("/category")
+    @GetMapping("/categories")
     public ResponseEntity<List<CategoryInfoResponse>> getAllCategories() {
         List<CategoryInfoResponse> categories = categoryService.getAllCategories();
         return new ResponseEntity<>(categories, HttpStatus.OK);
@@ -52,7 +52,7 @@ public class CategoryController {
      * @param categoryId 카테고리 ID
      * @return 조회된 카테고리 정보
      */
-    @GetMapping("/category/{categoryId}")
+    @GetMapping("/categories/{categoryId}")
     public ResponseEntity<CategoryInfoResponse> getCategoryById(@PathVariable Long categoryId) {
         CategoryInfoResponse category = categoryService.getCategoryById(categoryId);
         return new ResponseEntity<>(category, HttpStatus.OK);
@@ -64,7 +64,7 @@ public class CategoryController {
      * @param parentCategoryId 부모 카테고리 ID
      * @return 자식 카테고리 목록
      */
-    @GetMapping("/category/{parentCategoryId}/children")
+    @GetMapping("/categories/{parentCategoryId}/children")
     public ResponseEntity<List<CategoryInfoResponse>> getChildCategories(@PathVariable Long parentCategoryId) {
         List<CategoryInfoResponse> children = categoryService.getChildCategories(parentCategoryId);
         return new ResponseEntity<>(children, HttpStatus.OK);
@@ -75,7 +75,7 @@ public class CategoryController {
      *
      * @return 최상위 카테고리 목록
      */
-    @GetMapping("/category/root")
+    @GetMapping("/categories/root")
     public ResponseEntity<List<CategoryInfoResponse>> getRootCategories() {
         List<CategoryInfoResponse> rootCategories = categoryService.getRootCategories();
         return new ResponseEntity<>(rootCategories, HttpStatus.OK);
@@ -87,7 +87,7 @@ public class CategoryController {
      * @param name 검색할 카테고리 이름
      * @return 검색된 카테고리 목록
      */
-    @GetMapping("/category/search")
+    @GetMapping("/categories/search")
     public ResponseEntity<List<CategoryInfoResponse>> searchCategoriesByName(@RequestParam String name) {
         List<CategoryInfoResponse> categories = categoryService.searchCategoriesByName(name);
         return new ResponseEntity<>(categories, HttpStatus.OK);
@@ -99,7 +99,7 @@ public class CategoryController {
      * @param categoryId 카테고리 ID
      * @return 최상위 카테고리까지의 경로
      */
-    @GetMapping("/category/{categoryId}/path")
+    @GetMapping("/categories/{categoryId}/path")
     public ResponseEntity<List<CategoryInfoResponse>> getCategoryPath(@PathVariable Long categoryId) {
         List<CategoryInfoResponse> path = categoryService.getCategoryPath(categoryId);
         return new ResponseEntity<>(path, HttpStatus.OK);
@@ -112,7 +112,7 @@ public class CategoryController {
      * @param request 업데이트 요청 데이터
      * @return 업데이트된 카테고리 정보
      */
-    @PutMapping("/admin/category/{categoryId}")
+    @PutMapping("/admin/categories/{categoryId}")
     public ResponseEntity<CategoryInfoResponse> updateCategory(@PathVariable Long categoryId, @RequestBody CategoryUpdateRequest request) {
         CategoryInfoResponse updatedCategory = categoryService.updateCategory(categoryId, request);
         return new ResponseEntity<>(updatedCategory, HttpStatus.OK);
@@ -124,7 +124,7 @@ public class CategoryController {
      * @param categoryId 소프트 삭제할 카테고리 ID
      * @return 삭제 상태 변경 결과
      */
-    @DeleteMapping("/admin/category/{categoryId}")
+    @DeleteMapping("/admin/categories/{categoryId}")
     public ResponseEntity<Boolean> deleteCategory(@PathVariable Long categoryId) {
         boolean result = categoryService.deleteCategory(categoryId);
         return new ResponseEntity<>(result, HttpStatus.OK);
@@ -137,7 +137,7 @@ public class CategoryController {
      * @param depth      조회 깊이
      * @return 지정 깊이의 하위 카테고리 목록
      */
-    @GetMapping("/category/{categoryId}/children/depth/{depth}")
+    @GetMapping("/categories/{categoryId}/children/depth/{depth}")
     public ResponseEntity<List<CategoryInfoResponse>> getCategoryWithChildren(
             @PathVariable long categoryId, @PathVariable int depth) {
         List<CategoryInfoResponse> categories = categoryService.getCategoryWithChildren(categoryId, depth);
@@ -150,7 +150,7 @@ public class CategoryController {
      * @param categoryId 조회할 카테고리 ID
      * @return 모든 하위 카테고리 목록
      */
-    @GetMapping("/category/{categoryId}/descendants")
+    @GetMapping("/categories/{categoryId}/descendants")
     public ResponseEntity<List<CategoryInfoResponse>> getAllDescendants(@PathVariable long categoryId) {
         List<CategoryInfoResponse> descendants = categoryService.getAllDescendants(categoryId);
         return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(descendants);
