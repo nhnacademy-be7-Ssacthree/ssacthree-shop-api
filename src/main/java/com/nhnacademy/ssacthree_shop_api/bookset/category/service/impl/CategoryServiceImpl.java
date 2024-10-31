@@ -44,9 +44,9 @@ public class CategoryServiceImpl implements CategoryService {
         category.setCategoryIsUsed(categorySaveRequest.isCategoryIsUsed());
 
         // 상위 카테고리가 있는 경우
-        if (categorySaveRequest.getSuperCategory() != null) {
+        if (categorySaveRequest.getSuperCategoryId() != null) {
             // 상위 카테고리 ID로 조회
-            Category superCategory = categoryRepository.findById(categorySaveRequest.getSuperCategory().getCategoryId())
+            Category superCategory = categoryRepository.findById(categorySaveRequest.getSuperCategoryId())
                     .orElseThrow(() -> new IllegalArgumentException("상위 카테고리를 찾을 수 없습니다."));
 
             // 상위 카테고리가 사용중이지 않을 경우 상위 카테고리로 설정 불가능

@@ -63,7 +63,7 @@ public class CategoryServiceTest {
 
         CategoryInfoResponse response = categoryService.saveCategory(request);
 
-        CategorySaveRequest request2 = new CategorySaveRequest("문학", savedCategory, true);
+        CategorySaveRequest request2 = new CategorySaveRequest("문학", savedCategory.getCategoryId(), true);
         Category savedCategory2 = new Category();
         savedCategory2.setCategoryName("문학");
         savedCategory2.setCategoryIsUsed(true);
@@ -92,7 +92,7 @@ public class CategoryServiceTest {
         when(categoryRepository.findById(superCategory.getCategoryId())).thenReturn(Optional.of(superCategory));
 
         // 상위 카테고리를 가진 CategorySaveRequest 생성
-        CategorySaveRequest request = new CategorySaveRequest("새 카테고리", superCategory, true);
+        CategorySaveRequest request = new CategorySaveRequest("새 카테고리", superCategory.getCategoryId(), true);
 
         // saveCategory 호출 시 SuperCategoryNotUsableException이 발생하는지 검증
         assertThrows(SuperCategoryNotUsableException.class, () -> categoryService.saveCategory(request));
@@ -108,7 +108,7 @@ public class CategoryServiceTest {
         when(categoryRepository.findById(superCategory.getCategoryId())).thenReturn(Optional.of(superCategory));
 
         // 상위 카테고리를 가진 CategorySaveRequest 생성
-        CategorySaveRequest request = new CategorySaveRequest("문학", superCategory, true);
+        CategorySaveRequest request = new CategorySaveRequest("문학", superCategory.getCategoryId(), true);
 
         // saveCategory 호출 시 DuplicateCategoryNameException이 발생하는지 검증
         assertThrows(DuplicateCategoryNameException.class, () -> categoryService.saveCategory(request));
@@ -127,7 +127,7 @@ public class CategoryServiceTest {
         when(categoryRepository.existsBySuperCategoryAndCategoryName(superCategory, "문학")).thenReturn(true);
 
         // 상위 카테고리(국내도서)를 가진 CategorySaveRequest 생성 (중복 이름 "문학")
-        CategorySaveRequest request = new CategorySaveRequest("문학", superCategory, true);
+        CategorySaveRequest request = new CategorySaveRequest("문학", superCategory.getCategoryId(), true);
 
         // saveCategory 호출 시 DuplicateCategoryNameException이 발생하는지 검증
         assertThrows(DuplicateCategoryNameException.class, () -> categoryService.saveCategory(request));
