@@ -35,9 +35,13 @@ public class DeliveryRuleServiceImpl implements DeliveryRuleService {
             deliveryRuleCreateRequest.getDeliveryRuleName(),
             deliveryRuleCreateRequest.getDeliveryFee(),
             deliveryRuleCreateRequest.getDeliveryDiscountCost(),
-            deliveryRuleCreateRequest.isDeliveryRuleIsSelected(),
             LocalDateTime.now()
         );
+
+        if (getAllDeliveryRules().isEmpty()) {
+            deliveryRule.setDeliveryRuleIsSelected(true);
+        }
+
         return deliveryRuleRepository.save(deliveryRule);
     }
 
