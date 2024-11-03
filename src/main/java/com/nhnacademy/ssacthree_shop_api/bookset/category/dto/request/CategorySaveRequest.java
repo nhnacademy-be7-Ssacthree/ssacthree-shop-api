@@ -21,7 +21,6 @@ public class CategorySaveRequest {
     @Size(min = 1, max = 20, message = "카테고리 이름은 1~20자로 설정해야 합니다.")
     private String categoryName;
 
-    //private Category superCategory;
     private Long superCategoryId;
 
     private boolean categoryIsUsed;
