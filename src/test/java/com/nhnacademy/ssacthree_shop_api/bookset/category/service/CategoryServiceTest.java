@@ -7,7 +7,7 @@ import com.nhnacademy.ssacthree_shop_api.bookset.category.dto.response.CategoryI
 import com.nhnacademy.ssacthree_shop_api.bookset.category.exception.CategoryDepthNotFoundException;
 import com.nhnacademy.ssacthree_shop_api.bookset.category.exception.CategoryNotFoundException;
 import com.nhnacademy.ssacthree_shop_api.bookset.category.exception.DuplicateCategoryNameException;
-import com.nhnacademy.ssacthree_shop_api.bookset.category.exception.SuperCategoryNotUsableException;
+import com.nhnacademy.ssacthree_shop_api.bookset.category.exception.CategoryNotUsableException;
 import com.nhnacademy.ssacthree_shop_api.bookset.category.repository.CategoryRepository;
 import com.nhnacademy.ssacthree_shop_api.bookset.category.service.impl.CategoryServiceImpl;
 import org.junit.jupiter.api.DisplayName;
@@ -94,7 +94,7 @@ public class CategoryServiceTest {
         CategorySaveRequest request = new CategorySaveRequest("새 카테고리", superCategory.getCategoryId());
 
         // saveCategory 호출 시 SuperCategoryNotUsableException이 발생하는지 검증
-        assertThrows(SuperCategoryNotUsableException.class, () -> categoryService.saveCategory(request));
+        assertThrows(CategoryNotUsableException.class, () -> categoryService.saveCategory(request));
     }
 
     // 리플렉션을 통해 ID를 설정하는 메서드
@@ -396,9 +396,11 @@ public class CategoryServiceTest {
         // 기존 카테고리 및 하위 카테고리 설정
         Category category = new Category();
         category.setCategoryName("기존 카테고리");
+        category.setCategoryIsUsed(true);
 
         Category childCategory = new Category();
         childCategory.setCategoryName("중복된 이름");
+        childCategory.setCategoryIsUsed(true);
 
         // Mock 설정
         when(categoryRepository.findById(1L)).thenReturn(Optional.of(category));

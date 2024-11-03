@@ -50,7 +50,7 @@ public class CategoryServiceImpl implements CategoryService {
 
             // 상위 카테고리가 사용중이지 않을 경우 상위 카테고리로 설정 불가능
             if (!superCategory.getCategoryIsUsed()) {
-                throw new SuperCategoryNotUsableException(superCategory.getCategoryId());
+                throw new CategoryNotUsableException(superCategory.getCategoryId());
             }
 
             // 모든 상위 계층 카테고리 이름과 비교하여 중복 여부 확인
@@ -289,6 +289,10 @@ public class CategoryServiceImpl implements CategoryService {
         Category category = categoryRepository.findById(categoryId)
                 .orElseThrow(() -> new CategoryNotFoundException(categoryId));
 
+        if(!category.getCategoryIsUsed()){
+            throw new CategoryNotFoundException(categoryId);
+        }
+
         // 상위 카테고리 설정
         if (request.getSuperCategoryId() != null) {
             Category superCategory = categoryRepository.findById(request.getSuperCategoryId())
@@ -296,7 +300,7 @@ public class CategoryServiceImpl implements CategoryService {
 
             // 상위 카테고리가 사용 중이지 않으면 설정 불가
             if (!superCategory.getCategoryIsUsed()) {
-                throw new SuperCategoryNotUsableException(superCategory.getCategoryId());
+                throw new CategoryNotUsableException(superCategory.getCategoryId());
             }
 
             // 모든 상위 계층 카테고리 이름과 비교하여 중복 확인
