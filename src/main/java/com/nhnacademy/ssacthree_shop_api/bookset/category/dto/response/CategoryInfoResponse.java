@@ -20,7 +20,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @JsonSerialize(using = CategoryInfoResponseSerializer.class) // 맞춤 Serializer 적용
-@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "categoryName")
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "categoryId")
 public class CategoryInfoResponse {
 
     private Long categoryId;
@@ -35,6 +35,7 @@ public class CategoryInfoResponse {
 
 
     public CategoryInfoResponse(Category category) {
+        this.categoryId = category.getCategoryId();
         this.categoryName = category.getCategoryName();
         this.categoryIsUsed = category.getCategoryIsUsed();
     }

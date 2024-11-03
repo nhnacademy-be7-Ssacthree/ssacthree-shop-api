@@ -37,7 +37,6 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public CategoryInfoResponse saveCategory(CategorySaveRequest categorySaveRequest) {
 
-
         // CategorySaveRequest를 Category 엔티티로 변환
         Category category = new Category();
         category.setCategoryName(categorySaveRequest.getCategoryName());
@@ -81,7 +80,7 @@ public class CategoryServiceImpl implements CategoryService {
      * - 재귀적으로 상위 계층을 탐색하며 저장하려는 카테고리 이름이 상위 카테고리와 같을 경우 예외를 발생시킵니다.
      *
      * @param category 상위 계층에서 이름을 비교할 카테고리 (현재 카테고리의 상위 카테고리)
-     * @param name 저장하려는 카테고리 이름
+     * @param name     저장하려는 카테고리 이름
      * @throws IllegalArgumentException 상위 계층 중 하나의 카테고리와 이름이 중복될 경우 예외 발생
      */
     private void checkNameConflictWithSuperCategories(Category category, String name) {
@@ -280,7 +279,7 @@ public class CategoryServiceImpl implements CategoryService {
      * 기존 카테고리를 업데이트합니다.
      *
      * @param categoryId 업데이트할 카테고리의 ID
-     * @param request request 업데이트할 카테고리 정보
+     * @param request    request 업데이트할 카테고리 정보
      * @return 업데이트된 카테고리 정보
      */
     @Override
@@ -318,7 +317,7 @@ public class CategoryServiceImpl implements CategoryService {
         List<Category> childrenCategories = categoryRepository.findAllDescendants(categoryId);
 
         for (Category child : childrenCategories) {
-            if (!category.getCategoryName().equals(request.getCategoryName())&& child.getCategoryName().equals(request.getCategoryName())) {
+            if (!category.getCategoryName().equals(request.getCategoryName()) && child.getCategoryName().equals(request.getCategoryName())) {
                 throw new DuplicateCategoryNameException("하위 카테고리 중에 같은 이름의 카테고리가 존재합니다.");
             }
         }
@@ -363,7 +362,6 @@ public class CategoryServiceImpl implements CategoryService {
 
         return true;
     }
-
 
 
 }

@@ -40,7 +40,7 @@ public class Category {
     private Category superCategory;
 
     @OneToMany(mappedBy = "superCategory", cascade = CascadeType.ALL)
-    private List<Category> categories = new ArrayList<>();
+    private List<Category> children = new ArrayList<>();
 
     public Category(String categoryName, Category superCategory) {
         this.categoryName = categoryName;

@@ -10,10 +10,10 @@ public class CategoryInfoResponseSerializer extends JsonSerializer<CategoryInfoR
     @Override
     public void serialize(CategoryInfoResponse value, JsonGenerator gen, SerializerProvider serializers) throws IOException {
         gen.writeStartObject();
+        gen.writeNumberField("categoryId", value.getCategoryId());
         gen.writeStringField("categoryName", value.getCategoryName());
         gen.writeBooleanField("categoryIsUsed", value.isCategoryIsUsed());
 
-        // children 필드가 비어 있지 않은 경우에만 직렬화합니다.
         if (value.getChildren() != null && !value.getChildren().isEmpty()) {
             gen.writeArrayFieldStart("children");
             for (CategoryInfoResponse child : value.getChildren()) {
