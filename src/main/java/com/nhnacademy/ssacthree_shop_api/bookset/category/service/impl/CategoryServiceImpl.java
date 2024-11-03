@@ -40,7 +40,7 @@ public class CategoryServiceImpl implements CategoryService {
         // CategorySaveRequest를 Category 엔티티로 변환
         Category category = new Category();
         category.setCategoryName(categorySaveRequest.getCategoryName());
-        category.setCategoryIsUsed(categorySaveRequest.isCategoryIsUsed());
+        category.setCategoryIsUsed(true);
 
         // 상위 카테고리가 있는 경우
         if (categorySaveRequest.getSuperCategoryId() != null) {
@@ -324,10 +324,6 @@ public class CategoryServiceImpl implements CategoryService {
 
         // 카테고리 이름과 사용 여부 업데이트
         category.setCategoryName(request.getCategoryName());
-
-        // 사용 여부 변경 불가: 기존 사용 여부를 그대로 유지
-        boolean currentStatus = category.getCategoryIsUsed();
-        category.setCategoryIsUsed(currentStatus);
 
         // 카테고리 저장
         Category updatedCategory = categoryRepository.save(category);

@@ -23,7 +23,4 @@ public class CategorySaveRequest {
 
     private Long superCategoryId;
 
-    private boolean categoryIsUsed;
-
-
 }
