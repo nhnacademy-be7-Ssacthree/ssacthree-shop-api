@@ -1,6 +1,6 @@
 package com.nhnacademy.ssacthree_shop_api.bookset.author.dto;
 
-import lombok.AllArgsConstructor;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -8,9 +8,9 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
-public class AuthorDto {
-    private long authorId;
+public class AuthorCreateRequest {
+    @NotNull
     private String authorName;
+    @NotNull
     private String authorInfo;
 }
