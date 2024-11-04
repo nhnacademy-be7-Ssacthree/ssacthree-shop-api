@@ -35,7 +35,7 @@ public class DeliveryRuleController {
         return ResponseEntity.status(HttpStatus.CREATED).body(messageResponse);
     }
 
-    @PostMapping("/update")
+    @PutMapping
     public ResponseEntity<MessageResponse> updateDeliveryRule(
             @Valid @RequestBody DeliveryRuleUpdateRequest deliveryRuleUpdateRequest) {
 

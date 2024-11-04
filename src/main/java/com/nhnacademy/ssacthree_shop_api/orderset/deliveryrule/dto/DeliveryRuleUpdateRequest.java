@@ -9,9 +9,9 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
+@Setter
 public class DeliveryRuleUpdateRequest {
 
     @NotNull
-    @Setter
     private long deliveryRuleId;
 }
