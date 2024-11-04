@@ -15,6 +15,13 @@ import lombok.NoArgsConstructor;
 @Entity
 public class Address {
 
+    public Address(Member member, String addressAlias, String addressDetail, String addressPostalNumber) {
+        this.member = member;
+        this.addressAlias = addressAlias;
+        this.addressDetail = addressDetail;
+        this.addressPostalNumber = addressPostalNumber;
+    }
+
     @NotNull
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
