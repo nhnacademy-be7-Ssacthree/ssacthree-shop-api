@@ -1,0 +1,39 @@
+package com.nhnacademy.ssacthree_shop_api.bookset.book.dto.request;
+
+import com.nhnacademy.ssacthree_shop_api.bookset.book.domain.BookStatus;
+import com.nhnacademy.ssacthree_shop_api.bookset.book.domain.converter.BookStatusConverter;
+import com.nhnacademy.ssacthree_shop_api.bookset.publisher.domain.Publisher;
+import jakarta.persistence.Convert;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+import java.time.LocalDateTime;
+
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
+public class BookSaveRequest {
+    private String bookName;
+    private String bookIndex; // 목차
+    private String bookInfo; // 책 설명
+    private String bookIsbn;
+    private LocalDateTime publicationDate;
+    private int regularPrice; // 판매가
+    private int salePrice; // 할인 가격
+    private boolean isPacked;
+    private int stock;
+    private String bookThumbnailImageUrl;
+    private int bookViewCount;
+    private int bookDiscount; // 할인율
+
+    @Convert(converter = BookStatusConverter.class)
+    private BookStatus bookStatus;
+
+    // FK
+    private Long publisherId;
+}
