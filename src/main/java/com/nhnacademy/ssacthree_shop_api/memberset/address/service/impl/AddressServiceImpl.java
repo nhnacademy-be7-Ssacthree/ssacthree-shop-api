@@ -24,5 +24,6 @@ public class AddressServiceImpl implements AddressService {
             addressCreateRequest.getAddressDetail(),
             addressCreateRequest.getAddressPostalNumber()
         );
+        return address;
     }
 }
