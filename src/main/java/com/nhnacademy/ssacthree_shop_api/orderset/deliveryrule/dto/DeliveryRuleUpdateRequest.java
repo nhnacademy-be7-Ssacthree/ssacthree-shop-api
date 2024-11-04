@@ -13,5 +13,5 @@ import lombok.Setter;
 public class DeliveryRuleUpdateRequest {
 
     @NotNull
-    private long deliveryRuleId;
+    private Long deliveryRuleId;
 }
