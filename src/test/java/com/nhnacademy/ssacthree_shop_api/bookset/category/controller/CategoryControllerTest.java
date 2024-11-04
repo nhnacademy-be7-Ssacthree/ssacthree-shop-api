@@ -38,7 +38,7 @@ class CategoryControllerTest {
 
         when(categoryService.saveCategory(any(CategorySaveRequest.class))).thenReturn(response);
 
-        mockMvc.perform(MockMvcRequestBuilders.post("/api/category")
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/shop/admin/category")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"categoryName\":\"문학\",\"categoryIsUsed\":true}")
                         .accept(MediaType.APPLICATION_JSON))
@@ -54,7 +54,7 @@ class CategoryControllerTest {
 
         when(categoryService.getAllCategories()).thenReturn(List.of(category1, category2));
 
-        mockMvc.perform(MockMvcRequestBuilders.get("/api/category")
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/shop/category")
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -68,7 +68,7 @@ class CategoryControllerTest {
 
         when(categoryService.getCategoryById(anyLong())).thenReturn(category);
 
-        mockMvc.perform(MockMvcRequestBuilders.get("/api/category/1")
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/shop/category/1")
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -81,7 +81,7 @@ class CategoryControllerTest {
 
         when(categoryService.getRootCategories()).thenReturn(List.of(rootCategory));
 
-        mockMvc.perform(MockMvcRequestBuilders.get("/api/category/root")
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/shop/category/root")
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -98,7 +98,7 @@ class CategoryControllerTest {
         when(categoryService.getChildCategories(anyLong())).thenReturn(List.of(childCategory1, childCategory2));
 
         // MockMvc를 사용하여 요청 실행 및 검증
-        mockMvc.perform(MockMvcRequestBuilders.get("/api/category/1/children")
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/shop/category/1/children")
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -113,7 +113,7 @@ class CategoryControllerTest {
 
         when(categoryService.searchCategoriesByName(anyString())).thenReturn(List.of(category));
 
-        mockMvc.perform(MockMvcRequestBuilders.get("/api/category/search")
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/shop/category/search")
                         .param("name", "소설")
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -129,7 +129,7 @@ class CategoryControllerTest {
 
         when(categoryService.updateCategory(anyLong(), any(CategoryUpdateRequest.class))).thenReturn(response);
 
-        mockMvc.perform(MockMvcRequestBuilders.put("/api/category/1")
+        mockMvc.perform(MockMvcRequestBuilders.put("/api/shop/admin/category/1")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"categoryName\":\"문학\",\"categoryIsUsed\":true}")
                         .accept(MediaType.APPLICATION_JSON))
@@ -142,7 +142,7 @@ class CategoryControllerTest {
     void deleteCategory() throws Exception {
         when(categoryService.deleteCategory(anyLong())).thenReturn(true);
 
-        mockMvc.perform(MockMvcRequestBuilders.delete("/api/category/1")
+        mockMvc.perform(MockMvcRequestBuilders.delete("/api/shop/admin/category/1")
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -159,7 +159,7 @@ class CategoryControllerTest {
         when(categoryService.getCategoryWithChildren(anyLong(), anyInt())).thenReturn(List.of(childCategory1, childCategory2));
 
         // MockMvc를 사용하여 요청 실행 및 검증
-        mockMvc.perform(MockMvcRequestBuilders.get("/api/category/1/children/depth/2")
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/shop/category/1/children/depth/2")
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -177,7 +177,7 @@ class CategoryControllerTest {
         when(categoryService.getAllDescendants(anyLong())).thenReturn(List.of(descendant1, descendant2));
 
         // MockMvc를 사용하여 요청 실행 및 검증
-        mockMvc.perform(MockMvcRequestBuilders.get("/api/category/1/descendants")
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/shop/category/1/descendants")
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -196,7 +196,7 @@ class CategoryControllerTest {
         when(categoryService.getCategoryPath(anyLong())).thenReturn(List.of(rootCategory, middleCategory, targetCategory));
 
         // MockMvc를 사용하여 요청 실행 및 검증
-        mockMvc.perform(MockMvcRequestBuilders.get("/api/category/1/path")
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/shop/category/1/path")
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))

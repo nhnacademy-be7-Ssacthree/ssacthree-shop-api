@@ -10,6 +10,7 @@ import com.nhnacademy.ssacthree_shop_api.bookset.category.exception.DuplicateCat
 import com.nhnacademy.ssacthree_shop_api.bookset.category.exception.SuperCategoryNotUsableException;
 import com.nhnacademy.ssacthree_shop_api.bookset.category.repository.CategoryRepository;
 import com.nhnacademy.ssacthree_shop_api.bookset.category.service.impl.CategoryServiceImpl;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -307,6 +308,7 @@ public class CategoryServiceTest {
     }
 
     @Test
+    @DisplayName("깊이 설정이 유효하지 않은 경우 에러") //todo: test code 모두 displayName 쓰기
     void getCategoryWithChildren_ShouldThrowException_DepthInvalid() {
         Category parentCategory = new Category();
         parentCategory.setCategoryName("문학");
