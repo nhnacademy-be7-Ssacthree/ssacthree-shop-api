@@ -8,11 +8,13 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Getter
+@Setter
 @AllArgsConstructor
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor
 public class BookAuthor {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -28,4 +30,9 @@ public class BookAuthor {
     @JoinColumn(name="bookId")
     @NotNull
     private Book book;
+
+    public BookAuthor(Book book, Author author){
+        this.book = book;
+        this.author = author;
+    }
 }
