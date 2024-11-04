@@ -24,7 +24,7 @@ public class BookInfoRequest {
     private int bookViewCount;
     private int bookDiscount; // 할인율
 
-
+    private String bookStatus; // 배송 상태
 
     // FK
     private Long publisherId;

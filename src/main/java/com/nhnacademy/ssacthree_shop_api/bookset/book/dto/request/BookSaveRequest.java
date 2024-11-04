@@ -31,8 +31,7 @@ public class BookSaveRequest {
     private int bookViewCount;
     private int bookDiscount; // 할인율
 
-    @Convert(converter = BookStatusConverter.class)
-    private BookStatus bookStatus;
+    private String bookStatus; // 배송 상태
 
     // FK
     private Long publisherId;
