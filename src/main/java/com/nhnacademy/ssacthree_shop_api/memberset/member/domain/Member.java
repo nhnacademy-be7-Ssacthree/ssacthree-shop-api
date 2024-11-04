@@ -3,9 +3,6 @@ package com.nhnacademy.ssacthree_shop_api.memberset.member.domain;
 import com.nhnacademy.ssacthree_shop_api.customer.domain.Customer;
 import com.nhnacademy.ssacthree_shop_api.memberset.membergrade.domain.MemberGrade;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Null;
-import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -28,7 +25,7 @@ public class Member {
     ) {
         this.customer = customer;
         this.memberLoginId = loginId;
-        this.memberLoginPassword = password;
+        this.memberPassword = password;
         this.memberBirthdate = birthdate;
     }
 
@@ -50,7 +47,7 @@ public class Member {
     private String memberLoginId;
 
 
-    private String memberLoginPassword;
+    private String memberPassword;
 
 
     private String memberBirthdate;

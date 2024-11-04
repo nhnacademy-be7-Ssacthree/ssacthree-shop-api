@@ -1,5 +1,5 @@
 ### 멤버 등급 생성
-POST http://localhost:8081/api/memberGrades
+POST http://localhost:8082/api/shop/memberGrades
 Content-Type: application/json
 
 {
