@@ -22,7 +22,4 @@ public class CategoryUpdateRequest {
 
     private Long superCategoryId;
 
-    @NotNull
-    private boolean categoryIsUsed;
-
 }

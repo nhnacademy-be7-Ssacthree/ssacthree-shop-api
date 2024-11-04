@@ -15,7 +15,7 @@ public interface CategoryService {
     CategoryInfoResponse updateCategory(Long categoryId, CategoryUpdateRequest categoryUpdateRequest);
 
     // 카테고리 soft 삭제
-    boolean deleteCategory(long categoryId);
+    boolean deleteCategory(Long categoryId);
 
     /**
      * 전체 카테고리 트리를 조회합니다.
@@ -30,7 +30,7 @@ public interface CategoryService {
      * @param categoryId 카테고리 ID
      * @return 조회된 카테고리
      */
-    CategoryInfoResponse getCategoryById(long categoryId);
+    CategoryInfoResponse getCategoryById(Long categoryId);
 
     /**
      * 주어진 부모 카테고리 ID에 대한 자식 카테고리를 조회합니다.
@@ -38,7 +38,7 @@ public interface CategoryService {
      * @param parentCategoryId 부모 카테고리 ID
      * @return 자식 카테고리 목록
      */
-    List<CategoryInfoResponse> getChildCategories(long parentCategoryId);
+    List<CategoryInfoResponse> getChildCategories(Long parentCategoryId);
 
     /**
      * 최상위 카테고리를 조회합니다.
@@ -61,7 +61,7 @@ public interface CategoryService {
      * @param categoryId 카테고리 ID
      * @return 최상위 카테고리까지의 경로 목록
      */
-    List<CategoryInfoResponse> getCategoryPath(long categoryId);
+    List<CategoryInfoResponse> getCategoryPath(Long categoryId);
 
     /**
      * 특정 카테고리의 자식 카테고리를 지정된 깊이까지 조회합니다.
@@ -70,7 +70,7 @@ public interface CategoryService {
      * @param depth 조회 깊이
      * @return 자식 카테고리 목록
      */
-    List<CategoryInfoResponse> getCategoryWithChildren(long categoryId, int depth);
+    List<CategoryInfoResponse> getCategoryWithChildren(Long categoryId, int depth);
 
     /**
      * 특정 카테고리의 모든 하위 카테고리(자식 및 자손)를 조회합니다.
@@ -78,5 +78,5 @@ public interface CategoryService {
      * @param categoryId 카테고리 ID
      * @return 모든 하위 카테고리 목록
      */
-    List<CategoryInfoResponse> getAllDescendants(long categoryId);
+    List<CategoryInfoResponse> getAllDescendants(Long categoryId);
 }

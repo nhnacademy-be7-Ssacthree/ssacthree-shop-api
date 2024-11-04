@@ -7,7 +7,7 @@ import com.nhnacademy.ssacthree_shop_api.bookset.category.dto.response.CategoryI
 import com.nhnacademy.ssacthree_shop_api.bookset.category.exception.CategoryDepthNotFoundException;
 import com.nhnacademy.ssacthree_shop_api.bookset.category.exception.CategoryNotFoundException;
 import com.nhnacademy.ssacthree_shop_api.bookset.category.exception.DuplicateCategoryNameException;
-import com.nhnacademy.ssacthree_shop_api.bookset.category.exception.SuperCategoryNotUsableException;
+import com.nhnacademy.ssacthree_shop_api.bookset.category.exception.CategoryNotUsableException;
 import com.nhnacademy.ssacthree_shop_api.bookset.category.repository.CategoryRepository;
 import com.nhnacademy.ssacthree_shop_api.bookset.category.service.impl.CategoryServiceImpl;
 import org.junit.jupiter.api.DisplayName;
@@ -17,6 +17,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.lang.reflect.Field;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -35,7 +36,7 @@ public class CategoryServiceTest {
 
     @Test
     void saveCategory_rootCategory(){
-        CategorySaveRequest request = new CategorySaveRequest("문학", null, true);
+        CategorySaveRequest request = new CategorySaveRequest("문학", null);
         Category savedCategory = new Category();
         savedCategory.setCategoryName("문학");
         savedCategory.setCategoryIsUsed(true);
@@ -53,7 +54,7 @@ public class CategoryServiceTest {
     @Test
     void saveCategory_subCategory() {
 
-        CategorySaveRequest request = new CategorySaveRequest("국내 도서", null, true);
+        CategorySaveRequest request = new CategorySaveRequest("국내 도서", null);
         Category savedCategory = new Category();
         savedCategory.setCategoryName("국내 도서");
         savedCategory.setCategoryIsUsed(true);
@@ -63,14 +64,11 @@ public class CategoryServiceTest {
 
         CategoryInfoResponse response = categoryService.saveCategory(request);
 
-        CategorySaveRequest request2 = new CategorySaveRequest("문학", savedCategory, true);
+        CategorySaveRequest request2 = new CategorySaveRequest("문학", savedCategory.getCategoryId());
         Category savedCategory2 = new Category();
         savedCategory2.setCategoryName("문학");
         savedCategory2.setCategoryIsUsed(true);
         savedCategory2.setSuperCategory(savedCategory);
-
-        // 상위 카테고리를 찾기 위한 findById 호출에 대한 스터빙 추가
-        when(categoryRepository.findById(savedCategory.getCategoryId())).thenReturn(Optional.of(savedCategory));
 
         when(categoryRepository.save(any(Category.class))).thenReturn(savedCategory2);
 
@@ -82,56 +80,69 @@ public class CategoryServiceTest {
     }
 
     @Test
-    void saveCategory_ShouldThrowException_WhenSuperCategoryNotUsable() {
+    void saveCategory_ShouldThrowException_WhenSuperCategoryNotUsable() throws Exception {
 
         // 상위 카테고리
         Category superCategory = new Category();
+        setCategoryId(superCategory, 1L);
         superCategory.setCategoryName("상위 카테고리");
         superCategory.setCategoryIsUsed(false); // 사용 불가능 상태로 설정
 
         when(categoryRepository.findById(superCategory.getCategoryId())).thenReturn(Optional.of(superCategory));
 
         // 상위 카테고리를 가진 CategorySaveRequest 생성
-        CategorySaveRequest request = new CategorySaveRequest("새 카테고리", superCategory, true);
+        CategorySaveRequest request = new CategorySaveRequest("새 카테고리", superCategory.getCategoryId());
 
         // saveCategory 호출 시 SuperCategoryNotUsableException이 발생하는지 검증
-        assertThrows(SuperCategoryNotUsableException.class, () -> categoryService.saveCategory(request));
+        assertThrows(CategoryNotUsableException.class, () -> categoryService.saveCategory(request));
+    }
+
+    // 리플렉션을 통해 ID를 설정하는 메서드
+    private void setCategoryId(Category category, Long id) throws Exception {
+        Field field = Category.class.getDeclaredField("categoryId");
+        field.setAccessible(true);
+        field.set(category, id);
     }
 
     @Test
-    void saveCategory_ShouldThrowException_WhenCategoryNameIsSameWithSuperCategory() {
+    void saveCategory_ShouldThrowException_WhenCategoryNameIsSameWithSuperCategory() throws Exception {
         // 상위 카테고리
         Category superCategory = new Category();
+        setCategoryId(superCategory, 1L);
         superCategory.setCategoryName("문학");
         superCategory.setCategoryIsUsed(true);
 
         when(categoryRepository.findById(superCategory.getCategoryId())).thenReturn(Optional.of(superCategory));
 
         // 상위 카테고리를 가진 CategorySaveRequest 생성
-        CategorySaveRequest request = new CategorySaveRequest("문학", superCategory, true);
+        CategorySaveRequest request = new CategorySaveRequest("문학", superCategory.getCategoryId());
 
         // saveCategory 호출 시 DuplicateCategoryNameException이 발생하는지 검증
         assertThrows(DuplicateCategoryNameException.class, () -> categoryService.saveCategory(request));
     }
 
     @Test
-    void saveCategory_ShouldThrowException_WhenCategoryNameIsSameWithSameLevelCategory(){
+    void saveCategory_ShouldThrowException_WhenCategoryNameIsSameWithSameLevelCategory() throws Exception {
         // 상위 카테고리
         Category superCategory = new Category();
+        setCategoryId(superCategory, 1L);
         superCategory.setCategoryName("국내 도서");
         superCategory.setCategoryIsUsed(true);
 
         when(categoryRepository.findById(superCategory.getCategoryId())).thenReturn(Optional.of(superCategory));
 
-        // 상위 카테고리 아래에 '문학'이라는 카테고리가 있음을 알림.
-        when(categoryRepository.existsBySuperCategoryAndCategoryName(superCategory, "문학")).thenReturn(true);
+        // 상위 카테고리 아래에 '문학'이라는 카테고리가 이미 존재하는 상황을 시뮬레이션
+        Category duplicateCategory = new Category();
+        duplicateCategory.setCategoryName("문학");
+        duplicateCategory.setSuperCategory(superCategory);
+
+        when(categoryRepository.findBySuperCategoryAndCategoryName(superCategory, "문학")).thenReturn(duplicateCategory);
 
         // 상위 카테고리(국내도서)를 가진 CategorySaveRequest 생성 (중복 이름 "문학")
-        CategorySaveRequest request = new CategorySaveRequest("문학", superCategory, true);
+        CategorySaveRequest request = new CategorySaveRequest("문학", superCategory.getCategoryId());
 
         // saveCategory 호출 시 DuplicateCategoryNameException이 발생하는지 검증
         assertThrows(DuplicateCategoryNameException.class, () -> categoryService.saveCategory(request));
-
     }
 
 
@@ -351,29 +362,27 @@ public class CategoryServiceTest {
     }
 
     @Test
-    void updateCategory_ShouldUpdateCategorySuccessfully() {
+    void updateCategory_ShouldUpdateCategorySuccessfully() throws Exception {
         // 기존 카테고리 및 상위 카테고리 설정
         Category category = new Category();
+        setCategoryId(category, 1L);
         category.setCategoryName("기존 카테고리");
         category.setCategoryIsUsed(true);
 
         Category superCategory = new Category();
+        setCategoryId(superCategory, 2L);
         superCategory.setCategoryName("상위 카테고리");
         superCategory.setCategoryIsUsed(true);
 
         // Mock 설정
-        when(categoryRepository.findById(anyLong())).thenReturn(Optional.of(category), Optional.of(superCategory));
-        when(categoryRepository.existsBySuperCategoryAndCategoryName(superCategory, "새로운 이름")).thenReturn(false);
-        when(categoryRepository.findAllDescendants(anyLong())).thenReturn(Collections.emptyList());
-        when(categoryRepository.save(any(Category.class))).thenAnswer(invocation -> {
-            // 상위 카테고리가 설정되었는지 확인
-            Category savedCategory = invocation.getArgument(0);
-            assertEquals(superCategory, savedCategory.getSuperCategory()); // 상위 카테고리가 제대로 설정되었는지 확인
-            return savedCategory;
-        });
+        when(categoryRepository.findById(category.getCategoryId())).thenReturn(Optional.of(category));
+        when(categoryRepository.findById(superCategory.getCategoryId())).thenReturn(Optional.of(superCategory));
+        when(categoryRepository.findBySuperCategoryAndCategoryName(superCategory, "새로운 이름")).thenReturn(null); // 중복 없음
+        when(categoryRepository.findAllDescendants(category.getCategoryId())).thenReturn(Collections.emptyList()); // 하위 카테고리 없음
+        when(categoryRepository.save(any(Category.class))).thenAnswer(invocation -> invocation.getArgument(0)); // 저장된 카테고리 반환
 
         // 업데이트 요청 생성 및 호출
-        CategoryUpdateRequest request = new CategoryUpdateRequest("새로운 이름", superCategory.getCategoryId(), true);
+        CategoryUpdateRequest request = new CategoryUpdateRequest("새로운 이름", superCategory.getCategoryId());
         CategoryInfoResponse response = categoryService.updateCategory(category.getCategoryId(), request);
 
         // 결과 검증
@@ -386,16 +395,18 @@ public class CategoryServiceTest {
         // 기존 카테고리 및 하위 카테고리 설정
         Category category = new Category();
         category.setCategoryName("기존 카테고리");
+        category.setCategoryIsUsed(true);
 
         Category childCategory = new Category();
         childCategory.setCategoryName("중복된 이름");
+        childCategory.setCategoryIsUsed(true);
 
         // Mock 설정
         when(categoryRepository.findById(1L)).thenReturn(Optional.of(category));
         when(categoryRepository.findAllDescendants(1L)).thenReturn(List.of(childCategory));
 
         // 요청 생성 및 예외 검증
-        CategoryUpdateRequest request = new CategoryUpdateRequest("중복된 이름", null, true);
+        CategoryUpdateRequest request = new CategoryUpdateRequest("중복된 이름", null);
         assertThrows(DuplicateCategoryNameException.class, () -> categoryService.updateCategory(1L, request));
     }
 }
