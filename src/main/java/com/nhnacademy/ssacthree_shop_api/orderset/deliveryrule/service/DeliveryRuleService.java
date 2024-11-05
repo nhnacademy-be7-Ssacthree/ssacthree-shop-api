@@ -11,11 +11,9 @@ public interface DeliveryRuleService {
 
     DeliveryRule createDeliveryRule(DeliveryRuleCreateRequest deliveryRuleCreateRequest);
 
-    DeliveryRuleGetResponse getDeliveryRuleById(Long deliveryRuleId);
+    DeliveryRule getSelectedDeliveryRule();
 
-    void updateDeliveryRule(Long deliveryRuleId, DeliveryRuleUpdateRequest deliveryRuleUPdateRequest);
-
-    void deleteDeliveryRuleById(Long deliveryRuleId);
+    DeliveryRule updateDeliveryRule(DeliveryRuleUpdateRequest deliveryRuleUpdateRequest);
 
     List<DeliveryRuleGetResponse> getAllDeliveryRules();
 }
