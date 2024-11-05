@@ -1,8 +1,10 @@
 package com.nhnacademy.ssacthree_shop_api.bookset.book.repository;
 
+import com.nhnacademy.ssacthree_shop_api.bookset.author.domain.Author;
 import com.nhnacademy.ssacthree_shop_api.bookset.book.domain.Book;
 import com.nhnacademy.ssacthree_shop_api.bookset.book.dto.response.BookInfoResponse;
 import com.nhnacademy.ssacthree_shop_api.bookset.category.domain.Category;
+import com.nhnacademy.ssacthree_shop_api.bookset.tag.domain.Tag;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -17,7 +19,7 @@ public interface BookCustomRepository{
     Page<BookInfoResponse> findBooksByBookName(Pageable pageable, String bookName);
 
     // 판매 중, 재고 없는 책 전체 검색
-    Page<BookInfoResponse> findAllBooksByStatusOnSale(Pageable pageable);
+    Page<BookInfoResponse> findAllAvailableBooks(Pageable pageable);
 
     // 재고 없는 책 전체 검색
     Page<BookInfoResponse> findAllBooksByStatusNoStock(Pageable pageable);

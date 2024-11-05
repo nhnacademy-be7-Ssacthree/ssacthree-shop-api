@@ -1,5 +1,6 @@
 package com.nhnacademy.ssacthree_shop_api.bookset.book.repository.impl;
 
+import com.nhnacademy.ssacthree_shop_api.bookset.author.domain.Author;
 import com.nhnacademy.ssacthree_shop_api.bookset.author.domain.QAuthor;
 import com.nhnacademy.ssacthree_shop_api.bookset.book.domain.BookStatus;
 import com.nhnacademy.ssacthree_shop_api.bookset.book.domain.QBook;
@@ -9,9 +10,11 @@ import com.nhnacademy.ssacthree_shop_api.bookset.book.repository.BookCustomRepos
 import com.nhnacademy.ssacthree_shop_api.bookset.bookauthor.domain.QBookAuthor;
 import com.nhnacademy.ssacthree_shop_api.bookset.bookcategory.domain.QBookCategory;
 import com.nhnacademy.ssacthree_shop_api.bookset.booktag.domain.QBookTag;
+import com.nhnacademy.ssacthree_shop_api.bookset.category.domain.Category;
 import com.nhnacademy.ssacthree_shop_api.bookset.category.domain.QCategory;
 import com.nhnacademy.ssacthree_shop_api.bookset.publisher.domain.QPublisher;
 import com.nhnacademy.ssacthree_shop_api.bookset.tag.domain.QTag;
+import com.nhnacademy.ssacthree_shop_api.bookset.tag.domain.Tag;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
@@ -149,7 +152,7 @@ public class BookCustomRepositoryImpl implements BookCustomRepository {
      * @return Page<BookInfoResponse>
      */
     @Override
-    public Page<BookInfoResponse> findAllBooksByStatusOnSale(Pageable pageable) {
+    public Page<BookInfoResponse> findAllAvailableBooks(Pageable pageable) {
         List<BookInfoResponse> books = queryFactory
                 .from(book)
                 .join(book.publisher, publisher)
