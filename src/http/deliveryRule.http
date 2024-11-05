@@ -1,11 +1,17 @@
 ###배송정책 생성
-POST http://localhost:8081/api/admin/deliveryRules/create
+POST http://localhost:8082/api/shop/admin/deliveryRules/create
 Content-Type: application/json
 
 {
   "deliveryRuleName": "택배",
   "deliveryRuleFee": 3000,
-  "deliveryRuleDiscountCost": 30000,
-  "deliveryRuleIsSelected": true,
-  "deliveryRuleCreatedAt": "2021-07-01T00:00:00"
+  "deliveryRuleDiscountCost": 30000
+}
+
+###배송정책 수정
+POST http://localhost:8082/api/shop/admin/deliveryRules/update
+Content-Type: application/json
+
+{
+  "deliveryRuleId": 1
 }

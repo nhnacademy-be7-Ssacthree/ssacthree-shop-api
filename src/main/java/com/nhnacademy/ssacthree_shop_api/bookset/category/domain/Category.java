@@ -1,5 +1,9 @@
 package com.nhnacademy.ssacthree_shop_api.bookset.category.domain;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.*;
@@ -12,11 +16,12 @@ import java.util.List;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "categoryId")
 public class Category {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "category_id")
-    private long categoryId;
+    private Long categoryId;
 
     @NotNull
     @Size(max = 20)
@@ -25,11 +30,7 @@ public class Category {
 
     @NotNull
     @Setter
-    @Column(columnDefinition = "boolean default false")
     private boolean categoryIsUsed;
-    //todo: H2에서는 "boolean default false" 이거 괜찮지만
-    // MySQL에서는 "TINYINT(1) DEFAULT 0" 어떡하죠?
-    // 방법3: @Column private boolean categoryIsUsed = false;
 
 
     // 자기 참조
@@ -39,7 +40,7 @@ public class Category {
     private Category superCategory;
 
     @OneToMany(mappedBy = "superCategory", cascade = CascadeType.ALL)
-    private List<Category> categories = new ArrayList<>();
+    private List<Category> children = new ArrayList<>();
 
     public Category(String categoryName, Category superCategory) {
         this.categoryName = categoryName;
@@ -47,7 +48,7 @@ public class Category {
     }
 
 
-    //todo: categoryIsUsed에서 getter가 작동을 안 해서 임시로 추가함.
+    //categoryIsUsed에서 getter가 작동을 안 해서 추가함.
     public boolean getCategoryIsUsed() {
         return categoryIsUsed;
     }

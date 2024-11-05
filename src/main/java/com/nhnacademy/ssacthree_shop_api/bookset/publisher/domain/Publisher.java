@@ -3,6 +3,7 @@ package com.nhnacademy.ssacthree_shop_api.bookset.publisher.domain;
 import com.nhnacademy.ssacthree_shop_api.bookset.book.domain.Book;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Null;
 import jakarta.validation.constraints.Size;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -20,12 +21,14 @@ import lombok.Setter;
 public class Publisher {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name="publisher_id")
     private long publisherId;
 
     private String publisherName;
 
-
     private boolean publisherIsUsed;
+
+    public Publisher(String publisherName){
+        this.publisherName = publisherName;
+    }
 
 }

@@ -23,7 +23,7 @@ public class Book {
     private String bookName;
     private String bookIndex;
     private String bookInfo;
-    private String isbn;
+    private String bookIsbn;
 
     private LocalDateTime publicationDate;
 //    @Pattern(regexp = "\\d+", message = "가격은 숫자로 입력해주세요")
