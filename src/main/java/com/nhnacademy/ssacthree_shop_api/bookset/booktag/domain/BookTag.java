@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @AllArgsConstructor
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor
 public class BookTag {
     @EmbeddedId
     private BookTagId bookTagId;
@@ -27,4 +27,10 @@ public class BookTag {
     @MapsId("tagId")
     @JoinColumn(name = "tag_id")
     private Tag tag;
+
+    public BookTag(Book book, Tag tag) {
+        this.book = book;
+        this.tag = tag;
+        this.bookTagId = new BookTagId(book.getBookId(), tag.getTagId());
+    }
 }

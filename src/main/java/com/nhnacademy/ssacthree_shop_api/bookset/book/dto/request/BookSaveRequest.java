@@ -36,6 +36,13 @@ public class BookSaveRequest {
     // FK
     private Long publisherId;
 
+
+    private Long categoryId;
+
+    private Long authorId;
+
+    private Long tagId;
+
     public boolean getIsPacked() {
         return isPacked;
     }

@@ -1,13 +1,18 @@
 package com.nhnacademy.ssacthree_shop_api.bookset.book.repository.impl;
 
+import com.nhnacademy.ssacthree_shop_api.bookset.author.domain.QAuthor;
 import com.nhnacademy.ssacthree_shop_api.bookset.book.domain.BookStatus;
 import com.nhnacademy.ssacthree_shop_api.bookset.book.domain.QBook;
 import com.nhnacademy.ssacthree_shop_api.bookset.book.domain.converter.BookStatusConverter;
 import com.nhnacademy.ssacthree_shop_api.bookset.book.dto.response.BookInfoResponse;
 import com.nhnacademy.ssacthree_shop_api.bookset.book.repository.BookCustomRepository;
+import com.nhnacademy.ssacthree_shop_api.bookset.bookauthor.domain.QBookAuthor;
+import com.nhnacademy.ssacthree_shop_api.bookset.bookcategory.domain.QBookCategory;
+import com.nhnacademy.ssacthree_shop_api.bookset.booktag.domain.QBookTag;
+import com.nhnacademy.ssacthree_shop_api.bookset.category.domain.QCategory;
 import com.nhnacademy.ssacthree_shop_api.bookset.publisher.domain.QPublisher;
+import com.nhnacademy.ssacthree_shop_api.bookset.tag.domain.QTag;
 import com.querydsl.core.types.Projections;
-import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -24,6 +29,12 @@ public class BookCustomRepositoryImpl implements BookCustomRepository {
 
     private static final QBook book = QBook.book;
     private static final QPublisher publisher = QPublisher.publisher;
+    private static final QCategory category = QCategory.category;
+    private static final QBookCategory bookCategory = QBookCategory.bookCategory;
+    private static final QTag tag = QTag.tag;
+    private static final QBookTag bookTag = QBookTag.bookTag;
+    private static final QAuthor author = QAuthor.author;
+    private static final QBookAuthor bookAuthor = QBookAuthor.bookAuthor;
 
     BookStatusConverter converter = new BookStatusConverter();
 
@@ -36,7 +47,13 @@ public class BookCustomRepositoryImpl implements BookCustomRepository {
     public Page<BookInfoResponse> findRecentBooks(Pageable pageable) {
         List<BookInfoResponse> books = queryFactory
                 .from(book)
-                .innerJoin(publisher).on(book.publisher.publisherId.eq(publisher.publisherId))
+                .join(book.publisher, publisher)
+                .leftJoin(bookCategory).on(bookCategory.book.bookId.eq(book.bookId))
+                .leftJoin(category).on(bookCategory.category.categoryId.eq(category.categoryId))
+                .leftJoin(bookTag).on(bookTag.book.bookId.eq(book.bookId))
+                .leftJoin(tag).on(bookTag.tag.tagId.eq(tag.tagId))
+                .leftJoin(bookAuthor).on(bookAuthor.book.bookId.eq(book.bookId))
+                .leftJoin(author).on(bookAuthor.author.authorId.eq(author.authorId))
                 .select(Projections.fields(BookInfoResponse.class,
                         book.bookId,
                         book.bookName,
@@ -51,10 +68,13 @@ public class BookCustomRepositoryImpl implements BookCustomRepository {
                         book.bookThumbnailImageUrl,
                         book.bookViewCount,
                         book.bookDiscount,
-                        Expressions.stringTemplate("'{0}'", book.bookStatus).as("bookStatus"),
-                        book.publisher.publisherName
+                        book.bookStatus.stringValue().as("bookStatus"),
+                        book.publisher.publisherName,
+                        category.categoryName.as("categoryName"),
+                        tag.tagName.as("tagName"),
+                        author.authorName.as("authorName")
                 ))
-                .where(book.bookStatus.eq(BookStatus.ON_SALE), book.bookStatus.eq(BookStatus.NO_STOCK))
+                .where(book.bookStatus.eq(BookStatus.ON_SALE).or(book.bookStatus.eq(BookStatus.NO_STOCK)))
                 .orderBy(book.publicationDate.desc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
@@ -62,7 +82,7 @@ public class BookCustomRepositoryImpl implements BookCustomRepository {
 
         Long count = queryFactory.select(book.count())
                 .from(book)
-                .where(book.bookStatus.eq(BookStatus.ON_SALE), book.bookStatus.eq(BookStatus.NO_STOCK))
+                .where(book.bookStatus.eq(BookStatus.ON_SALE).or(book.bookStatus.eq(BookStatus.NO_STOCK)))
                 .fetchOne();
 
         count = (count == null ? 0 : count);
@@ -80,7 +100,13 @@ public class BookCustomRepositoryImpl implements BookCustomRepository {
     public Page<BookInfoResponse> findBooksByBookName(Pageable pageable, String bookName) {
         List<BookInfoResponse> books = queryFactory
                 .from(book)
-                .innerJoin(publisher).on(book.publisher.publisherId.eq(publisher.publisherId))
+                .join(book.publisher, publisher)
+                .leftJoin(bookCategory).on(bookCategory.book.bookId.eq(book.bookId))
+                .leftJoin(category).on(bookCategory.category.categoryId.eq(category.categoryId))
+                .leftJoin(bookTag).on(bookTag.book.bookId.eq(book.bookId))
+                .leftJoin(tag).on(bookTag.tag.tagId.eq(tag.tagId))
+                .leftJoin(bookAuthor).on(bookAuthor.book.bookId.eq(book.bookId))
+                .leftJoin(author).on(bookAuthor.author.authorId.eq(author.authorId))
                 .select(Projections.fields(BookInfoResponse.class,
                         book.bookId,
                         book.bookName,
@@ -95,10 +121,13 @@ public class BookCustomRepositoryImpl implements BookCustomRepository {
                         book.bookThumbnailImageUrl,
                         book.bookViewCount,
                         book.bookDiscount,
-                        Expressions.stringTemplate("'{0}'", book.bookStatus).as("bookStatus"),
-                        book.publisher.publisherName
+                        book.bookStatus.stringValue().as("bookStatus"),
+                        book.publisher.publisherName,
+                        category.categoryName.as("categoryName"),
+                        tag.tagName.as("tagName"),
+                        author.authorName.as("authorName")
                 ))
-                .where(book.bookStatus.eq(BookStatus.ON_SALE), book.bookStatus.eq(BookStatus.NO_STOCK), book.bookName.containsIgnoreCase(bookName))
+                .where(book.bookStatus.eq(BookStatus.ON_SALE).or(book.bookStatus.eq(BookStatus.NO_STOCK)), book.bookName.containsIgnoreCase(bookName))
                 .orderBy(book.publicationDate.desc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
@@ -106,7 +135,7 @@ public class BookCustomRepositoryImpl implements BookCustomRepository {
 
         Long count = queryFactory.select(book.count())
                 .from(book)
-                .where(book.bookStatus.eq(BookStatus.ON_SALE), book.bookStatus.eq(BookStatus.NO_STOCK), book.bookName.containsIgnoreCase(bookName))
+                .where(book.bookStatus.eq(BookStatus.ON_SALE).or(book.bookStatus.eq(BookStatus.NO_STOCK)), book.bookName.containsIgnoreCase(bookName))
                 .fetchOne();
 
         count = (count == null ? 0 : count);
@@ -123,7 +152,13 @@ public class BookCustomRepositoryImpl implements BookCustomRepository {
     public Page<BookInfoResponse> findAllBooksByStatusOnSale(Pageable pageable) {
         List<BookInfoResponse> books = queryFactory
                 .from(book)
-                .innerJoin(publisher).on(book.publisher.publisherId.eq(publisher.publisherId))
+                .join(book.publisher, publisher)
+                .leftJoin(bookCategory).on(bookCategory.book.bookId.eq(book.bookId))
+                .leftJoin(category).on(bookCategory.category.categoryId.eq(category.categoryId))
+                .leftJoin(bookTag).on(bookTag.book.bookId.eq(book.bookId))
+                .leftJoin(tag).on(bookTag.tag.tagId.eq(tag.tagId))
+                .leftJoin(bookAuthor).on(bookAuthor.book.bookId.eq(book.bookId))
+                .leftJoin(author).on(bookAuthor.author.authorId.eq(author.authorId))
                 .select(Projections.fields(BookInfoResponse.class,
                         book.bookId,
                         book.bookName,
@@ -138,10 +173,13 @@ public class BookCustomRepositoryImpl implements BookCustomRepository {
                         book.bookThumbnailImageUrl,
                         book.bookViewCount,
                         book.bookDiscount,
-                        Expressions.stringTemplate("'{0}'", book.bookStatus).as("bookStatus"),
-                        book.publisher.publisherName
+                        book.bookStatus.stringValue().as("bookStatus"),
+                        book.publisher.publisherName,
+                        category.categoryName.as("categoryName"),
+                        tag.tagName.as("tagName"),
+                        author.authorName.as("authorName")
                 ))
-                .where(book.bookStatus.eq(BookStatus.ON_SALE), book.bookStatus.eq(BookStatus.NO_STOCK))
+                .where(book.bookStatus.eq(BookStatus.ON_SALE).or(book.bookStatus.eq(BookStatus.NO_STOCK)))
                 .orderBy(book.publicationDate.desc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
@@ -149,7 +187,7 @@ public class BookCustomRepositoryImpl implements BookCustomRepository {
 
         Long count = queryFactory.select(book.count())
                 .from(book)
-                .where(book.bookStatus.eq(BookStatus.ON_SALE), book.bookStatus.eq(BookStatus.NO_STOCK))
+                .where(book.bookStatus.eq(BookStatus.ON_SALE).or(book.bookStatus.eq(BookStatus.NO_STOCK)))
                 .fetchOne();
 
         count = (count == null ? 0 : count);
@@ -166,7 +204,13 @@ public class BookCustomRepositoryImpl implements BookCustomRepository {
     public Page<BookInfoResponse> findAllBooksByStatusNoStock(Pageable pageable) {
         List<BookInfoResponse> books = queryFactory
                 .from(book)
-                .innerJoin(publisher).on(book.publisher.publisherId.eq(publisher.publisherId))
+                .join(book.publisher, publisher)
+                .leftJoin(bookCategory).on(bookCategory.book.bookId.eq(book.bookId))
+                .leftJoin(category).on(bookCategory.category.categoryId.eq(category.categoryId))
+                .leftJoin(bookTag).on(bookTag.book.bookId.eq(book.bookId))
+                .leftJoin(tag).on(bookTag.tag.tagId.eq(tag.tagId))
+                .leftJoin(bookAuthor).on(bookAuthor.book.bookId.eq(book.bookId))
+                .leftJoin(author).on(bookAuthor.author.authorId.eq(author.authorId))
                 .select(Projections.fields(BookInfoResponse.class,
                         book.bookId,
                         book.bookName,
@@ -181,8 +225,11 @@ public class BookCustomRepositoryImpl implements BookCustomRepository {
                         book.bookThumbnailImageUrl,
                         book.bookViewCount,
                         book.bookDiscount,
-                        Expressions.stringTemplate("'{0}'", book.bookStatus).as("bookStatus"),
-                        book.publisher.publisherName
+                        book.bookStatus.stringValue().as("bookStatus"),
+                        book.publisher.publisherName,
+                        category.categoryName.as("categoryName"),
+                        tag.tagName.as("tagName"),
+                        author.authorName.as("authorName")
                 ))
                 .where(book.bookStatus.eq(BookStatus.NO_STOCK))
                 .orderBy(book.publicationDate.desc())
@@ -209,7 +256,13 @@ public class BookCustomRepositoryImpl implements BookCustomRepository {
     public Page<BookInfoResponse> findStatusDiscontinued(Pageable pageable) {
         List<BookInfoResponse> books = queryFactory
                 .from(book)
-                .innerJoin(publisher).on(book.publisher.publisherId.eq(publisher.publisherId))
+                .join(book.publisher, publisher)
+                .leftJoin(bookCategory).on(bookCategory.book.bookId.eq(book.bookId))
+                .leftJoin(category).on(bookCategory.category.categoryId.eq(category.categoryId))
+                .leftJoin(bookTag).on(bookTag.book.bookId.eq(book.bookId))
+                .leftJoin(tag).on(bookTag.tag.tagId.eq(tag.tagId))
+                .leftJoin(bookAuthor).on(bookAuthor.book.bookId.eq(book.bookId))
+                .leftJoin(author).on(bookAuthor.author.authorId.eq(author.authorId))
                 .select(Projections.fields(BookInfoResponse.class,
                         book.bookId,
                         book.bookName,
@@ -224,8 +277,11 @@ public class BookCustomRepositoryImpl implements BookCustomRepository {
                         book.bookThumbnailImageUrl,
                         book.bookViewCount,
                         book.bookDiscount,
-                        Expressions.stringTemplate("'{0}'", book.bookStatus).as("bookStatus"),
-                        book.publisher.publisherName
+                        book.bookStatus.stringValue().as("bookStatus"),
+                        book.publisher.publisherName,
+                        category.categoryName.as("categoryName"),
+                        tag.tagName.as("tagName"),
+                        author.authorName.as("authorName")
                 ))
                 .where(book.bookStatus.eq(BookStatus.DISCONTINUED))
                 .orderBy(book.publicationDate.desc())

@@ -33,7 +33,11 @@ public class BookInfoResponse {
     // FK
     private String publisherName;
 
-    public BookInfoResponse(Book book) {
+    private String categoryName;
+    private String tagName;
+    private String authorName;
+
+    public BookInfoResponse(Book book, String categoryName, String tagName, String authorName) {
         this.bookId = book.getBookId();
         this.bookName = book.getBookName();
         this.bookIndex = book.getBookIndex();
@@ -52,6 +56,10 @@ public class BookInfoResponse {
         this.bookStatus = converter.convertToDatabaseColumn(book.getBookStatus());
 
         this.publisherName = book.getPublisher().getPublisherName();
+
+        this.categoryName = categoryName;
+        this.tagName = tagName;
+        this.authorName = authorName;
     }
 
 }
