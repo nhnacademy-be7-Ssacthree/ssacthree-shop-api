@@ -19,8 +19,6 @@ import java.util.List;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-@JsonSerialize(using = CategoryInfoResponseSerializer.class) // 맞춤 Serializer 적용
-@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "categoryId")
 public class CategoryInfoResponse {
 
     private Long categoryId;
