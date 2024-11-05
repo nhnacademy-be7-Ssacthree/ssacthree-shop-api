@@ -3,6 +3,7 @@ package com.nhnacademy.ssacthree_shop_api.orderset.deliveryrule.controller;
 import com.nhnacademy.ssacthree_shop_api.commons.dto.MessageResponse;
 import com.nhnacademy.ssacthree_shop_api.orderset.deliveryrule.dto.DeliveryRuleCreateRequest;
 import com.nhnacademy.ssacthree_shop_api.orderset.deliveryrule.dto.DeliveryRuleGetResponse;
+import com.nhnacademy.ssacthree_shop_api.orderset.deliveryrule.dto.DeliveryRuleUpdateRequest;
 import com.nhnacademy.ssacthree_shop_api.orderset.deliveryrule.service.DeliveryRuleService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -13,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/admin/deliveryRules")
+@RequestMapping("/api/shop/admin/deliveryRules")
 @RequiredArgsConstructor
 public class DeliveryRuleController {
 
@@ -26,11 +27,21 @@ public class DeliveryRuleController {
 
     @PostMapping("/create")
     public ResponseEntity<MessageResponse> createDeliveryRule(
-            @Valid @RequestBody DeliveryRuleCreateRequest deliveryRuleCreateRequest) {
+            @Valid @RequestBody DeliveryRuleCreateRequest request) {
 
-        deliveryRuleService.createDeliveryRule(deliveryRuleCreateRequest);
+        deliveryRuleService.createDeliveryRule(request);
         MessageResponse messageResponse = new MessageResponse("생성 성공");
 
         return ResponseEntity.status(HttpStatus.CREATED).body(messageResponse);
+    }
+
+    @PutMapping
+    public ResponseEntity<MessageResponse> updateDeliveryRule(
+            @Valid @RequestBody DeliveryRuleUpdateRequest deliveryRuleUpdateRequest) {
+
+        deliveryRuleService.updateDeliveryRule(deliveryRuleUpdateRequest);
+        MessageResponse messageResponse = new MessageResponse("수정 성공");
+
+        return ResponseEntity.status(HttpStatus.OK).body(messageResponse);
     }
 }

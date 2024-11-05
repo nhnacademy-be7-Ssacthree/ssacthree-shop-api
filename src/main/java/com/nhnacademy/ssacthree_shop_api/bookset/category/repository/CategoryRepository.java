@@ -29,8 +29,8 @@ public interface CategoryRepository extends JpaRepository<Category, Long>, Categ
      * 특정 상위 카테고리 아래에 같은 이름의 카테고리가 존재하는지 확인합니다.
      *
      * @param superCategory 상위 카테고리
-     * @param categoryName  확인할 카테고리 이름
-     * @return 같은 이름의 카테고리가 존재하면 true, 그렇지 않으면 false
+     * @param categoryName  설정하고자 하는 카테고리 이름
+     * @return 같은 상위 카테고리 아래 설정하고자 하는 이름을 가진 카테고리
      */
-    boolean existsBySuperCategoryAndCategoryName(Category superCategory, String categoryName);
+    Category findBySuperCategoryAndCategoryName(Category superCategory, String categoryName);
 }

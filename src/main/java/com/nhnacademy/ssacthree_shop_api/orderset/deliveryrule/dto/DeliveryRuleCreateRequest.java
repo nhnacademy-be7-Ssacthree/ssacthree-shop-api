@@ -21,7 +21,4 @@ public class DeliveryRuleCreateRequest {
 
     @Min(0)
     private int deliveryDiscountCost;
-
-    @NotNull
-    private boolean deliveryRuleIsSelected;
 }
