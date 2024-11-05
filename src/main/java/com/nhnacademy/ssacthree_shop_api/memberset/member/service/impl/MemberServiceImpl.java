@@ -4,8 +4,11 @@ import com.nhnacademy.ssacthree_shop_api.customer.domain.Customer;
 import com.nhnacademy.ssacthree_shop_api.customer.dto.CustomerCreateRequest;
 import com.nhnacademy.ssacthree_shop_api.customer.service.CustomerService;
 import com.nhnacademy.ssacthree_shop_api.memberset.member.domain.Member;
+import com.nhnacademy.ssacthree_shop_api.memberset.member.dto.MemberInfoGetResponse;
 import com.nhnacademy.ssacthree_shop_api.memberset.member.dto.MemberRegisterRequest;
+import com.nhnacademy.ssacthree_shop_api.memberset.member.repository.MemberCustomRepository;
 import com.nhnacademy.ssacthree_shop_api.memberset.member.repository.MemberRepository;
+import com.nhnacademy.ssacthree_shop_api.memberset.member.repository.impl.MemberCustomerRepositoryImpl;
 import com.nhnacademy.ssacthree_shop_api.memberset.member.service.MemberService;
 import com.nhnacademy.ssacthree_shop_api.memberset.membergrade.domain.MemberGrade;
 import com.nhnacademy.ssacthree_shop_api.memberset.membergrade.exception.MemberGradeNotFoundException;
@@ -22,6 +25,8 @@ public class MemberServiceImpl implements MemberService {
     private final CustomerService customerService;
     private final MemberGradeRepository memberGradeRepository;
     private final PasswordEncoder passwordEncoder;
+    private final MemberCustomRepository memberCustomRepository;
+
 
     @Override
     public void registerMember(MemberRegisterRequest memberRegisterRequest) {
@@ -46,8 +51,9 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
-    public void getMemberById(String memberLoginId) {
-
+    public MemberInfoGetResponse getMemberInfoById(String memberLoginId) {
+        MemberInfoGetResponse memberInfoGetResponse = memberCustomRepository.getMemberWithCustomer(memberLoginId);
+        return memberInfoGetResponse;
     }
 
 //    @Override

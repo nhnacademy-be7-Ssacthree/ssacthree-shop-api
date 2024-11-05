@@ -1,7 +1,7 @@
 package com.nhnacademy.ssacthree_shop_api.memberset.member.controller;
 
 import com.nhnacademy.ssacthree_shop_api.commons.dto.MessageResponse;
-import com.nhnacademy.ssacthree_shop_api.memberset.member.dto.MemberGetResponse;
+import com.nhnacademy.ssacthree_shop_api.memberset.member.dto.MemberInfoGetResponse;
 import com.nhnacademy.ssacthree_shop_api.memberset.member.dto.MemberRegisterRequest;
 import com.nhnacademy.ssacthree_shop_api.memberset.member.service.MemberService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -34,9 +34,10 @@ public class MemberController {
     }
 
     @GetMapping("/mypage")
-    public ResponseEntity<MemberGetResponse> getMemberInfo(HttpServletRequest request, @RequestHeader(name = "X-USER-ID") String header) {
+    public ResponseEntity<MemberInfoGetResponse> getMemberInfo(@RequestHeader(name = "X-USER-ID") String header) {
 
-        return null;
+        MemberInfoGetResponse memberInfoGetResponse = memberService.getMemberInfoById(header);
+        return ResponseEntity.status(HttpStatus.OK).body(memberInfoGetResponse);
 
     }
 }
