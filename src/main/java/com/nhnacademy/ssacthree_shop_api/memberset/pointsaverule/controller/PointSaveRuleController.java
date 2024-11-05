@@ -24,7 +24,7 @@ public class PointSaveRuleController {
         return ResponseEntity.ok().body(pointSaveRuleService.getAllPointSaveRules());
     }
 
-    @PostMapping("/create")
+    @PostMapping
     public ResponseEntity<MessageResponse> createPointSaveRule(
             @Valid @RequestBody PointSaveRuleCreateRequest request) {
 

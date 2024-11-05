@@ -25,7 +25,7 @@ public class DeliveryRuleController {
         return ResponseEntity.ok().body(deliveryRuleService.getAllDeliveryRules());
     }
 
-    @PostMapping("/create")
+    @PostMapping
     public ResponseEntity<MessageResponse> createDeliveryRule(
             @Valid @RequestBody DeliveryRuleCreateRequest request) {
 
