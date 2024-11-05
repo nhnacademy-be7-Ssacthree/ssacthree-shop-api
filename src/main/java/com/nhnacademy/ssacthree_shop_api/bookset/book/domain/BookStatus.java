@@ -7,8 +7,9 @@ import java.util.Arrays;
 @Getter
 public enum BookStatus {
     ON_SALE("판매 중"),
+    NO_STOCK("재고 없음"),
     DISCONTINUED("판매 중단"),
-    OUT_OF_STOCK("재고 없음");
+    DELETE_BOOK("삭제 도서");
 
     private final String status;
 

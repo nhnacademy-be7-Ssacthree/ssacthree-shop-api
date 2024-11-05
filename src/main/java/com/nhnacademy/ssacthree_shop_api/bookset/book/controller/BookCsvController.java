@@ -16,11 +16,15 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 public class BookCsvController {
 
-    @Autowired
+
     private CsvParserService csvParserService;
 
-    @Autowired
     private PublisherService publisherService;
+
+    public BookCsvController(CsvParserService csvParserService, PublisherService publisherService) {
+        this.csvParserService = csvParserService;
+        this.publisherService = publisherService;
+    }
 
 
     @PostMapping("/bookauthors")

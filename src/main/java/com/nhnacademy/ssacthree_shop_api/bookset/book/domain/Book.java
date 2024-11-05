@@ -55,4 +55,12 @@ public class Book {
     @JoinColumn(name = "publisher_id")
     private  Publisher publisher;
 
+    public boolean getIsPacked() {
+        return isPacked;
+    }
+
+    public void setIsPacked(boolean isPacked) {
+        this.isPacked = isPacked;
+    }
+
 }

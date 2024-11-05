@@ -35,4 +35,12 @@ public class BookSaveRequest {
 
     // FK
     private Long publisherId;
+
+    public boolean getIsPacked() {
+        return isPacked;
+    }
+
+    public void setIsPacked(boolean isPacked) {
+        this.isPacked = isPacked;
+    }
 }
