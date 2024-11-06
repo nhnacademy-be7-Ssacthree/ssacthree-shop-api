@@ -1,0 +1,19 @@
+### 사용자 주소 등록
+POST http://localhost:8083/api/shop/members/address
+Content-Type: application/json
+X-USER-ID: 2
+
+{
+  "addressAlias": "Home",
+  "addressDetail": "Apartment 101",
+  "addressRoadname": "123 Main St",
+  "addressPostalNumber": "54321"
+}
+
+### 사용자 주소 전체 조회
+GET http://localhost:8083/api/shop/members/address
+Content-Type: application/json
+
+### 사용자 주소 삭제 (1번 삭제)
+DELETE http://localhost:8083/api/shop/members/address/1
+Content-Type: application/json

@@ -10,9 +10,8 @@ import lombok.NoArgsConstructor;
 @Getter
 public class AddressCreateRequest {
 
-    private Member member; // 이거 있어야하나? 어케 가져오지
-
     private String addressAlias;
+    private String addressRoadname;
     private String addressDetail;
     private String addressPostalNumber;
 

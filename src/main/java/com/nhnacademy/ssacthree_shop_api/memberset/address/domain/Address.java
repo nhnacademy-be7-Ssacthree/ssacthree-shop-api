@@ -32,9 +32,11 @@ public class Address {
     @JoinColumn(name="customer_id")
     private Member member;
 
-    @Null
     @Size(max = 15)
     private String addressAlias;
+
+    @Size(max = 30)
+    private String addressRoadname;
 
     @NotNull
     @Size(max = 35)

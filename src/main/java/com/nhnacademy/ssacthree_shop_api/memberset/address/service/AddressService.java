@@ -5,6 +5,6 @@ import com.nhnacademy.ssacthree_shop_api.memberset.address.dto.AddressCreateRequ
 
 public interface AddressService {
 
-    Address createAddress(AddressCreateRequest addressCreateRequest);
+    Address createAddress(long memberId, AddressCreateRequest addressCreateRequest);
 
 }
