@@ -1,4 +1,4 @@
-package com.nhnacademy.ssacthree_shop_api.orderset.deliveryrule.service.Impl;
+package com.nhnacademy.ssacthree_shop_api.orderset.deliveryrule.service.impl;
 
 import com.nhnacademy.ssacthree_shop_api.orderset.deliveryrule.domain.DeliveryRule;
 import com.nhnacademy.ssacthree_shop_api.orderset.deliveryrule.domain.QDeliveryRule;
@@ -16,7 +16,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -34,35 +33,29 @@ public class DeliveryRuleServiceImpl implements DeliveryRuleService {
         DeliveryRule deliveryRule = new DeliveryRule(
             deliveryRuleCreateRequest.getDeliveryRuleName(),
             deliveryRuleCreateRequest.getDeliveryFee(),
-            deliveryRuleCreateRequest.getDeliveryDiscountCost(),
-            deliveryRuleCreateRequest.isDeliveryRuleIsSelected(),
-            LocalDateTime.now()
+            deliveryRuleCreateRequest.getDeliveryDiscountCost()
         );
+
+        if (getAllDeliveryRules().isEmpty()) {
+            deliveryRule.setDeliveryRuleIsSelected(true);
+        }
+
         return deliveryRuleRepository.save(deliveryRule);
     }
 
     @Transactional(readOnly = true)
     @Override
-    public DeliveryRuleGetResponse getDeliveryRuleById(Long deliveryRuleId) {
-        if (deliveryRuleId <= 0) {
-            throw new IllegalArgumentException("deliveryRuleId는 0 이하일 수 없습니다.");
-        }
-
-        DeliveryRule foundDeliveryRule = deliveryRuleRepository.findById(deliveryRuleId)
-                .orElseThrow(() -> new DeliveryRuleNotFoundException(deliveryRuleId + "를 찾을 수 없습니다."));
-
-        return new DeliveryRuleGetResponse(
-            foundDeliveryRule.getId(),
-            foundDeliveryRule.getDeliveryRuleName(),
-            foundDeliveryRule.getDeliveryFee(),
-            foundDeliveryRule.getDeliveryDiscountCost(),
-            foundDeliveryRule.isDeliveryRuleIsSelected(),
-            foundDeliveryRule.getDeliveryRuleCreatedAt()
-        );
+    public DeliveryRule getSelectedDeliveryRule() {
+        return deliveryRuleRepository.findAll()
+                .stream()
+                .filter(DeliveryRule::isDeliveryRuleIsSelected)
+                .findFirst()
+                .orElseThrow(() -> new DeliveryRuleNotFoundException("선택된 배송 규칙이 없습니다."));
     }
 
     @Override
-    public void updateDeliveryRule(Long deliveryRuleId, DeliveryRuleUpdateRequest deliveryRuleUPdateRequest) {
+    public DeliveryRule updateDeliveryRule(DeliveryRuleUpdateRequest deliveryRuleUpdateRequest) {
+        Long deliveryRuleId = deliveryRuleUpdateRequest.getDeliveryRuleId();
         if (deliveryRuleId <= 0) {
             throw new IllegalArgumentException("deliveryRuleId는 0 이하일 수 없습니다.");
         }
@@ -70,26 +63,14 @@ public class DeliveryRuleServiceImpl implements DeliveryRuleService {
         DeliveryRule deliveryRule = deliveryRuleRepository.findById(deliveryRuleId)
                 .orElseThrow(() -> new DeliveryRuleNotFoundException(deliveryRuleId + "를 찾을 수 없습니다."));
 
-        deliveryRule.setDeliveryRuleName(deliveryRuleUPdateRequest.getDeliveryRuleName());
-        deliveryRule.setDeliveryFee(deliveryRuleUPdateRequest.getDeliveryFee());
-        deliveryRule.setDeliveryDiscountCost(deliveryRuleUPdateRequest.getDeliveryDiscountCost());
-        deliveryRule.setDeliveryRuleIsSelected(deliveryRuleUPdateRequest.isDeliveryRuleIsSelected());
-        deliveryRule.setDeliveryRuleCreatedAt(deliveryRuleUPdateRequest.getDeliveryRuleCreatedAt());
+        // 기존에 선택된 배송정책 찾아서 선택 해제
+        DeliveryRule selectedDeliveryRule = getSelectedDeliveryRule();
+        selectedDeliveryRule.setDeliveryRuleIsSelected(false);
 
-        deliveryRuleRepository.save(deliveryRule);
-    }
+        // 새로운 배송정책 선택
+        deliveryRule.setDeliveryRuleIsSelected(true);
 
-    @Override
-    public void deleteDeliveryRuleById(Long deliveryRuleId) {
-        if (deliveryRuleId <= 0) {
-            throw new IllegalArgumentException("deliveryRuleId는 0 이하일 수 없습니다.");
-        }
-
-        if (!deliveryRuleRepository.existsById(deliveryRuleId)) {
-            throw new DeliveryRuleNotFoundException(deliveryRuleId + "를 찾을 수 없습니다.");
-        }
-
-        deliveryRuleRepository.deleteById(deliveryRuleId);
+        return deliveryRuleRepository.save(deliveryRule);
     }
 
     @Override
@@ -99,7 +80,7 @@ public class DeliveryRuleServiceImpl implements DeliveryRuleService {
         return new JPAQueryFactory(entityManager)
                 .select(Projections.constructor(
                         DeliveryRuleGetResponse.class,
-                        deliveryRule.id,
+                        deliveryRule.deliveryRuleId,
                         deliveryRule.deliveryRuleName,
                         deliveryRule.deliveryFee,
                         deliveryRule.deliveryDiscountCost,
@@ -107,7 +88,8 @@ public class DeliveryRuleServiceImpl implements DeliveryRuleService {
                         deliveryRule.deliveryRuleCreatedAt
                 ))
                 .from(deliveryRule)
+                .orderBy(deliveryRule.deliveryRuleIsSelected.desc())
+                .orderBy(deliveryRule.deliveryRuleCreatedAt.asc())
                 .fetch();
     }
-
 }
