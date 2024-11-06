@@ -20,6 +20,6 @@ GET http://localhost:8083/api/shop/members/address/1
 Content-Type: application/json
 X-USER-ID: kim123456
 
-### 사용자 주소 삭제 (1번 삭제)
-DELETE http://localhost:8083/api/shop/members/address/
+### 사용자 주소 삭제 (4번 삭제, 아이디에 따라 수정해서 사용) (구현 완료)
+DELETE http://localhost:8083/api/shop/members/address/4
 Content-Type: application/json

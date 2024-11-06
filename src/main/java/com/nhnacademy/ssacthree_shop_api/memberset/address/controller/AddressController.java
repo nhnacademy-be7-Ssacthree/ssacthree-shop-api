@@ -51,9 +51,9 @@ public class AddressController {
 //        return ResponseEntity.ok(address);
 //    }
 
-    @DeleteMapping("/address")
+    @DeleteMapping("/address/{addressId}")
     public ResponseEntity<Void> deleteAddress(
-        @RequestParam("addressId") String addressId) {
+        @PathVariable("addressId") String addressId) {
 
         addressService.deleteAddressById(addressId);
 
