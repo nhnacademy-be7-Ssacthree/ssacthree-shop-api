@@ -9,6 +9,8 @@ import com.nhnacademy.ssacthree_shop_api.memberset.address.service.AddressServic
 import com.nhnacademy.ssacthree_shop_api.memberset.member.domain.Member;
 import com.nhnacademy.ssacthree_shop_api.memberset.member.exception.MemberNotFoundException;
 import com.nhnacademy.ssacthree_shop_api.memberset.member.repository.MemberRepository;
+import java.util.List;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -39,4 +41,21 @@ public class AddressServiceImpl implements AddressService {
             address.getAddressPostalNumber()
         );
     }
+
+    @Override
+    public List<AddressResponse> getAddressesByUserId(String userId) {
+        Member member = memberRepository.findByMemberLoginId(userId)
+            .orElseThrow(() -> new MemberNotFoundException("member not found"));
+
+        // Address 엔티티를 AddressResponse DTO로 변환
+        return addressRepository.findAllByMember(member).stream()
+            .map(address -> new AddressResponse(
+                address.getAddressAlias(),
+                address.getAddressRoadname(),
+                address.getAddressDetail(),
+                address.getAddressPostalNumber()
+            ))
+            .collect(Collectors.toList());
+    }
+
 }
