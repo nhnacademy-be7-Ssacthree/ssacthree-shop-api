@@ -33,7 +33,7 @@ public class MemberController {
         return ResponseEntity.status(HttpStatus.CREATED).body(messageResponse);
     }
 
-    @GetMapping("/mypage")
+    @GetMapping("/my-page")
     public ResponseEntity<MemberInfoGetResponse> getMemberInfo(@RequestHeader(name = "X-USER-ID") String header) {
 
         MemberInfoGetResponse memberInfoGetResponse = memberService.getMemberInfoById(header);
