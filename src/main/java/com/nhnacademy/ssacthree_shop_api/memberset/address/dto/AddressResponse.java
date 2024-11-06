@@ -8,6 +8,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Getter
 public class AddressResponse {
+
+    private long addressId;
     private String addressAlias;
     private String addressDetail;
     private String addressRoadname;

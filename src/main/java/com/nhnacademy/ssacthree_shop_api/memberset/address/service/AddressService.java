@@ -10,4 +10,6 @@ public interface AddressService {
     AddressResponse createAddress(String header, AddressCreateRequest addressCreateRequest);
 
     List<AddressResponse> getAddressesByUserId(String header);
+
+    void deleteAddressById(String addressId);
 }

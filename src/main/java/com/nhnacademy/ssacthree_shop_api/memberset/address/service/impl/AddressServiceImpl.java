@@ -1,15 +1,16 @@
 package com.nhnacademy.ssacthree_shop_api.memberset.address.service.impl;
 
-import com.nhnacademy.ssacthree_shop_api.customer.repository.CustomerRepository;
 import com.nhnacademy.ssacthree_shop_api.memberset.address.domain.Address;
 import com.nhnacademy.ssacthree_shop_api.memberset.address.dto.AddressCreateRequest;
 import com.nhnacademy.ssacthree_shop_api.memberset.address.dto.AddressResponse;
+import com.nhnacademy.ssacthree_shop_api.memberset.address.exception.DuplicateAddressException;
 import com.nhnacademy.ssacthree_shop_api.memberset.address.repository.AddressRepository;
 import com.nhnacademy.ssacthree_shop_api.memberset.address.service.AddressService;
 import com.nhnacademy.ssacthree_shop_api.memberset.member.domain.Member;
 import com.nhnacademy.ssacthree_shop_api.memberset.member.exception.MemberNotFoundException;
 import com.nhnacademy.ssacthree_shop_api.memberset.member.repository.MemberRepository;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -33,8 +34,14 @@ public class AddressServiceImpl implements AddressService {
             addressCreateRequest.getAddressRoadname(),
             addressCreateRequest.getAddressPostalNumber()
         );
+        Optional<Address> existingAddress = addressRepository.findByAddressRoadname(addressCreateRequest.getAddressRoadname());
+
+        if (existingAddress.isPresent()) {
+            throw new DuplicateAddressException("해당 도로명 주소는 이미 존재합니다.");
+        }
         addressRepository.save(address);
         return new AddressResponse(
+            address.getRegisteredAddressId(),
             address.getAddressAlias(),
             address.getAddressDetail(),
             address.getAddressRoadname(),
@@ -50,12 +57,20 @@ public class AddressServiceImpl implements AddressService {
         // Address 엔티티를 AddressResponse DTO로 변환
         return addressRepository.findAllByMember(member).stream()
             .map(address -> new AddressResponse(
+                address.getRegisteredAddressId(),
                 address.getAddressAlias(),
                 address.getAddressRoadname(),
                 address.getAddressDetail(),
                 address.getAddressPostalNumber()
             ))
             .collect(Collectors.toList());
+    }
+
+    @Override
+    public void deleteAddressById(String addressId) {
+        long id = Long.parseLong(addressId);
+        Address address = addressRepository.findAddressByRegisteredAddressId(id);
+        addressRepository.delete(address);
     }
 
 }

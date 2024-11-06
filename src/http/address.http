@@ -1,4 +1,4 @@
-### 사용자 주소 등록
+### 사용자 주소 등록 (구현 완료)
 POST http://localhost:8083/api/shop/members/address
 Content-Type: application/json
 X-USER-ID: kim123456
@@ -10,11 +10,16 @@ X-USER-ID: kim123456
   "addressPostalNumber": "54321"
 }
 
-### 사용자 주소 전체 조회
+### 사용자 주소 전체 조회 (구현 완료)
 GET http://localhost:8083/api/shop/members/address
 Content-Type: application/json
 X-USER-ID: kim123456
 
+### 사용자 주소 일부 조회
+GET http://localhost:8083/api/shop/members/address/1
+Content-Type: application/json
+X-USER-ID: kim123456
+
 ### 사용자 주소 삭제 (1번 삭제)
-DELETE http://localhost:8083/api/shop/members/address/1
+DELETE http://localhost:8083/api/shop/members/address/
 Content-Type: application/json
