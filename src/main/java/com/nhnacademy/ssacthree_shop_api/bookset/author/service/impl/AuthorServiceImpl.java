@@ -33,14 +33,16 @@ public class AuthorServiceImpl implements AuthorService {
 
     @Override
     public Author createAuthor(AuthorCreateRequest authorCreateRequest) {
+        if (Objects.isNull(authorCreateRequest) ||
+                Objects.isNull(authorCreateRequest.getAuthorName()) ||
+                Objects.isNull(authorCreateRequest.getAuthorInfo())) {
+            throw new AuthorNotFoundException(AUTHOR_CREATE_ERROR_MESSAGE);
+        }
+
         Author author = new Author(
                 authorCreateRequest.getAuthorName(),
                 authorCreateRequest.getAuthorInfo()
         );
-
-        if(getAllAuthors().isEmpty()){
-            throw new AuthorNotFoundException(AUTHOR_CREATE_ERROR_MESSAGE);
-        }
 
         return authorRepository.save(author);
     }
@@ -51,6 +53,7 @@ public class AuthorServiceImpl implements AuthorService {
         if(authorId < 1){
             throw new AuthorNotFoundException(AUTHOR_ID_ERROR_MESSAGE);
         }
+
         Author author = authorRepository.findById(authorId)
                 .orElseThrow(() -> new AuthorNotFoundException(AUTHOR_NOT_FOUND_MESSAGE + authorId));
 
@@ -74,5 +77,34 @@ public class AuthorServiceImpl implements AuthorService {
                 .from(qAuthor)
                 .orderBy(qAuthor.authorId.asc())
                 .fetch();
+    }
+
+    @Override
+    public AuthorGetResponse getAuthorById(long authorId) {
+        QAuthor qAuthor = QAuthor.author;
+
+        return new JPAQueryFactory(entityManager)
+                .select(Projections.constructor(
+                        AuthorGetResponse.class,
+                        qAuthor.authorId,
+                        qAuthor.authorName,
+                        qAuthor.authorInfo
+                ))
+                .from(qAuthor)
+                .where(qAuthor.authorId.eq(authorId))
+                .fetchOne();
+    }
+
+    @Override
+    public void deleteAuthor(long authorId){
+        if (!authorRepository.existsById(authorId)) {
+            throw new AuthorNotFoundException(AUTHOR_NOT_FOUND_MESSAGE + authorId);
+        }
+        authorRepository.deleteById(authorId);
+    }
+
+    @Override
+    public void deleteAllAuthors() {
+        authorRepository.deleteAll();
     }
 }
