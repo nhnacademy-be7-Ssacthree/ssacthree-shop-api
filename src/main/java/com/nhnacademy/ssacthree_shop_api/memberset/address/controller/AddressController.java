@@ -2,7 +2,9 @@ package com.nhnacademy.ssacthree_shop_api.memberset.address.controller;
 
 import com.nhnacademy.ssacthree_shop_api.memberset.address.domain.Address;
 import com.nhnacademy.ssacthree_shop_api.memberset.address.dto.AddressCreateRequest;
+import com.nhnacademy.ssacthree_shop_api.memberset.address.dto.AddressResponse;
 import com.nhnacademy.ssacthree_shop_api.memberset.address.service.AddressService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,11 +23,10 @@ public class AddressController {
     private final AddressService addressService;
 
     @PostMapping("/address")
-    public ResponseEntity<Address> createAddress(
-        @RequestHeader(name = "X-USER-ID") String memberId,
-        @Validated @RequestBody AddressCreateRequest addressRequest) {
-
-        Address savedAddress = addressService.createAddress(Long.parseLong(memberId), addressRequest);
+    public ResponseEntity<AddressResponse> createAddress(
+        @RequestHeader(name = "X-USER-ID") String header,
+        @Valid @RequestBody AddressCreateRequest addressRequest) {
+        AddressResponse savedAddress = addressService.createAddress(header, addressRequest);
         return ResponseEntity.status(HttpStatus.CREATED).body(savedAddress);
     }
 

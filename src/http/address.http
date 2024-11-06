@@ -1,12 +1,12 @@
 ### 사용자 주소 등록
 POST http://localhost:8083/api/shop/members/address
 Content-Type: application/json
-X-USER-ID: 2
+X-USER-ID: kim123456
 
 {
-  "addressAlias": "Home",
-  "addressDetail": "Apartment 101",
-  "addressRoadname": "123 Main St",
+  "addressAlias": "집",
+  "addressDetail": "1층 집",
+  "addressRoadname": "청주시 서원구 구룡산로 417번길 103",
   "addressPostalNumber": "54321"
 }
 

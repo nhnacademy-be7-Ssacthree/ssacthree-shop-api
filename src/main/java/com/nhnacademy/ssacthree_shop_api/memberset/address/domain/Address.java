@@ -15,10 +15,11 @@ import lombok.NoArgsConstructor;
 @Entity
 public class Address {
 
-    public Address(Member member, String addressAlias, String addressDetail, String addressPostalNumber) {
+    public Address(Member member, String addressAlias, String addressDetail, String addressRoadname, String addressPostalNumber) {
         this.member = member;
         this.addressAlias = addressAlias;
         this.addressDetail = addressDetail;
+        this.addressRoadname = addressRoadname;
         this.addressPostalNumber = addressPostalNumber;
     }
 
@@ -35,6 +36,7 @@ public class Address {
     @Size(max = 15)
     private String addressAlias;
 
+    @NotNull
     @Size(max = 30)
     private String addressRoadname;
 

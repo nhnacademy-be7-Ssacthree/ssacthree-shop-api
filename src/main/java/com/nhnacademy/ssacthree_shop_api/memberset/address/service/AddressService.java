@@ -1,10 +1,10 @@
 package com.nhnacademy.ssacthree_shop_api.memberset.address.service;
 
-import com.nhnacademy.ssacthree_shop_api.memberset.address.domain.Address;
 import com.nhnacademy.ssacthree_shop_api.memberset.address.dto.AddressCreateRequest;
+import com.nhnacademy.ssacthree_shop_api.memberset.address.dto.AddressResponse;
 
 public interface AddressService {
 
-    Address createAddress(long memberId, AddressCreateRequest addressCreateRequest);
+    AddressResponse createAddress(String header, AddressCreateRequest addressCreateRequest);
 
 }
