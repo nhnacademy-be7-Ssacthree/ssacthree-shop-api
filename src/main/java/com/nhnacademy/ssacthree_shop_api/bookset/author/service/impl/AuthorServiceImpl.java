@@ -103,8 +103,4 @@ public class AuthorServiceImpl implements AuthorService {
         authorRepository.deleteById(authorId);
     }
 
-    @Override
-    public void deleteAllAuthors() {
-        authorRepository.deleteAll();
-    }
 }

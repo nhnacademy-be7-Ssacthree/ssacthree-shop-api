@@ -18,6 +18,4 @@ public interface AuthorService {
     AuthorGetResponse getAuthorById(long authorId);
 
     void deleteAuthor(long authorId);
-
-    void deleteAllAuthors();
 }
