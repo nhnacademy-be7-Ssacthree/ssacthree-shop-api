@@ -11,7 +11,7 @@ public class AddressResponse {
 
     private long addressId;
     private String addressAlias;
-    private String addressDetail;
     private String addressRoadname;
+    private String addressDetail;
     private String addressPostalNumber;
 }
