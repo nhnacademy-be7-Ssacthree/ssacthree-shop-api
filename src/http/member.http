@@ -3,7 +3,7 @@ POST http://localhost:8083/api/shop/members
 Content-Type: application/json
 
 {
-  "loginId": "kim",
+  "loginId": "kim123456",
   "loginPassword": "test1234",
   "customerName" : "김희망",
   "customerPhoneNumber" : "010-3622-0514",
