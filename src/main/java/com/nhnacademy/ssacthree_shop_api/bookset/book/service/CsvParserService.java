@@ -10,7 +10,6 @@ import com.nhnacademy.ssacthree_shop_api.bookset.book.repository.BookRepository;
 import com.nhnacademy.ssacthree_shop_api.bookset.bookauthor.domain.BookAuthor;
 import com.nhnacademy.ssacthree_shop_api.bookset.bookauthor.repository.BookAuthorRepository;
 import com.nhnacademy.ssacthree_shop_api.bookset.publisher.domain.Publisher;
-import com.nhnacademy.ssacthree_shop_api.bookset.publisher.dto.PublisherDto;
 import com.nhnacademy.ssacthree_shop_api.bookset.publisher.repository.PublisherRepository;
 import com.opencsv.CSVParserBuilder;
 import com.opencsv.CSVReader;
@@ -21,27 +20,27 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
-import java.util.*;
-import java.util.stream.Collectors;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class CsvParserService {
     private final static DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
 
-    @Autowired
-    BookRepository bookRepository;
-    @Autowired
-    PublisherRepository publisherRepository;
-    @Autowired
-    AuthorRepository authorRepository;
-    @Autowired
-    private BookAuthorRepository bookAuthorRepository;
+
+    private final BookRepository bookRepository;
+
+    private final PublisherRepository publisherRepository;
+
+    private final AuthorRepository authorRepository;
+
+    private final BookAuthorRepository bookAuthorRepository;
+
 
 
     public void saveBooksFromCsv(String filePath){
