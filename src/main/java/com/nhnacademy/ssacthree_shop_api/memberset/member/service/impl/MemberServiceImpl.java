@@ -8,6 +8,7 @@ import com.nhnacademy.ssacthree_shop_api.memberset.member.domain.Member;
 import com.nhnacademy.ssacthree_shop_api.memberset.member.dto.MemberInfoGetResponse;
 import com.nhnacademy.ssacthree_shop_api.memberset.member.dto.MemberInfoUpdateRequest;
 import com.nhnacademy.ssacthree_shop_api.memberset.member.dto.MemberRegisterRequest;
+import com.nhnacademy.ssacthree_shop_api.memberset.member.exception.AlreadyMemberException;
 import com.nhnacademy.ssacthree_shop_api.memberset.member.exception.MemberNotFoundException;
 import com.nhnacademy.ssacthree_shop_api.memberset.member.repository.MemberCustomRepository;
 import com.nhnacademy.ssacthree_shop_api.memberset.member.repository.MemberRepository;
@@ -33,6 +34,11 @@ public class MemberServiceImpl implements MemberService {
 
     @Override
     public MessageResponse registerMember(MemberRegisterRequest memberRegisterRequest) {
+
+        if(memberRepository.existsByMemberLoginId(memberRegisterRequest.getLoginId())) {
+            throw new AlreadyMemberException("멤버가 이미 존재합니다!");
+        }
+
         CustomerCreateRequest customerCreateRequest = new CustomerCreateRequest(
             memberRegisterRequest.getCustomerName(),
             memberRegisterRequest.getCustomerPhoneNumber(),
