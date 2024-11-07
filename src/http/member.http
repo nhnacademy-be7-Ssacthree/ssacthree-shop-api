@@ -1,11 +1,11 @@
 ###회원 생성
-POST http://localhost:8082/api/shop/members
+POST http://localhost:8083/api/shop/members
 Content-Type: application/json
 
 {
   "loginId": "kim",
   "loginPassword": "test1234",
-  "customerName" : "mang mang 2",
+  "customerName" : "김희망",
   "customerPhoneNumber" : "010-3622-0514",
   "customerEmail" : "xxx@naver.com",
   "birth" : "19990514"
