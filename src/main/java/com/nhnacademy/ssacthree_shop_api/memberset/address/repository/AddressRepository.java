@@ -10,5 +10,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface AddressRepository extends JpaRepository<Address, Long> {
     List<Address> findAllByMember(Member member);
     Address findAddressByRegisteredAddressId(long id);
-    Optional<Address> findByAddressRoadname(String addressRoadname);
+    Optional<Address> findByAddressRoadnameAndMember(String addressRoadname, Member member);
 }
