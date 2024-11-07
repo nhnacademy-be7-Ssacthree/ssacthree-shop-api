@@ -4,6 +4,7 @@ import com.nhnacademy.ssacthree_shop_api.memberset.pointsaverule.domain.PointSav
 import com.nhnacademy.ssacthree_shop_api.memberset.pointsaverule.dto.PointSaveRuleCreateRequest;
 import com.nhnacademy.ssacthree_shop_api.memberset.pointsaverule.dto.PointSaveRuleGetResponse;
 import com.nhnacademy.ssacthree_shop_api.memberset.pointsaverule.domain.QPointSaveRule;
+import com.nhnacademy.ssacthree_shop_api.memberset.pointsaverule.dto.PointSaveRuleUpdateRequest;
 import com.nhnacademy.ssacthree_shop_api.memberset.pointsaverule.exception.PointSaveRuleNotFoundException;
 import com.nhnacademy.ssacthree_shop_api.memberset.pointsaverule.repository.PointSaveRuleRepository;
 import com.nhnacademy.ssacthree_shop_api.memberset.pointsaverule.service.PointSaveRuleService;
@@ -70,5 +71,21 @@ public class PointSaveRuleServiceImpl implements PointSaveRuleService {
                 .filter(PointSaveRule::isPointSaveRuleIsSelected)
                 .findFirst()
                 .orElseThrow(() -> new PointSaveRuleNotFoundException("선택된 포인트 적립 정책이 없습니다."));
+    }
+
+    @Override
+    public PointSaveRule updatePointSaveRule(PointSaveRuleUpdateRequest pointSaveRuleUpdateRequest) {
+
+        Long pointSaveRuleId = pointSaveRuleUpdateRequest.getPointSaveRuleId();
+        if (pointSaveRuleId <= 0) {
+            throw new IllegalArgumentException("pointSaveRuleId는 0 이하일 수 없습니다.");
+        }
+
+        PointSaveRule pointSaveRule = pointSaveRuleRepository.findById(pointSaveRuleId)
+                .orElseThrow(() -> new PointSaveRuleNotFoundException(pointSaveRuleId + "를 찾을 수 없습니다."));
+
+        pointSaveRule.setPointSaveRuleIsSelected(!pointSaveRule.isPointSaveRuleIsSelected());
+
+        return pointSaveRuleRepository.save(pointSaveRule);
     }
 }

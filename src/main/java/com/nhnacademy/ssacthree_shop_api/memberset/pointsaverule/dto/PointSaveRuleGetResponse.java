@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 @Getter
 public class PointSaveRuleGetResponse {
 
-    private long pointSaveRuleId;
+    private Long pointSaveRuleId;
     private String pointSaveRuleName;
     private int pointSaveAmount;
     private LocalDateTime pointSaveRuleGenerateDate;
