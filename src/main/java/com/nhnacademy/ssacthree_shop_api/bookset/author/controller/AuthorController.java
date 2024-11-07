@@ -43,7 +43,7 @@ public class AuthorController {
         return ResponseEntity.status(HttpStatus.CREATED).body(messageResponse);
     }
 
-    @PutMapping
+    @PutMapping("/{authorId}")
     public ResponseEntity<MessageResponse> updateAuthor(
             @Valid @RequestBody AuthorUpdateRequest authorUpdateRequest) {
         authorService.updateAuthor(authorUpdateRequest);
