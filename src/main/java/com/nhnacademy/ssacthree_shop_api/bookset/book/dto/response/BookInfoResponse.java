@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 
 @Getter
@@ -33,11 +34,11 @@ public class BookInfoResponse {
     // FK
     private String publisherName;
 
-    private String categoryName;
-    private String tagName;
-    private String authorName;
+    private List<String> categoryNameList;
+    private List<String> tagNameList;
+    private List<String> authorNameList;
 
-    public BookInfoResponse(Book book, String categoryName, String tagName, String authorName) {
+    public BookInfoResponse(Book book, List<String> categoryNameList, List<String> tagNameList, List<String> authorNameList) {
         this.bookId = book.getBookId();
         this.bookName = book.getBookName();
         this.bookIndex = book.getBookIndex();
@@ -57,9 +58,9 @@ public class BookInfoResponse {
 
         this.publisherName = book.getPublisher().getPublisherName();
 
-        this.categoryName = categoryName;
-        this.tagName = tagName;
-        this.authorName = authorName;
+        this.categoryNameList = categoryNameList;
+        this.tagNameList = tagNameList;
+        this.authorNameList = authorNameList;
     }
 
 }

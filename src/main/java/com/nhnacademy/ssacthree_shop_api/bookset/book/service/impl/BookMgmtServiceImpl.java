@@ -28,6 +28,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -59,24 +62,41 @@ public class BookMgmtServiceImpl implements BookMgmtService {
 
         Book saveBook = bookRepository.save(book);
 
+        List<String> categoryNameList = new ArrayList<>();
+        List<String> tagNameList = new ArrayList<>();
+        List<String> authorNameList = new ArrayList<>();
 
-        Category category = categoryRepository.findById(bookSaveRequest.getCategoryId()).orElseThrow(() -> new NotFoundException("해당 카테고리가 존재하지 않습니다."));
-        BookCategory bookCategory = new BookCategory(book, category);
-        bookCategoryRepository.save(bookCategory);
+        for(Long categoryId : bookSaveRequest.getCategoryIdList()) {
+            Category category = categoryRepository.findById(categoryId).orElseThrow(() -> new NotFoundException("해당 카테고리가 존재하지 않습니다."));
+            BookCategory bookCategory = new BookCategory(book, category);
+            bookCategoryRepository.save(bookCategory);
+            categoryNameList.add(category.getCategoryName());
+        }
 
-        Tag tag = tagRepository.findById(bookSaveRequest.getTagId()).orElseThrow(() -> new NotFoundException("해당 태그가 존재하지 않습니다."));
-        BookTag bookTag = new BookTag(book, tag);
-        bookTagRepository.save(bookTag);
+        for(Long tagId : bookSaveRequest.getTagIdList()) {
+            Tag tag = tagRepository.findById(tagId).orElseThrow(() -> new NotFoundException("해당 태그가 존재하지 않습니다."));
+            BookTag bookTag = new BookTag(book, tag);
+            bookTagRepository.save(bookTag);
+            tagNameList.add(tag.getTagName());
+        }
 
-        Author author = authorRepository.findById(bookSaveRequest.getAuthorId()).orElseThrow(() -> new NotFoundException("해당 작가가 존재하지 않습니다."));
-        BookAuthor bookAuthor = new BookAuthor(book, author);
-        bookAuthorRepository.save(bookAuthor);
+        for(Long authorId : bookSaveRequest.getAuthorIdList()) {
+            Author author = authorRepository.findById(authorId).orElseThrow(() -> new NotFoundException("해당 작가가 존재하지 않습니다."));
+            BookAuthor bookAuthor = new BookAuthor(book, author);
+            bookAuthorRepository.save(bookAuthor);
+            authorNameList.add(author.getAuthorName());
+        }
 
-        return new BookInfoResponse(saveBook, category.getCategoryName(), tag.getTagName(), author.getAuthorName());
+
+        return new BookInfoResponse(saveBook, categoryNameList, tagNameList, authorNameList);
     }
 
     @Override
     public BookInfoResponse updateBook(Long bookId, BookSaveRequest bookSaveRequest) {
+        Book book = bookRepository.findById(bookId)
+                .orElseThrow(() -> new NotFoundException("해당 책이 존재하지 않습니다."));
+
+
         return null;
     }
 

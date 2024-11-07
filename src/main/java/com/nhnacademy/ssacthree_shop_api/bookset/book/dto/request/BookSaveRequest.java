@@ -12,6 +12,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Setter
@@ -31,17 +32,17 @@ public class BookSaveRequest {
     private int bookViewCount;
     private int bookDiscount; // 할인율
 
-    private String bookStatus; // 배송 상태
+    private String bookStatus; // 도서 상태
 
     // FK
     private Long publisherId;
 
 
-    private Long categoryId;
+    private List<Long> categoryIdList;
 
-    private Long authorId;
+    private List<Long> authorIdList;
 
-    private Long tagId;
+    private List<Long> tagIdList;
 
     public boolean getIsPacked() {
         return isPacked;

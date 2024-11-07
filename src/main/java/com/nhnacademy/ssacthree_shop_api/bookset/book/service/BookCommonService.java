@@ -13,4 +13,7 @@ public interface BookCommonService {
 
     // 도서 최신순 검색
     Page<BookInfoResponse> getRecentBooks (Pageable pageable);
+
+    // 도서 이름 검색
+    Page<BookInfoResponse> getBooksByBookName(Pageable pageable, String bookName);
 }
