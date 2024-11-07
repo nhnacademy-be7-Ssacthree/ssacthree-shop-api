@@ -52,10 +52,7 @@ jobs:
         key: ${{ secrets.SSH_KEY }}
         port: ${{ secrets.SSH_PORT }}
         script_stop: true
-        script: |
-         # 8082,8083 포트 프로세스 종료 및 재시작
-          fuser -k 8082/tcp || echo "No process on 8082"
-          fuser -k 8083/tcp || echo "No process on 8083"
+        script:
           chmod +x ./shop_startup.sh
           ./shop_startup.sh
 

@@ -15,6 +15,14 @@ import lombok.NoArgsConstructor;
 @Entity
 public class Address {
 
+    public Address(Member member, String addressAlias, String addressDetail, String addressRoadname, String addressPostalNumber) {
+        this.member = member;
+        this.addressAlias = addressAlias;
+        this.addressDetail = addressDetail;
+        this.addressRoadname = addressRoadname;
+        this.addressPostalNumber = addressPostalNumber;
+    }
+
     @NotNull
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -25,9 +33,12 @@ public class Address {
     @JoinColumn(name="customer_id")
     private Member member;
 
-    @Null
     @Size(max = 15)
     private String addressAlias;
+
+    @NotNull
+    @Size(max = 30)
+    private String addressRoadname;
 
     @NotNull
     @Size(max = 35)

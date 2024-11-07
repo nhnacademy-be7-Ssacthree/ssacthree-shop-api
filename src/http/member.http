@@ -1,9 +1,9 @@
 ###회원 생성
-POST http://localhost:8082/api/shop/members
+POST http://localhost:8083/api/shop/members
 Content-Type: application/json
 
 {
-  "loginId": "kim",
+  "loginId": "kim123456",
   "loginPassword": "test1234",
   "customerName" : "mang mang 2",
   "customerPhoneNumber" : "010-3622-0514",

@@ -19,7 +19,7 @@ public class BookAuthor {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="book_author_id")
-    private long bookAuthorId;
+    private Long bookAuthorId;
 
     @ManyToOne
     @JoinColumn(name="authorId")

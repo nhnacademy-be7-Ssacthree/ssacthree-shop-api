@@ -21,24 +21,26 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class CsvParserService {
     private final static DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
 
-    @Autowired
-    BookRepository bookRepository;
-    @Autowired
-    PublisherRepository publisherRepository;
-    @Autowired
-    AuthorRepository authorRepository;
-    @Autowired
-    private BookAuthorRepository bookAuthorRepository;
+
+    private final BookRepository bookRepository;
+
+    private final PublisherRepository publisherRepository;
+
+    private final AuthorRepository authorRepository;
+
+    private final BookAuthorRepository bookAuthorRepository;
+
 
 
     public void saveBooksFromCsv(String filePath){
