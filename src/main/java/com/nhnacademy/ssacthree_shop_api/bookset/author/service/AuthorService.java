@@ -15,5 +15,7 @@ public interface AuthorService {
 
     List<AuthorGetResponse> getAllAuthors();
 
+    AuthorGetResponse getAuthorById(long authorId);
 
+    void deleteAuthor(long authorId);
 }
