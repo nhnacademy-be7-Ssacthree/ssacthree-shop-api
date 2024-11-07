@@ -1,0 +1,47 @@
+### 카테고리 생성 - 문학
+POST http://localhost:8083/api/shop/admin/categories
+Content-Type: application/json
+
+{
+  "categoryName": "문학",
+  "categoryIsUsed": true
+}
+
+### 작가 생성
+POST http://localhost:8083/api/shop/admin/authors/create
+Content-Type: application/json
+
+{
+  "authorName": "한강",
+  "authorInfo": "노벨문학상 작가"
+}
+
+### 도서 생성
+POST http://localhost:8083/api/shop/admin/books
+Content-Type: application/json
+
+{
+  "bookName": "채식주의자",
+  "bookIndex": "",
+  "bookInfo": "노벨문학상 작품",
+  "bookIsbn":"123456789",
+  "publicationDate": "2024-11-07",
+  "regularPrice": 20000,
+  "salePrice": 18000,
+  "isPacked": true,
+  "stock": 20,
+  "bookThumbnailImageUrl": "어딘가",
+  "bookViewCount": 0,
+  "bookStatus": "판매 중",
+  "publisherId": 1,
+  "categoryIdList": [1],
+  "authorIdList": [1]
+}
+
+### 도서 검색(최신순)
+
+
+### 출판사 생성(아직 없네..ㅠ)
+
+### 태그 생성(도 아직 없네..)
+

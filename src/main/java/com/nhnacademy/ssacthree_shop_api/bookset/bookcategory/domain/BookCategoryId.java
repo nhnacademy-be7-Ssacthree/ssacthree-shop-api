@@ -8,12 +8,13 @@ import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 
+@Getter
 @Embeddable
 @AllArgsConstructor
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor
 public class BookCategoryId implements Serializable {
-    private long bookId;
-    private long categoryId;
+    private Long bookId;
+    private Long categoryId;
 
 
 }

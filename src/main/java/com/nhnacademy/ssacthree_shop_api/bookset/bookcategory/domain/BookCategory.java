@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @AllArgsConstructor
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor
 public class BookCategory {
     @EmbeddedId
     private BookCategoryId bookCategoryId;
@@ -25,4 +25,10 @@ public class BookCategory {
     @MapsId("categoryId")
     @JoinColumn(name = "category_id")
     private Category category;
+
+    public BookCategory(Book book, Category category){
+        this.book = book;
+        this.category = category;
+        this.bookCategoryId = new BookCategoryId(book.getBookId(), category.getCategoryId());
+    }
 }
