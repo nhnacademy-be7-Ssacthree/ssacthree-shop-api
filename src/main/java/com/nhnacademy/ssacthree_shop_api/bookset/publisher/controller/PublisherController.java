@@ -1,7 +1,6 @@
 package com.nhnacademy.ssacthree_shop_api.bookset.publisher.controller;
 
 import com.nhnacademy.ssacthree_shop_api.bookset.publisher.dto.PublisherCreateRequest;
-import com.nhnacademy.ssacthree_shop_api.bookset.publisher.dto.PublisherDeleteRequest;
 import com.nhnacademy.ssacthree_shop_api.bookset.publisher.dto.PublisherGetResponse;
 import com.nhnacademy.ssacthree_shop_api.bookset.publisher.dto.PublisherUpdateRequest;
 import com.nhnacademy.ssacthree_shop_api.bookset.publisher.service.PublisherService;
@@ -45,14 +44,4 @@ public class PublisherController {
 
         return ResponseEntity.status(HttpStatus.CREATED).body(messageResponse);
     }
-
-    @DeleteMapping("/publishers")
-    ResponseEntity<MessageResponse> deletePublisher(@RequestBody PublisherDeleteRequest publisherDeleteRequest) {
-
-            publisherService.deletePublisher(publisherDeleteRequest);
-            MessageResponse messageResponse = new MessageResponse("삭제 성공");
-
-            return ResponseEntity.status(HttpStatus.OK).body(messageResponse);
-    }
-
 }

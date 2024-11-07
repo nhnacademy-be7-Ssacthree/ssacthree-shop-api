@@ -4,7 +4,6 @@ import com.nhnacademy.ssacthree_shop_api.bookset.book.exception.CsvProcessingExc
 import com.nhnacademy.ssacthree_shop_api.bookset.publisher.domain.Publisher;
 import com.nhnacademy.ssacthree_shop_api.bookset.publisher.domain.QPublisher;
 import com.nhnacademy.ssacthree_shop_api.bookset.publisher.dto.PublisherCreateRequest;
-import com.nhnacademy.ssacthree_shop_api.bookset.publisher.dto.PublisherDeleteRequest;
 import com.nhnacademy.ssacthree_shop_api.bookset.publisher.dto.PublisherGetResponse;
 import com.nhnacademy.ssacthree_shop_api.bookset.publisher.dto.PublisherUpdateRequest;
 import com.nhnacademy.ssacthree_shop_api.bookset.publisher.repository.PublisherRepository;
@@ -77,19 +76,6 @@ public class PublisherService {
         publisher.setPublisherIsUsed(!publisher.isPublisherIsUsed());
 
         return publisherRepository.save(publisher);
-    }
-
-    public void deletePublisher(PublisherDeleteRequest publisherDeleteRequest) {
-
-            Long publisherId = publisherDeleteRequest.getPublisherId();
-            if (publisherId <= 0) {
-                throw new IllegalArgumentException("출판사 ID가 잘못되었습니다.");
-            }
-
-            Publisher publisher = publisherRepository.findById(publisherId)
-                    .orElseThrow(() -> new IllegalArgumentException("출판사가 존재하지 않습니다."));
-
-            publisherRepository.delete(publisher);
     }
 
     public void savePublisherFromCsv(String filePath){
