@@ -25,7 +25,7 @@ public class PublisherController {
         return ResponseEntity.ok().body(publisherService.getAllPublishers());
     }
 
-    @PutMapping("/publishers")
+    @PutMapping
     ResponseEntity<MessageResponse> updatePublisher(
             @Valid @RequestBody PublisherUpdateRequest publisherUpdateRequest) {
 
@@ -35,7 +35,7 @@ public class PublisherController {
         return ResponseEntity.status(HttpStatus.OK).body(messageResponse);
     }
 
-    @PostMapping("/publishers")
+    @PostMapping
     ResponseEntity<MessageResponse> createPublisher(
             @Valid @RequestBody PublisherCreateRequest publisherCreateRequest) {
 

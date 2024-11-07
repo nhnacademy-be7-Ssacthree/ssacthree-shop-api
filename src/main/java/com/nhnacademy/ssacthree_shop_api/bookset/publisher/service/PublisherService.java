@@ -37,7 +37,7 @@ public class PublisherService {
     @PersistenceContext
     private EntityManager entityManager;
 
-    private PublisherRepository publisherRepository;
+    private final PublisherRepository publisherRepository;
 
     public List<PublisherGetResponse> getAllPublishers() {
         QPublisher publisher = QPublisher.publisher;
@@ -131,11 +131,11 @@ public class PublisherService {
 
     }
 
-    private Publisher convertToPublisherEntity(PublisherGetResponse publisherdto){
+    private Publisher convertToPublisherEntity(PublisherGetResponse publisherGetResponse){
         return new Publisher(
-                publisherdto.getPublisherId(),
-                publisherdto.getPublisherName(),
-                publisherdto.isPublisherIsUsed()
+                publisherGetResponse.getPublisherId(),
+                publisherGetResponse.getPublisherName(),
+                publisherGetResponse.isPublisherIsUsed()
         );
     }
 
