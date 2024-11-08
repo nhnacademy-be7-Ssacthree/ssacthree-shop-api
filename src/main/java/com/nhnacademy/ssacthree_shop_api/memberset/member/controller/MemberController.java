@@ -2,6 +2,7 @@ package com.nhnacademy.ssacthree_shop_api.memberset.member.controller;
 
 import com.nhnacademy.ssacthree_shop_api.commons.dto.MessageResponse;
 import com.nhnacademy.ssacthree_shop_api.memberset.member.dto.MemberInfoGetResponse;
+import com.nhnacademy.ssacthree_shop_api.memberset.member.dto.MemberInfoUpdateRequest;
 import com.nhnacademy.ssacthree_shop_api.memberset.member.dto.MemberRegisterRequest;
 import com.nhnacademy.ssacthree_shop_api.memberset.member.service.MemberService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -11,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -39,5 +41,11 @@ public class MemberController {
         MemberInfoGetResponse memberInfoGetResponse = memberService.getMemberInfoById(header);
         return ResponseEntity.status(HttpStatus.OK).body(memberInfoGetResponse);
 
+    }
+
+    @PutMapping("/my-page")
+    public ResponseEntity<MessageResponse> updateMemberInfo(@RequestHeader(name = "X-USER-ID") String header, @RequestBody MemberInfoUpdateRequest  memberInfoUpdateRequest) {
+        MessageResponse messageResponse = memberService.updateMember(header, memberInfoUpdateRequest);
+        return ResponseEntity.status(HttpStatus.OK).body(messageResponse);
     }
 }

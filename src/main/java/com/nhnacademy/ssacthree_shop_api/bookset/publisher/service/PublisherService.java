@@ -2,7 +2,10 @@ package com.nhnacademy.ssacthree_shop_api.bookset.publisher.service;
 
 import com.nhnacademy.ssacthree_shop_api.bookset.book.exception.CsvProcessingException;
 import com.nhnacademy.ssacthree_shop_api.bookset.publisher.domain.Publisher;
-import com.nhnacademy.ssacthree_shop_api.bookset.publisher.dto.PublisherDto;
+import com.nhnacademy.ssacthree_shop_api.bookset.publisher.domain.QPublisher;
+import com.nhnacademy.ssacthree_shop_api.bookset.publisher.dto.PublisherCreateRequest;
+import com.nhnacademy.ssacthree_shop_api.bookset.publisher.dto.PublisherGetResponse;
+import com.nhnacademy.ssacthree_shop_api.bookset.publisher.dto.PublisherUpdateRequest;
 import com.nhnacademy.ssacthree_shop_api.bookset.publisher.repository.PublisherRepository;
 import com.opencsv.CSVParserBuilder;
 import com.opencsv.CSVReader;
@@ -13,23 +16,71 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import com.querydsl.core.types.Projections;
+import com.querydsl.jpa.impl.JPAQueryFactory;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
+@Transactional
 public class PublisherService {
 
-    @Autowired
-    private PublisherRepository publisherRepository;
+    @PersistenceContext
+    private EntityManager entityManager;
+
+    private final PublisherRepository publisherRepository;
+
+    public List<PublisherGetResponse> getAllPublishers() {
+        QPublisher publisher = QPublisher.publisher;
+
+        return new JPAQueryFactory(entityManager)
+                .select(Projections.constructor(
+                        PublisherGetResponse.class,
+                        publisher.publisherId,
+                        publisher.publisherName,
+                        publisher.publisherIsUsed
+                ))
+                .from(publisher)
+                .orderBy(publisher.publisherIsUsed.desc())
+                .orderBy(publisher.publisherId.asc())
+                .fetch();
+    }
+
+    public Publisher createPublisher(PublisherCreateRequest publisherCreateRequest) {
+        Publisher publisher = new Publisher(
+                publisherCreateRequest.getPublisherName()
+        );
+
+        return publisherRepository.save(publisher);
+    }
+
+    public Publisher updatePublisher(PublisherUpdateRequest publisherUpdateRequest) {
+
+        Long publisherId = publisherUpdateRequest.getPublisherId();
+        if (publisherId <= 0) {
+            throw new IllegalArgumentException("출판사 ID가 잘못되었습니다.");
+        }
+
+        Publisher publisher = publisherRepository.findById(publisherId)
+                .orElseThrow(() -> new IllegalArgumentException("출판사가 존재하지 않습니다."));
+
+        publisher.setPublisherIsUsed(!publisher.isPublisherIsUsed());
+
+        return publisherRepository.save(publisher);
+    }
 
     public void savePublisherFromCsv(String filePath){
         Set<String> publisherNamesInCsv = new HashSet<>();
-        List<PublisherDto> publishersToSave = new ArrayList<>();
+        List<PublisherGetResponse> publishersToSave = new ArrayList<>();
 
 
         try{
@@ -57,10 +108,10 @@ public class PublisherService {
 
             for (String publisherName : normalizedPublisherNames) {
                 if (!existingPublisherNames.contains(publisherName)) {
-                    PublisherDto publisherDto = new PublisherDto();
-                    publisherDto.setPublisherName(publisherName);
-                    publisherDto.setPublisherIsUsed(true);
-                    publishersToSave.add(publisherDto);
+                    PublisherGetResponse publisherGetResponse = new PublisherGetResponse();
+                    publisherGetResponse.setPublisherName(publisherName);
+                    publisherGetResponse.setPublisherIsUsed(true);
+                    publishersToSave.add(publisherGetResponse);
                 }
             }
 
@@ -80,11 +131,11 @@ public class PublisherService {
 
     }
 
-    private Publisher convertToPublisherEntity(PublisherDto publisherdto){
+    private Publisher convertToPublisherEntity(PublisherGetResponse publisherGetResponse){
         return new Publisher(
-                publisherdto.getPublisherId(),
-                publisherdto.getPublisherName(),
-                publisherdto.isPublisherIsUsed()
+                publisherGetResponse.getPublisherId(),
+                publisherGetResponse.getPublisherName(),
+                publisherGetResponse.isPublisherIsUsed()
         );
     }
 

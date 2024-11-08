@@ -1,16 +1,17 @@
 package com.nhnacademy.ssacthree_shop_api.bookset.publisher.dto;
 
-import lombok.AllArgsConstructor;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+@NoArgsConstructor
 @Getter
 @Setter
-@AllArgsConstructor
-@NoArgsConstructor
-public class PublisherDto {
-    private long publisherId;
+public class PublisherCreateRequest {
+
+    @NotBlank
+    @Size(max = 30)
     private String publisherName;
-    private boolean publisherIsUsed;
 }
