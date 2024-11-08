@@ -13,11 +13,10 @@ public class CustomHealthIndicator implements HealthIndicator {
         this.applicationStatus = applicationStatus;
     }
 
-
     @Override
     public Health health() {
         // (애플리케이션 상태) 헬스 체크해서 false면(정상상태x) down으로 변경. -> eureka에게 알림
-        if (!applicationStatus.getStatus()) {
+        if(!applicationStatus.getStatus()){
             return Health.down().build();
         }
         // 이 경우 서비스가 "UP" 상태임을 나타내며, 추가 정보 "service": "start"를 포함하여 서비스가 실행 중임을 알립니다.

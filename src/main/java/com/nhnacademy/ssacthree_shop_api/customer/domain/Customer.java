@@ -17,6 +17,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @Getter
 @Entity
+@Setter
 public class Customer {
 
     public Customer(String customerName, String customerEmail, String customerPhoneNumber) {
@@ -31,13 +32,10 @@ public class Customer {
     @Id
     private long customerId;
 
-    @Setter
     private String customerName;
 
-    @Setter
     private String customerEmail;
 
-    @Setter
     private String customerPhoneNumber;
 
 

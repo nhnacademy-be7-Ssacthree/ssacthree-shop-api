@@ -52,9 +52,7 @@ jobs:
         key: ${{ secrets.SSH_KEY }}
         port: ${{ secrets.SSH_PORT }}
         script_stop: true
-        script:
-          chmod +x ./shop_startup.sh
-          ./shop_startup.sh
+        script: ./shop_startup.sh
 
     - name: Run SonarQube
       run: mvn sonar:sonar -Dsonar.projectKey=ssacthree-shop-api -Dsonar.host.url=${{secrets.SONAR_HOST}} -Dsonar.token=${{secrets.SONAR_TOKEN}}

@@ -35,6 +35,7 @@ public class Member {
     @MapsId
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "customer_id")
+    @Setter
     private Customer customer;
 
 
