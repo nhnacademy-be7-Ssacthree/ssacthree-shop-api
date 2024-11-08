@@ -2,6 +2,7 @@ package com.nhnacademy.ssacthree_shop_api.bookset.book.repository.impl;
 
 import com.nhnacademy.ssacthree_shop_api.bookset.author.domain.Author;
 import com.nhnacademy.ssacthree_shop_api.bookset.author.domain.QAuthor;
+import com.nhnacademy.ssacthree_shop_api.bookset.author.dto.AuthorNameResponse;
 import com.nhnacademy.ssacthree_shop_api.bookset.book.domain.BookStatus;
 import com.nhnacademy.ssacthree_shop_api.bookset.book.domain.QBook;
 import com.nhnacademy.ssacthree_shop_api.bookset.book.domain.converter.BookStatusConverter;
@@ -12,9 +13,11 @@ import com.nhnacademy.ssacthree_shop_api.bookset.bookcategory.domain.QBookCatego
 import com.nhnacademy.ssacthree_shop_api.bookset.booktag.domain.QBookTag;
 import com.nhnacademy.ssacthree_shop_api.bookset.category.domain.Category;
 import com.nhnacademy.ssacthree_shop_api.bookset.category.domain.QCategory;
+import com.nhnacademy.ssacthree_shop_api.bookset.category.dto.response.CategoryNameResponse;
 import com.nhnacademy.ssacthree_shop_api.bookset.publisher.domain.QPublisher;
 import com.nhnacademy.ssacthree_shop_api.bookset.tag.domain.QTag;
 import com.nhnacademy.ssacthree_shop_api.bookset.tag.domain.Tag;
+import com.nhnacademy.ssacthree_shop_api.bookset.tag.dto.response.TagInfoResponse;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
@@ -56,12 +59,6 @@ public class BookCustomRepositoryImpl implements BookCustomRepository {
         Map<Long, BookInfoResponse> bookMap = queryFactory
                 .from(book)
                 .join(book.publisher, publisher)
-                .leftJoin(bookCategory).on(bookCategory.book.bookId.eq(book.bookId))
-                .leftJoin(category).on(bookCategory.category.categoryId.eq(category.categoryId))
-                .leftJoin(bookTag).on(bookTag.book.bookId.eq(book.bookId))
-                .leftJoin(tag).on(bookTag.tag.tagId.eq(tag.tagId))
-                .leftJoin(bookAuthor).on(bookAuthor.book.bookId.eq(book.bookId))
-                .leftJoin(author).on(bookAuthor.author.authorId.eq(author.authorId))
                 .where(book.bookStatus.eq(BookStatus.ON_SALE).or(book.bookStatus.eq(BookStatus.NO_STOCK)))
                 .transform(groupBy(book.bookId).as(Projections.constructor(BookInfoResponse.class,
                         book.bookId,
@@ -78,10 +75,7 @@ public class BookCustomRepositoryImpl implements BookCustomRepository {
                         book.bookViewCount,
                         book.bookDiscount,
                         book.bookStatus.stringValue().as("bookStatus"),
-                        book.publisher.publisherName,
-                        list(category.categoryName).as("categoryNameList"),
-                        list(tag.tagName).as("tagNameList"),
-                        list(author.authorName).as("authorNameList")
+                        book.publisher.publisherName
                 )));
 
         List<BookInfoResponse> books = new ArrayList<>(bookMap.values());
@@ -107,12 +101,6 @@ public class BookCustomRepositoryImpl implements BookCustomRepository {
         Map<Long, BookInfoResponse> bookMap = queryFactory
                 .from(book)
                 .join(book.publisher, publisher)
-                .leftJoin(bookCategory).on(bookCategory.book.bookId.eq(book.bookId))
-                .leftJoin(category).on(bookCategory.category.categoryId.eq(category.categoryId))
-                .leftJoin(bookTag).on(bookTag.book.bookId.eq(book.bookId))
-                .leftJoin(tag).on(bookTag.tag.tagId.eq(tag.tagId))
-                .leftJoin(bookAuthor).on(bookAuthor.book.bookId.eq(book.bookId))
-                .leftJoin(author).on(bookAuthor.author.authorId.eq(author.authorId))
                 .where(book.bookStatus.eq(BookStatus.ON_SALE)
                         .or(book.bookStatus.eq(BookStatus.NO_STOCK))
                         .and(book.bookName.containsIgnoreCase(bookName)))
@@ -131,10 +119,7 @@ public class BookCustomRepositoryImpl implements BookCustomRepository {
                         book.bookViewCount,
                         book.bookDiscount,
                         book.bookStatus.stringValue().as("bookStatus"),
-                        book.publisher.publisherName,
-                        list(category.categoryName).as("categoryNameList"),
-                        list(tag.tagName).as("tagNameList"),
-                        list(author.authorName).as("authorNameList")
+                        book.publisher.publisherName
                 )));
 
         List<BookInfoResponse> books = new ArrayList<>(bookMap.values());
@@ -160,12 +145,6 @@ public class BookCustomRepositoryImpl implements BookCustomRepository {
         Map<Long, BookInfoResponse> bookMap = queryFactory
                 .from(book)
                 .join(book.publisher, publisher)
-                .leftJoin(bookCategory).on(bookCategory.book.bookId.eq(book.bookId))
-                .leftJoin(category).on(bookCategory.category.categoryId.eq(category.categoryId))
-                .leftJoin(bookTag).on(bookTag.book.bookId.eq(book.bookId))
-                .leftJoin(tag).on(bookTag.tag.tagId.eq(tag.tagId))
-                .leftJoin(bookAuthor).on(bookAuthor.book.bookId.eq(book.bookId))
-                .leftJoin(author).on(bookAuthor.author.authorId.eq(author.authorId))
                 .where(book.bookStatus.eq(BookStatus.ON_SALE).or(book.bookStatus.eq(BookStatus.NO_STOCK)))
                 .transform(groupBy(book.bookId).as(Projections.constructor(BookInfoResponse.class,
                         book.bookId,
@@ -182,10 +161,7 @@ public class BookCustomRepositoryImpl implements BookCustomRepository {
                         book.bookViewCount,
                         book.bookDiscount,
                         book.bookStatus.stringValue().as("bookStatus"),
-                        book.publisher.publisherName,
-                        list(category.categoryName).as("categoryNameList"),
-                        list(tag.tagName).as("tagNameList"),
-                        list(author.authorName).as("authorNameList")
+                        book.publisher.publisherName
                 )));
 
         List<BookInfoResponse> books = new ArrayList<>(bookMap.values());
@@ -210,12 +186,6 @@ public class BookCustomRepositoryImpl implements BookCustomRepository {
         Map<Long, BookInfoResponse> bookMap = queryFactory
                 .from(book)
                 .join(book.publisher, publisher)
-                .leftJoin(bookCategory).on(bookCategory.book.bookId.eq(book.bookId))
-                .leftJoin(category).on(bookCategory.category.categoryId.eq(category.categoryId))
-                .leftJoin(bookTag).on(bookTag.book.bookId.eq(book.bookId))
-                .leftJoin(tag).on(bookTag.tag.tagId.eq(tag.tagId))
-                .leftJoin(bookAuthor).on(bookAuthor.book.bookId.eq(book.bookId))
-                .leftJoin(author).on(bookAuthor.author.authorId.eq(author.authorId))
                 .where(book.bookStatus.eq(BookStatus.NO_STOCK))
                 .transform(groupBy(book.bookId).as(Projections.constructor(BookInfoResponse.class,
                         book.bookId,
@@ -232,10 +202,7 @@ public class BookCustomRepositoryImpl implements BookCustomRepository {
                         book.bookViewCount,
                         book.bookDiscount,
                         book.bookStatus.stringValue().as("bookStatus"),
-                        book.publisher.publisherName,
-                        list(category.categoryName).as("categoryNameList"),
-                        list(tag.tagName).as("tagNameList"),
-                        list(author.authorName).as("authorNameList")
+                        book.publisher.publisherName
                 )));
 
         List<BookInfoResponse> books = new ArrayList<>(bookMap.values());
@@ -260,12 +227,6 @@ public class BookCustomRepositoryImpl implements BookCustomRepository {
         Map<Long, BookInfoResponse> bookMap = queryFactory
                 .from(book)
                 .join(book.publisher, publisher)
-                .leftJoin(bookCategory).on(bookCategory.book.bookId.eq(book.bookId))
-                .leftJoin(category).on(bookCategory.category.categoryId.eq(category.categoryId))
-                .leftJoin(bookTag).on(bookTag.book.bookId.eq(book.bookId))
-                .leftJoin(tag).on(bookTag.tag.tagId.eq(tag.tagId))
-                .leftJoin(bookAuthor).on(bookAuthor.book.bookId.eq(book.bookId))
-                .leftJoin(author).on(bookAuthor.author.authorId.eq(author.authorId))
                 .where(book.bookStatus.eq(BookStatus.DISCONTINUED))
                 .transform(groupBy(book.bookId).as(Projections.constructor(BookInfoResponse.class,
                         book.bookId,
@@ -282,10 +243,7 @@ public class BookCustomRepositoryImpl implements BookCustomRepository {
                         book.bookViewCount,
                         book.bookDiscount,
                         book.bookStatus.stringValue().as("bookStatus"),
-                        book.publisher.publisherName,
-                        list(category.categoryName).as("categoryNameList"),
-                        list(tag.tagName).as("tagNameList"),
-                        list(author.authorName).as("authorNameList")
+                        book.publisher.publisherName
                 )));
 
         List<BookInfoResponse> books = new ArrayList<>(bookMap.values());

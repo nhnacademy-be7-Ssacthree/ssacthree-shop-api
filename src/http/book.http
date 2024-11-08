@@ -8,13 +8,23 @@ Content-Type: application/json
 }
 
 ### 작가 생성
-POST http://localhost:8083/api/shop/admin/authors/create
+POST http://localhost:8083/api/shop/admin/authors
 Content-Type: application/json
 
 {
   "authorName": "한강",
   "authorInfo": "노벨문학상 작가"
 }
+
+### 출판사 생성
+POST http://localhost:8083/api/shop/upload/publishers
+Content-Type: application/json
+
+{
+  "publisherName": "민지출판",
+  "publisherIsUsed": "true"
+}
+
 
 ### 도서 생성
 POST http://localhost:8083/api/shop/admin/books
@@ -38,10 +48,31 @@ Content-Type: application/json
   "authorIdList": [1]
 }
 
+### 도서 생성
+POST http://localhost:8083/api/shop/admin/books
+Content-Type: application/json
+
+{
+  "bookName": "안뇽",
+  "bookIndex": "",
+  "bookInfo": "노벨문학상 작품",
+  "bookIsbn":"123456789",
+  "publicationDate": "2024-11-06",
+  "regularPrice": 20000,
+  "salePrice": 18000,
+  "isPacked": true,
+  "stock": 20,
+  "bookThumbnailImageUrl": "어딘가",
+  "bookViewCount": 0,
+  "bookStatus": "판매 중",
+  "publisherId": 1,
+  "categoryIdList": [1],
+  "authorIdList": [1]
+}
+
 ### 도서 검색(최신순)
-
-
-### 출판사 생성(아직 없네..ㅠ)
+GET http://localhost:8083/api/shop/books
+Content-Type: application/json
 
 ### 태그 생성(도 아직 없네..)
 

@@ -97,8 +97,8 @@ public class CsvParserService {
 
                 bookDto.setPublisher(publisher);
 
-                Book bookResult = bookRepository.save(bookDto.convertToEntity());
-                bookAuthorRepository.save(new BookAuthor(bookResult, author));
+                //Book bookResult = bookRepository.save(bookDto.convertToEntity());
+                //bookAuthorRepository.save(new BookAuthor(bookResult, author));
             }
         }catch (IOException | CsvValidationException e) {
             throw new CsvProcessingException("Failed to process CSV file" + e.getMessage());

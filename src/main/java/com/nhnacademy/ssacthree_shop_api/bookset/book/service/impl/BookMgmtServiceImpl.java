@@ -1,12 +1,16 @@
 package com.nhnacademy.ssacthree_shop_api.bookset.book.service.impl;
 
 import com.nhnacademy.ssacthree_shop_api.bookset.author.domain.Author;
+import com.nhnacademy.ssacthree_shop_api.bookset.author.dto.AuthorNameResponse;
 import com.nhnacademy.ssacthree_shop_api.bookset.author.repository.AuthorRepository;
 import com.nhnacademy.ssacthree_shop_api.bookset.book.domain.Book;
 import com.nhnacademy.ssacthree_shop_api.bookset.book.domain.BookStatus;
 import com.nhnacademy.ssacthree_shop_api.bookset.book.dto.mapper.BookMapper;
 import com.nhnacademy.ssacthree_shop_api.bookset.book.dto.request.BookSaveRequest;
 import com.nhnacademy.ssacthree_shop_api.bookset.book.dto.response.BookInfoResponse;
+import com.nhnacademy.ssacthree_shop_api.bookset.book.exception.AuthorNotSetException;
+import com.nhnacademy.ssacthree_shop_api.bookset.book.exception.CategoryLimitExceededException;
+import com.nhnacademy.ssacthree_shop_api.bookset.book.exception.CategoryNotSetException;
 import com.nhnacademy.ssacthree_shop_api.bookset.book.repository.BookRepository;
 import com.nhnacademy.ssacthree_shop_api.bookset.book.service.BookMgmtService;
 import com.nhnacademy.ssacthree_shop_api.bookset.bookauthor.domain.BookAuthor;
@@ -16,10 +20,12 @@ import com.nhnacademy.ssacthree_shop_api.bookset.bookcategory.repository.BookCat
 import com.nhnacademy.ssacthree_shop_api.bookset.booktag.domain.BookTag;
 import com.nhnacademy.ssacthree_shop_api.bookset.booktag.repository.BookTagRepository;
 import com.nhnacademy.ssacthree_shop_api.bookset.category.domain.Category;
+import com.nhnacademy.ssacthree_shop_api.bookset.category.dto.response.CategoryNameResponse;
 import com.nhnacademy.ssacthree_shop_api.bookset.category.repository.CategoryRepository;
 import com.nhnacademy.ssacthree_shop_api.bookset.publisher.domain.Publisher;
 import com.nhnacademy.ssacthree_shop_api.bookset.publisher.repository.PublisherRepository;
 import com.nhnacademy.ssacthree_shop_api.bookset.tag.domain.Tag;
+import com.nhnacademy.ssacthree_shop_api.bookset.tag.dto.response.TagInfoResponse;
 import com.nhnacademy.ssacthree_shop_api.bookset.tag.repository.TagRepository;
 import jakarta.ws.rs.NotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -28,6 +34,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.sql.Array;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -60,35 +67,64 @@ public class BookMgmtServiceImpl implements BookMgmtService {
         book.setPublisher(publisher);
         book.setBookStatus(BookStatus.ON_SALE);
 
-        Book saveBook = bookRepository.save(book);
+        // 카테고리 설정 개수가 올바른지 체크
+        validateCategoryCountLimit(bookSaveRequest);
 
-        List<String> categoryNameList = new ArrayList<>();
-        List<String> tagNameList = new ArrayList<>();
-        List<String> authorNameList = new ArrayList<>();
+        // 작가 설정 개수가 올바른지 체크
+        validateAuthorCountLimit(bookSaveRequest);
+
+        List<CategoryNameResponse> categories = new ArrayList<>();
+        List<TagInfoResponse> tags = new ArrayList<>();
+        List<AuthorNameResponse> authors = new ArrayList<>();
 
         for(Long categoryId : bookSaveRequest.getCategoryIdList()) {
             Category category = categoryRepository.findById(categoryId).orElseThrow(() -> new NotFoundException("해당 카테고리가 존재하지 않습니다."));
             BookCategory bookCategory = new BookCategory(book, category);
-            bookCategoryRepository.save(bookCategory);
-            categoryNameList.add(category.getCategoryName());
+            book.addCategory(bookCategory);
+            categories.add(new CategoryNameResponse(category));
         }
 
         for(Long tagId : bookSaveRequest.getTagIdList()) {
             Tag tag = tagRepository.findById(tagId).orElseThrow(() -> new NotFoundException("해당 태그가 존재하지 않습니다."));
             BookTag bookTag = new BookTag(book, tag);
-            bookTagRepository.save(bookTag);
-            tagNameList.add(tag.getTagName());
+            book.addTag(bookTag);
+            tags.add(new TagInfoResponse(tag));
         }
 
         for(Long authorId : bookSaveRequest.getAuthorIdList()) {
             Author author = authorRepository.findById(authorId).orElseThrow(() -> new NotFoundException("해당 작가가 존재하지 않습니다."));
             BookAuthor bookAuthor = new BookAuthor(book, author);
-            bookAuthorRepository.save(bookAuthor);
-            authorNameList.add(author.getAuthorName());
+            book.addAuthor(bookAuthor);
+            authors.add(new AuthorNameResponse(author));
         }
 
+        // todo: <질문> bookcategory, booktag, bookauthor의 repository에 저장을 안 해도 되는걸까?
 
-        return new BookInfoResponse(saveBook, categoryNameList, tagNameList, authorNameList);
+        bookRepository.save(book);
+
+        return new BookInfoResponse(book, categories, tags, authors);
+    }
+
+    /**
+     * 카테고리 설정 개수가 0개이거나 10개를 초과했을 경우 exception
+     * @param bookSaveRequest 도서 저장 정보
+     */
+    public void validateCategoryCountLimit(BookSaveRequest bookSaveRequest) {
+        if(bookSaveRequest.getCategoryIdList().isEmpty()){
+            throw new CategoryNotSetException();
+        }else if(bookSaveRequest.getCategoryIdList().size() > 10){
+            throw new CategoryLimitExceededException();
+        }
+    }
+
+    /**
+     * 카테고리 설정 개수가 0개이거나 10개를 초과했을 경우 exception
+     * @param bookSaveRequest 도서 저장 정보
+     */
+    public void validateAuthorCountLimit(BookSaveRequest bookSaveRequest) {
+        if(bookSaveRequest.getAuthorIdList().isEmpty()){
+            throw new AuthorNotSetException();
+        }
     }
 
     @Override
