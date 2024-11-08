@@ -1,4 +1,4 @@
-package com.nhnacademy.ssacthree_shop_api.elastic;
+package com.nhnacademy.ssacthree_shop_api.config;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableScheduling;

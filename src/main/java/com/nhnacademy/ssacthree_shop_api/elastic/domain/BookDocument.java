@@ -25,6 +25,7 @@ public class BookDocument {
   private String bookThumbnailImageUrl;
   private int bookViewCount;
   private int bookDiscount;
-  private String publisherName;
-
+  private String publisherNames;
+  private String authorNames;
+  private String tagNames;
 }
