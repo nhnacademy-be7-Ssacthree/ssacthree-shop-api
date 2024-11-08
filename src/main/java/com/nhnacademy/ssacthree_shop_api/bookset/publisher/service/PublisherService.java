@@ -108,10 +108,10 @@ public class PublisherService {
 
             for (String publisherName : normalizedPublisherNames) {
                 if (!existingPublisherNames.contains(publisherName)) {
-                    PublisherGetResponse publisherDto = new PublisherGetResponse();
-                    publisherDto.setPublisherName(publisherName);
-                    publisherDto.setPublisherIsUsed(true);
-                    publishersToSave.add(publisherDto);
+                    PublisherGetResponse publisherGetResponse = new PublisherGetResponse();
+                    publisherGetResponse.setPublisherName(publisherName);
+                    publisherGetResponse.setPublisherIsUsed(true);
+                    publishersToSave.add(publisherGetResponse);
                 }
             }
 
