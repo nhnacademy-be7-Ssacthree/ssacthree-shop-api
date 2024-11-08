@@ -31,24 +31,24 @@ public class BookDto {
     private Publisher publisher;
     private BookStatus bookStatus;
 
-    public Book convertToEntity(){
-        return new Book(
-                this.bookId,
-                this.bookName,
-                this.bookIndex,
-                this.bookInfo,
-                this.bookIsbn,
-                this.publicationDate,
-                this.regularPrice,
-                this.salePrice,
-                this.isPacked,
-                this.stock,
-                this.bookThumbnailImageUrl,
-                this.bookViewCount,
-                this.bookDiscount,
-                this.bookStatus,
-                this.publisher
-        );
+//    public Book convertToEntity(){
+//        return new Book(
+//                this.bookId,
+//                this.bookName,
+//                this.bookIndex,
+//                this.bookInfo,
+//                this.bookIsbn,
+//                this.publicationDate,
+//                this.regularPrice,
+//                this.salePrice,
+//                this.isPacked,
+//                this.stock,
+//                this.bookThumbnailImageUrl,
+//                this.bookViewCount,
+//                this.bookDiscount,
+//                this.bookStatus,
+//                this.publisher
+//        );
 
-    }
+//    }
 }

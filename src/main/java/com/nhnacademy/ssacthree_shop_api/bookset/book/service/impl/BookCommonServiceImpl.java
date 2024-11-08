@@ -3,9 +3,6 @@ package com.nhnacademy.ssacthree_shop_api.bookset.book.service.impl;
 import com.nhnacademy.ssacthree_shop_api.bookset.author.domain.Author;
 import com.nhnacademy.ssacthree_shop_api.bookset.book.domain.Book;
 import com.nhnacademy.ssacthree_shop_api.bookset.book.dto.response.BookInfoResponse;
-import com.nhnacademy.ssacthree_shop_api.bookset.book.exception.AuthorNotSetException;
-import com.nhnacademy.ssacthree_shop_api.bookset.book.exception.CategoryLimitExceededException;
-import com.nhnacademy.ssacthree_shop_api.bookset.book.exception.CategoryNotSetException;
 import com.nhnacademy.ssacthree_shop_api.bookset.book.repository.BookRepository;
 import com.nhnacademy.ssacthree_shop_api.bookset.book.service.BookCommonService;
 import com.nhnacademy.ssacthree_shop_api.bookset.bookauthor.repository.BookAuthorRepository;
@@ -71,18 +68,8 @@ public class BookCommonServiceImpl implements BookCommonService {
         for(Author author : bookAuthorRepository.findBookAuthorByBookId(bookId)){
             authorNameList.add(author.getAuthorName());
         }
-
-        if(categoryNameList.isEmpty()){
-            throw new CategoryNotSetException();
-        }else if(categoryNameList.size() > 10){
-            throw new CategoryLimitExceededException();
-        }
-
-        if(authorNameList.isEmpty()){
-            throw new AuthorNotSetException();
-        }
-
-        return new BookInfoResponse(book, categoryNameList, tagNameList, authorNameList);
+        //todo: 수정해야함.
+        return new BookInfoResponse(book);
     }
 
     /**

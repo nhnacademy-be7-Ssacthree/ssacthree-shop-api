@@ -1,14 +1,24 @@
 package com.nhnacademy.ssacthree_shop_api.bookset.book.domain;
 
 
+import com.nhnacademy.ssacthree_shop_api.bookset.author.domain.Author;
 import com.nhnacademy.ssacthree_shop_api.bookset.book.domain.converter.BookStatusConverter;
+import com.nhnacademy.ssacthree_shop_api.bookset.bookauthor.domain.BookAuthor;
+import com.nhnacademy.ssacthree_shop_api.bookset.bookcategory.domain.BookCategory;
+import com.nhnacademy.ssacthree_shop_api.bookset.booktag.domain.BookTag;
+import com.nhnacademy.ssacthree_shop_api.bookset.category.domain.Category;
 import com.nhnacademy.ssacthree_shop_api.bookset.publisher.domain.Publisher;
+import com.nhnacademy.ssacthree_shop_api.bookset.tag.domain.Tag;
 import jakarta.persistence.*; // jakarta -> javax?
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 import lombok.Setter;
 
 @Entity
@@ -54,6 +64,27 @@ public class Book {
     @ManyToOne
     @JoinColumn(name = "publisher_id")
     private  Publisher publisher;
+
+    @OneToMany(mappedBy="book", fetch = FetchType.LAZY)
+    private Set<BookCategory> bookCategories = new HashSet<>();
+
+    @OneToMany(mappedBy="book", fetch = FetchType.LAZY)
+    private Set<BookAuthor> bookAuthors = new HashSet<>();
+
+    @OneToMany(mappedBy="book", fetch = FetchType.LAZY)
+    private Set<BookTag> bookTags = new HashSet<>();
+
+    public void addCategory(BookCategory bookCategory) {
+        bookCategories.add(bookCategory);
+    }
+
+    public void addTag(BookTag bookTag) {
+        bookTags.add(bookTag);
+    }
+
+    public void addAuthor(BookAuthor bookAuthor) {
+        bookAuthors.add(bookAuthor);
+    }
 
     public boolean getIsPacked() {
         return isPacked;

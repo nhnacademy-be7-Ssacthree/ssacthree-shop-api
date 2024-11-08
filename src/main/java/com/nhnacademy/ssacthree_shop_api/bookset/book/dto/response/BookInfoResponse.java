@@ -1,14 +1,23 @@
 package com.nhnacademy.ssacthree_shop_api.bookset.book.dto.response;
 
+import com.nhnacademy.ssacthree_shop_api.bookset.author.dto.AuthorCreateRequest;
+import com.nhnacademy.ssacthree_shop_api.bookset.author.dto.AuthorGetResponse;
+import com.nhnacademy.ssacthree_shop_api.bookset.author.dto.AuthorNameResponse;
 import com.nhnacademy.ssacthree_shop_api.bookset.book.domain.Book;
 import com.nhnacademy.ssacthree_shop_api.bookset.book.domain.converter.BookStatusConverter;
+import com.nhnacademy.ssacthree_shop_api.bookset.bookcategory.domain.BookCategory;
+import com.nhnacademy.ssacthree_shop_api.bookset.category.dto.response.CategoryInfoResponse;
+import com.nhnacademy.ssacthree_shop_api.bookset.category.dto.response.CategoryNameResponse;
+import com.nhnacademy.ssacthree_shop_api.bookset.tag.dto.response.TagInfoResponse;
 import com.querydsl.core.annotations.QueryProjection;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 
 @Getter
@@ -34,11 +43,36 @@ public class BookInfoResponse {
     // FK
     private String publisherName;
 
-    private List<String> categoryNameList;
-    private List<String> tagNameList;
-    private List<String> authorNameList;
+    private List<CategoryNameResponse> categories;
+    private List<TagInfoResponse> tags;
+    private List<AuthorNameResponse> authors;
 
-    public BookInfoResponse(Book book, List<String> categoryNameList, List<String> tagNameList, List<String> authorNameList) {
+
+    // 카테고리, 태그, 작가 리스트 없는 생성자.
+    public BookInfoResponse(Book book) {
+        this.bookId = book.getBookId();
+        this.bookName = book.getBookName();
+        this.bookIndex = book.getBookIndex();
+        this.bookInfo = book.getBookInfo();
+        this.bookIsbn = book.getBookIsbn();
+        this.publicationDate = book.getPublicationDate();
+        this.regularPrice = book.getRegularPrice();
+        this.salePrice = book.getSalePrice();
+        this.isPacked = book.getIsPacked();
+        this.stock = book.getStock();
+        this.bookThumbnailImageUrl = book.getBookThumbnailImageUrl();
+        this.bookViewCount = book.getBookViewCount();
+        this.bookDiscount = book.getBookDiscount();
+
+        BookStatusConverter converter = new BookStatusConverter();
+        this.bookStatus = converter.convertToDatabaseColumn(book.getBookStatus());
+
+        this.publisherName = book.getPublisher().getPublisherName();
+    }
+
+
+    // 카테고리, 태그, 작가 리스트 있는 생성자.
+    public BookInfoResponse(Book book, List<CategoryNameResponse> categories, List<TagInfoResponse> tags, List<AuthorNameResponse> authors ) {
         this.bookId = book.getBookId();
         this.bookName = book.getBookName();
         this.bookIndex = book.getBookIndex();
@@ -58,9 +92,9 @@ public class BookInfoResponse {
 
         this.publisherName = book.getPublisher().getPublisherName();
 
-        this.categoryNameList = categoryNameList;
-        this.tagNameList = tagNameList;
-        this.authorNameList = authorNameList;
+        this.categories =  categories;
+        this.tags = tags;
+        this.authors = authors;
     }
 
 }

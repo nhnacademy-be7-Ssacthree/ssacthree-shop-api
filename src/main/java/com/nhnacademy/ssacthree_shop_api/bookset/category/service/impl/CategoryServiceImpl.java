@@ -289,24 +289,24 @@ public class CategoryServiceImpl implements CategoryService {
         Category category = categoryRepository.findById(categoryId)
                 .orElseThrow(() -> new CategoryNotFoundException(categoryId));
 
-        if(!category.getCategoryIsUsed()){
+        if (!category.getCategoryIsUsed()) {
             throw new CategoryNotFoundException(categoryId);
         }
 
         // 사용중인 카테고리와 이름 중복 체크.
         // 같은 트리 아래에 있으면 이름 중복 불가(루트 카테고리끼리, 같은 상위 카테고리를 갖은 것 끼리,
         // 자신의 상위/하위 카테고리와 이름 중복 불가)
-        if(request.getSuperCategoryId() == null){
+        if (request.getSuperCategoryId() == null) {
             // root 카테고리인 경우
             List<Category> rootCategories = categoryRepository.findBySuperCategoryIsNull();
 
-            for(Category rootCategory : rootCategories){
-                if(rootCategory.getCategoryIsUsed() && request.getCategoryName().equals(rootCategory.getCategoryName())){
-                    throw new DuplicateCategoryNameException(request.getCategoryName()+"과 이름이 같은 최상위 카테고리가 이미 존재합니다.");
+            for (Category rootCategory : rootCategories) {
+                if (rootCategory.getCategoryIsUsed() && request.getCategoryName().equals(rootCategory.getCategoryName())) {
+                    throw new DuplicateCategoryNameException(request.getCategoryName() + "과 이름이 같은 최상위 카테고리가 이미 존재합니다.");
                 }
             }
 
-        }else {
+        } else {
             Category superCategory = categoryRepository.findById(request.getSuperCategoryId())
                     .orElseThrow(() -> new IllegalArgumentException("상위 카테고리를 찾을 수 없습니다."));
 
@@ -316,7 +316,7 @@ public class CategoryServiceImpl implements CategoryService {
 
             // 같은 상위 카테고리 아래에서 이름 중복 확인
             Category duplicateNameCategory = categoryRepository.findBySuperCategoryAndCategoryName(superCategory, request.getCategoryName());
-            if (duplicateNameCategory!=null && duplicateNameCategory.getCategoryIsUsed() && !category.getCategoryName().equals(request.getCategoryName())) {
+            if (duplicateNameCategory != null && duplicateNameCategory.getCategoryIsUsed() && !category.getCategoryName().equals(request.getCategoryName())) {
                 throw new DuplicateCategoryNameException("같은 상위 카테고리 아래에 같은 이름의 카테고리가 존재합니다.");
             }
         }
