@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/shop/admin/pointSaveRules")
+@RequestMapping("/api/shop/admin/point-save-rules")
 @RequiredArgsConstructor
 public class PointSaveRuleController {
 
