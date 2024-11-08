@@ -43,14 +43,6 @@ public class AddressController {
         return ResponseEntity.ok(addresses);
     }
 
-//    @GetMapping("/address/{registeredAddressId}") 보류 사용할 상황이 있을까?
-//    public ResponseEntity<AddressResponse> getAddress(
-//        @RequestHeader(name = "X-USER-ID") String header,
-//        @PathVariable String registeredAddressId) {
-//        AddressResponse address = addressService.getAddressByAddressId(registeredAddressId);
-//        return ResponseEntity.ok(address);
-//    }
-
     @DeleteMapping("/address/{addressId}")
     public ResponseEntity<Void> deleteAddress(
         @PathVariable("addressId") String addressId) {
