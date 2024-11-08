@@ -1,9 +1,5 @@
 package com.nhnacademy.ssacthree_shop_api.elastic.controller;
 
-import com.nhnacademy.ssacthree_shop_api.elastic.domain.BookDocument;
-import com.nhnacademy.ssacthree_shop_api.elastic.service.BookSyncService;
-import org.springframework.web.bind.annotation.RequestBody;
-
 import com.nhnacademy.ssacthree_shop_api.elastic.service.BookElasticService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;

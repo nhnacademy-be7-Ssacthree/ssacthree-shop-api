@@ -1,6 +1,6 @@
 package com.nhnacademy.ssacthree_shop_api.elastic.service;
 
-import com.nhnacademy.ssacthree_shop_api.elastic.client.ElasticFeignClient;
+import com.nhnacademy.ssacthree_shop_api.elastic.client.ElasticsearchFeignClient;
 import com.nhnacademy.ssacthree_shop_api.elastic.domain.BookDocument;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
 public class BookElasticService {
 
 
-  private final ElasticFeignClient elasticFeignClient;
+  private final ElasticsearchFeignClient elasticFeignClient;
 
 
   public void saveBookToElasticsearch(BookDocument bookDocument) {
