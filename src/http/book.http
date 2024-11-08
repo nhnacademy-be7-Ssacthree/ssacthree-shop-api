@@ -17,12 +17,11 @@ Content-Type: application/json
 }
 
 ### 출판사 생성
-POST http://localhost:8083/api/shop/upload/publishers
+POST http://localhost:8083//api/shop/admin/publishers
 Content-Type: application/json
 
 {
-  "publisherName": "민지출판",
-  "publisherIsUsed": "true"
+  "publisherName": "민지출판"
 }
 
 
@@ -31,11 +30,11 @@ POST http://localhost:8083/api/shop/admin/books
 Content-Type: application/json
 
 {
-  "bookName": "채식주의자",
-  "bookIndex": "",
+  "bookName": "채식주의자5",
+  "bookIndex": "gjewjpj",
   "bookInfo": "노벨문학상 작품",
-  "bookIsbn":"123456789",
-  "publicationDate": "2024-11-07",
+  "bookIsbn":"123456789112234587",
+  "publicationDate": "2024-11-07T11:00:00",
   "regularPrice": 20000,
   "salePrice": 18000,
   "isPacked": true,
@@ -45,7 +44,8 @@ Content-Type: application/json
   "bookStatus": "판매 중",
   "publisherId": 1,
   "categoryIdList": [1],
-  "authorIdList": [1]
+  "authorIdList": [3],
+  "tagIdList": []
 }
 
 ### 도서 생성
@@ -57,7 +57,7 @@ Content-Type: application/json
   "bookIndex": "",
   "bookInfo": "노벨문학상 작품",
   "bookIsbn":"123456789",
-  "publicationDate": "2024-11-06",
+  "publicationDate": "2024-11-06T11:00:00",
   "regularPrice": 20000,
   "salePrice": 18000,
   "isPacked": true,
@@ -67,7 +67,8 @@ Content-Type: application/json
   "bookStatus": "판매 중",
   "publisherId": 1,
   "categoryIdList": [1],
-  "authorIdList": [1]
+  "authorIdList": [3],
+  "tagIdList": []
 }
 
 ### 도서 검색(최신순)
