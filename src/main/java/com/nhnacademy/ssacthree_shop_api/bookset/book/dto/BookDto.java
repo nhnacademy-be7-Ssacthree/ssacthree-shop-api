@@ -1,6 +1,7 @@
 package com.nhnacademy.ssacthree_shop_api.bookset.book.dto;
 
 import com.nhnacademy.ssacthree_shop_api.bookset.book.domain.Book;
+import com.nhnacademy.ssacthree_shop_api.bookset.book.domain.BookStatus;
 import com.nhnacademy.ssacthree_shop_api.bookset.publisher.domain.Publisher;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -14,7 +15,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class BookDto {
-    private long bookId;
+    private Long bookId;
     private String bookName;
     private String bookIndex;
     private String bookInfo;
@@ -28,24 +29,26 @@ public class BookDto {
     private int bookViewCount;
     private int bookDiscount;
     private Publisher publisher;
+    private BookStatus bookStatus;
 
-    public Book convertToEntity(){
-        return new Book(
-                this.bookId,
-                this.bookName,
-                this.bookIndex,
-                this.bookInfo,
-                this.bookIsbn,
-                this.publicationDate,
-                this.regularPrice,
-                this.salePrice,
-                this.isPacked,
-                this.stock,
-                this.bookThumbnailImageUrl,
-                this.bookViewCount,
-                this.bookDiscount,
-                this.publisher
-        );
+//    public Book convertToEntity(){
+//        return new Book(
+//                this.bookId,
+//                this.bookName,
+//                this.bookIndex,
+//                this.bookInfo,
+//                this.bookIsbn,
+//                this.publicationDate,
+//                this.regularPrice,
+//                this.salePrice,
+//                this.isPacked,
+//                this.stock,
+//                this.bookThumbnailImageUrl,
+//                this.bookViewCount,
+//                this.bookDiscount,
+//                this.bookStatus,
+//                this.publisher
+//        );
 
-    }
+//    }
 }

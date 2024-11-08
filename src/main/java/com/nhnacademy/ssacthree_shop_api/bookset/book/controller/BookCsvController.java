@@ -2,8 +2,8 @@ package com.nhnacademy.ssacthree_shop_api.bookset.book.controller;
 
 import com.nhnacademy.ssacthree_shop_api.bookset.book.service.CsvParserService;
 import com.nhnacademy.ssacthree_shop_api.bookset.publisher.service.PublisherService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -13,14 +13,14 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/shop/upload")
+@RequiredArgsConstructor
 @Slf4j
 public class BookCsvController {
 
-    @Autowired
-    private CsvParserService csvParserService;
 
-    @Autowired
-    private PublisherService publisherService;
+    private final CsvParserService csvParserService;
+
+    private final PublisherService publisherService;
 
 
     @PostMapping("/bookauthors")

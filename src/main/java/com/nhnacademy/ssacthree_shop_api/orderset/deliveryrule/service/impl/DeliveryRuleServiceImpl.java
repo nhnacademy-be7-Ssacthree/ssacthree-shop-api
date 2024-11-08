@@ -1,4 +1,4 @@
-package com.nhnacademy.ssacthree_shop_api.orderset.deliveryrule.service.Impl;
+package com.nhnacademy.ssacthree_shop_api.orderset.deliveryrule.service.impl;
 
 import com.nhnacademy.ssacthree_shop_api.orderset.deliveryrule.domain.DeliveryRule;
 import com.nhnacademy.ssacthree_shop_api.orderset.deliveryrule.domain.QDeliveryRule;
@@ -16,7 +16,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -34,8 +33,7 @@ public class DeliveryRuleServiceImpl implements DeliveryRuleService {
         DeliveryRule deliveryRule = new DeliveryRule(
             deliveryRuleCreateRequest.getDeliveryRuleName(),
             deliveryRuleCreateRequest.getDeliveryFee(),
-            deliveryRuleCreateRequest.getDeliveryDiscountCost(),
-            LocalDateTime.now()
+            deliveryRuleCreateRequest.getDeliveryDiscountCost()
         );
 
         if (getAllDeliveryRules().isEmpty()) {
@@ -57,7 +55,7 @@ public class DeliveryRuleServiceImpl implements DeliveryRuleService {
 
     @Override
     public DeliveryRule updateDeliveryRule(DeliveryRuleUpdateRequest deliveryRuleUpdateRequest) {
-        long deliveryRuleId = deliveryRuleUpdateRequest.getDeliveryRuleId();
+        Long deliveryRuleId = deliveryRuleUpdateRequest.getDeliveryRuleId();
         if (deliveryRuleId <= 0) {
             throw new IllegalArgumentException("deliveryRuleId는 0 이하일 수 없습니다.");
         }
@@ -82,7 +80,7 @@ public class DeliveryRuleServiceImpl implements DeliveryRuleService {
         return new JPAQueryFactory(entityManager)
                 .select(Projections.constructor(
                         DeliveryRuleGetResponse.class,
-                        deliveryRule.id,
+                        deliveryRule.deliveryRuleId,
                         deliveryRule.deliveryRuleName,
                         deliveryRule.deliveryFee,
                         deliveryRule.deliveryDiscountCost,

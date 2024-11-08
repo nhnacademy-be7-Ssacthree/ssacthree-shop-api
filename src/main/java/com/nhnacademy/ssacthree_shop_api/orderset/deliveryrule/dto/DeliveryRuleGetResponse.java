@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 @Getter
 public class DeliveryRuleGetResponse {
 
-    private long deliveryRuleId;
+    private Long deliveryRuleId;
     private String deliveryRuleName;
     private int deliveryFee;
     private int deliveryDiscountCost;

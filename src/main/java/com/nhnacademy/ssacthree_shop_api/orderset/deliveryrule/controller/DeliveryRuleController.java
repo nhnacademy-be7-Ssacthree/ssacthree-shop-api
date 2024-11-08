@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/shop/admin/deliveryRules")
+@RequestMapping("/api/shop/admin/delivery-rules")
 @RequiredArgsConstructor
 public class DeliveryRuleController {
 
@@ -25,7 +25,7 @@ public class DeliveryRuleController {
         return ResponseEntity.ok().body(deliveryRuleService.getAllDeliveryRules());
     }
 
-    @PostMapping("/create")
+    @PostMapping
     public ResponseEntity<MessageResponse> createDeliveryRule(
             @Valid @RequestBody DeliveryRuleCreateRequest request) {
 

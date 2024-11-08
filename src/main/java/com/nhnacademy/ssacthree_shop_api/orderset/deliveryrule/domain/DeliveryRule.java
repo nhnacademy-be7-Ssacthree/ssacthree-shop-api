@@ -13,17 +13,16 @@ import java.time.LocalDateTime;
 @Table(name = "delivery_rule")
 public class DeliveryRule {
 
-    public DeliveryRule(String name, int fee, int discount_cost, LocalDateTime created_at) {
+    public DeliveryRule(String name, int fee, int discount_cost) {
         this.deliveryRuleName = name;
         this.deliveryFee = fee;
         this.deliveryDiscountCost = discount_cost;
-        this.deliveryRuleCreatedAt = created_at;
     }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "delivery_rule_id")
-    private long id;
+    private Long deliveryRuleId;
 
     @Column(name = "delivery_rule_name")
     private String deliveryRuleName;
