@@ -66,7 +66,13 @@ public class CategoryServiceImpl implements CategoryService {
             category.setSuperCategory(superCategory); // 상위 카테고리 설정
         } else {
             // 상위 카테고리가 없는 경우
-            category.setSuperCategory(null);
+            List<Category> rootCategories = categoryRepository.findBySuperCategoryIsNull();
+
+            for (Category rootCategory : rootCategories) {
+                if (rootCategory.getCategoryIsUsed() && categorySaveRequest.getCategoryName().equals(rootCategory.getCategoryName())) {
+                    throw new DuplicateCategoryNameException(categorySaveRequest.getCategoryName() + "과 이름이 같은 최상위 카테고리가 이미 존재합니다.");
+                }
+            }
         }
 
         // 카테고리 저장
