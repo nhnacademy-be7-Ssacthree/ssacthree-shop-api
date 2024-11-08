@@ -12,6 +12,11 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Tag {
+
+    public Tag(String tagName) {
+        this.tagName = tagName;
+    }
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "tag_id")
@@ -20,4 +25,6 @@ public class Tag {
     @NotNull
     @Column(name = "tag_name")
     private String tagName;
+
+
 }
