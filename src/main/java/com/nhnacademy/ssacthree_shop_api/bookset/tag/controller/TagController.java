@@ -1,7 +1,7 @@
 package com.nhnacademy.ssacthree_shop_api.bookset.tag.controller;
 
 import com.nhnacademy.ssacthree_shop_api.bookset.tag.dto.request.TagCreateRequest;
-import com.nhnacademy.ssacthree_shop_api.bookset.tag.dto.response.TagGetResponse;
+import com.nhnacademy.ssacthree_shop_api.bookset.tag.dto.response.TagInfoResponse;
 import com.nhnacademy.ssacthree_shop_api.bookset.tag.service.TagService;
 import com.nhnacademy.ssacthree_shop_api.commons.dto.MessageResponse;
 import java.util.List;
@@ -28,7 +28,7 @@ public class TagController {
     }
 
     @GetMapping
-    public ResponseEntity<List<TagGetResponse>> getAllTags() {
+    public ResponseEntity<List<TagInfoResponse>> getAllTags() {
         return ResponseEntity.status(HttpStatus.OK).body(tagService.getAllTags());
     }
 

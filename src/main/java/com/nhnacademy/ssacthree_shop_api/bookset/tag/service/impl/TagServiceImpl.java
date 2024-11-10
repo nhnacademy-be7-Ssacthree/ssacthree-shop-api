@@ -4,13 +4,11 @@ import static com.nhnacademy.ssacthree_shop_api.memberset.membergrade.domain.QMe
 
 import com.nhnacademy.ssacthree_shop_api.bookset.tag.domain.Tag;
 import com.nhnacademy.ssacthree_shop_api.bookset.tag.dto.request.TagCreateRequest;
-import com.nhnacademy.ssacthree_shop_api.bookset.tag.dto.response.TagGetResponse;
+import com.nhnacademy.ssacthree_shop_api.bookset.tag.dto.response.TagInfoResponse;
 import com.nhnacademy.ssacthree_shop_api.bookset.tag.exception.TagAlreadyException;
 import com.nhnacademy.ssacthree_shop_api.bookset.tag.repository.TagRepository;
 import com.nhnacademy.ssacthree_shop_api.bookset.tag.service.TagService;
 import com.nhnacademy.ssacthree_shop_api.commons.dto.MessageResponse;
-import com.nhnacademy.ssacthree_shop_api.memberset.membergrade.domain.MemberGrade;
-import com.nhnacademy.ssacthree_shop_api.memberset.membergrade.dto.MemberGradeGetResponse;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -36,14 +34,10 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
-    public List<TagGetResponse> getAllTags() {
+    public List<TagInfoResponse> getAllTags() {
         List<Tag> tagList = tagRepository.findAll();
 
         return tagList.stream()
-            .map(tag ->
-                new TagGetResponse(
-                   tag.getTagId(), tag.getTagName()
-                )
-            ).collect(Collectors.toList());
+            .map(TagInfoResponse::new).collect(Collectors.toList());
     }
 }

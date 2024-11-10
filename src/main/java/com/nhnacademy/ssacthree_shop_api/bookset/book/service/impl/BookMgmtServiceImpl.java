@@ -9,6 +9,7 @@ import com.nhnacademy.ssacthree_shop_api.bookset.book.dto.mapper.BookMapper;
 import com.nhnacademy.ssacthree_shop_api.bookset.book.dto.request.BookSaveRequest;
 import com.nhnacademy.ssacthree_shop_api.bookset.book.dto.response.BookInfoResponse;
 import com.nhnacademy.ssacthree_shop_api.bookset.book.exception.AuthorNotSetException;
+import com.nhnacademy.ssacthree_shop_api.bookset.book.exception.BookAlreadyExistsException;
 import com.nhnacademy.ssacthree_shop_api.bookset.book.exception.CategoryLimitExceededException;
 import com.nhnacademy.ssacthree_shop_api.bookset.book.exception.CategoryNotSetException;
 import com.nhnacademy.ssacthree_shop_api.bookset.book.repository.BookRepository;
@@ -63,6 +64,11 @@ public class BookMgmtServiceImpl implements BookMgmtService {
     @Override
     public BookInfoResponse saveBook(BookSaveRequest bookSaveRequest) {
         Book book = bookMapper.bookSaveRequestToBook(bookSaveRequest);
+
+        if(bookRepository.findByBookIsbn(book.getBookIsbn()) != null){
+            throw new BookAlreadyExistsException(book.getBookIsbn());
+        }
+
         Publisher publisher = publisherRepository.findById(bookSaveRequest.getPublisherId()).orElseThrow(() -> new NotFoundException("해당 출판사가 존재하지 않습니다."));
         book.setPublisher(publisher);
         book.setBookStatus(BookStatus.ON_SALE);
@@ -98,11 +104,9 @@ public class BookMgmtServiceImpl implements BookMgmtService {
             authors.add(new AuthorNameResponse(author));
         }
 
-        // todo: <질문> bookcategory, booktag, bookauthor의 repository에 저장을 안 해도 되는걸까?
-
         bookRepository.save(book);
 
-        return new BookInfoResponse(book, categories, tags, authors);
+        return new BookInfoResponse(book);
     }
 
     /**

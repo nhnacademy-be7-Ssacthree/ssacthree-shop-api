@@ -1,6 +1,7 @@
 package com.nhnacademy.ssacthree_shop_api.config;
 
 
+import com.querydsl.jpa.JPQLTemplates;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -18,6 +19,6 @@ public class QuerydslConfig {
 
     @Bean
     public JPAQueryFactory jpaQueryFactory(EntityManager em){
-        return new JPAQueryFactory(em);
+        return new JPAQueryFactory(JPQLTemplates.DEFAULT , em);
     }
 }
