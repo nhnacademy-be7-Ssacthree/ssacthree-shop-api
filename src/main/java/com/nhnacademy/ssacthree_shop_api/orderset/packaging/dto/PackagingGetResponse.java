@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Getter
 public class PackagingGetResponse {
+    private Long id;
     private String packagingName;
     private int packagingPrice;
     private String packagingImageUrl;

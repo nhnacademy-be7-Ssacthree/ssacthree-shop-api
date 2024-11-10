@@ -21,7 +21,7 @@ public class PackagingServiceImpl implements PackagingService {
         //초기화 필요
         List<PackagingGetResponse> packagingGetResponses = new ArrayList<>();
         for (Packaging pack : packaging) {
-            packagingGetResponses.add(new PackagingGetResponse(pack.getPackagingName(), pack.getPackagingPrice(), pack.getPackagingImageUrl()));
+            packagingGetResponses.add(new PackagingGetResponse(pack.getId(), pack.getPackagingName(), pack.getPackagingPrice(), pack.getPackagingImageUrl()));
         }
         return packagingGetResponses;
     }
