@@ -15,7 +15,7 @@ public interface ElasticsearchFeignClient {
   @PostMapping("/ssacthree_books/_search")
   Map<String, Object> searchBooks(@RequestBody Map<String, Object> query);
   
-//   데이터 저장
+//   데이터 1개씩 저장
   @PostMapping("/ssacthree_books/_doc")
   void saveBook(BookDocument bookDocument);
 
@@ -24,8 +24,13 @@ public interface ElasticsearchFeignClient {
   @PostMapping("/ssacthree_books/_delete_by_query")
   void deleteAllDocuments(@RequestBody Map<String, Object> query);
 
-  // bulk 구현 못함
-//  @PostMapping("/_bulk")
-//  void bulkSave(@RequestBody String bulkRequest);
+
+  // Bulk API를 통한 묶음 데이터 저장
+  @PostMapping(value = "/_bulk", consumes = "application/x-ndjson")
+  void bulkSave(@RequestBody String bulkRequest);
+
+
+  @PostMapping("/ssacthree_books/_refresh")
+  void refreshIndex();
 
 }
