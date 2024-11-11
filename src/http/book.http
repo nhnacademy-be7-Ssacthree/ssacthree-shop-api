@@ -8,7 +8,7 @@ Content-Type: application/json
 }
 
 ### 작가 생성
-POST http://localhost:8083/api/shop/admin/authors/create
+POST http://localhost:8083/api/shop/admin/authors
 Content-Type: application/json
 
 {
@@ -16,16 +16,25 @@ Content-Type: application/json
   "authorInfo": "노벨문학상 작가"
 }
 
+### 출판사 생성
+POST http://localhost:8083//api/shop/admin/publishers
+Content-Type: application/json
+
+{
+  "publisherName": "민지출판"
+}
+
+
 ### 도서 생성
 POST http://localhost:8083/api/shop/admin/books
 Content-Type: application/json
 
 {
-  "bookName": "채식주의자",
-  "bookIndex": "",
+  "bookName": "채식주의자5",
+  "bookIndex": "gjewjpj",
   "bookInfo": "노벨문학상 작품",
-  "bookIsbn":"123456789",
-  "publicationDate": "2024-11-07",
+  "bookIsbn":"123456789112234587",
+  "publicationDate": "2024-11-07T11:00:00",
   "regularPrice": 20000,
   "salePrice": 18000,
   "isPacked": true,
@@ -35,14 +44,50 @@ Content-Type: application/json
   "bookStatus": "판매 중",
   "publisherId": 1,
   "categoryIdList": [1],
-  "authorIdList": [1]
+  "authorIdList": [3],
+  "tagIdList": []
 }
 
+### 도서 생성
+POST http://localhost:8083/api/shop/admin/books
+Content-Type: application/json
+
+{
+  "bookName": "안뇽",
+  "bookIndex": "",
+  "bookInfo": "노벨문학상 작품",
+  "bookIsbn":"123456789",
+  "publicationDate": "2024-11-06T11:00:00",
+  "regularPrice": 20000,
+  "salePrice": 18000,
+  "isPacked": true,
+  "stock": 20,
+  "bookThumbnailImageUrl": "어딘가",
+  "bookViewCount": 0,
+  "bookStatus": "판매 중",
+  "publisherId": 1,
+  "categoryIdList": [1],
+  "authorIdList": [3],
+  "tagIdList": []
+}
+
+### 도서 검색(채식주의자)
+GET http://localhost:8083/api/shop/books/search?title=채식주의자
+Content-Type: application/json
+
+### 도서 아이디 검색
+GET http://localhost:8083/api/shop/books/510
+Content-Type: application/json
+
 ### 도서 검색(최신순)
+GET http://localhost:8083/api/shop/books
+Content-Type: application/json
 
+### 엘라스틱 서치로 키워드 검색
+GET http://localhost:8083/Search/books
+Content-Type: application/json
 
-### 출판사 생성(아직 없네..ㅠ)
+### 작가 아이디로 도서 검색
+GET http://localhost:8083/api/shop/books/author/349
+Content-Type: application/json
 
-### 태그 생성(도 아직 없네..)
-
-GET http://localhost:8080/Search/books
