@@ -71,9 +71,18 @@ Content-Type: application/json
   "tagIdList": []
 }
 
+### 도서 검색(채식주의자)
+GET http://localhost:8083/api/shop/books/search?title=채식주의자
+Content-Type: application/json
+
+### 도서 아이디 검색
+GET http://localhost:8083/api/shop/books/510
+Content-Type: application/json
+
 ### 도서 검색(최신순)
 GET http://localhost:8083/api/shop/books
 Content-Type: application/json
 
-### 태그 생성(도 아직 없네..)
-
+### 작가 아이디로 도서 검색
+GET http://localhost:8083/api/shop/books/author/349
+Content-Type: application/json

@@ -65,13 +65,13 @@ public class Book {
     @JoinColumn(name = "publisher_id")
     private  Publisher publisher;
 
-    @OneToMany(mappedBy="book", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy="book", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Set<BookCategory> bookCategories = new HashSet<>();
 
-    @OneToMany(mappedBy="book", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy="book", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Set<BookAuthor> bookAuthors = new HashSet<>();
 
-    @OneToMany(mappedBy="book", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy="book", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Set<BookTag> bookTags = new HashSet<>();
 
     public void addCategory(BookCategory bookCategory) {
