@@ -137,4 +137,15 @@ public class BookCommonServiceImpl implements BookCommonService {
         return addAssociatedDataToBookInfoResponse(bookRepository.findByBookIsbn(isbn));
     }
 
+    @Override
+    public Page<BookInfoResponse> getBooksByAuthorId(Pageable pageable, Long authorId) {
+        Page<BookBaseResponse> booksPage =  bookRepository.findBooksByAuthorId(authorId, pageable);
+
+        List<BookInfoResponse> bookInfoResponses = booksPage.getContent().stream()
+                .map(this::addAssociatedDataToBookInfoResponse)
+                .collect(Collectors.toList());
+
+        return new PageImpl<>(bookInfoResponses, pageable, booksPage.getTotalElements());
+    }
+
 }

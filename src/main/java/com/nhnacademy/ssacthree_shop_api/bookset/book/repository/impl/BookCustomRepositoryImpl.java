@@ -10,8 +10,11 @@ import com.nhnacademy.ssacthree_shop_api.bookset.book.dto.response.BookBaseRespo
 import com.nhnacademy.ssacthree_shop_api.bookset.book.dto.response.BookInfoResponse;
 import com.nhnacademy.ssacthree_shop_api.bookset.book.repository.BookCustomRepository;
 import com.nhnacademy.ssacthree_shop_api.bookset.bookauthor.domain.QBookAuthor;
+import com.nhnacademy.ssacthree_shop_api.bookset.bookauthor.dto.BookAuthorDto;
 import com.nhnacademy.ssacthree_shop_api.bookset.bookcategory.domain.QBookCategory;
+import com.nhnacademy.ssacthree_shop_api.bookset.bookcategory.dto.BookCategoryDto;
 import com.nhnacademy.ssacthree_shop_api.bookset.booktag.domain.QBookTag;
+import com.nhnacademy.ssacthree_shop_api.bookset.booktag.dto.BookTagDto;
 import com.nhnacademy.ssacthree_shop_api.bookset.category.domain.Category;
 import com.nhnacademy.ssacthree_shop_api.bookset.category.domain.QCategory;
 import com.nhnacademy.ssacthree_shop_api.bookset.category.dto.response.CategoryNameResponse;
@@ -355,6 +358,50 @@ public class BookCustomRepositoryImpl implements BookCustomRepository {
                 .from(bookAuthor)
                 .leftJoin(bookAuthor.author, author)
                 .where(bookAuthor.book.bookId.eq(bookId))
+                .fetch();
+    }
+
+    //todo: 현재 구현되어 있는 카테고리, 태그, 작가 리스트를 불러오는 방식이 N+1 문제를 발생시킬 것 같아서
+    // 다른 방식 구현 중
+    @Override
+    public List<BookCategoryDto> findCategoriesByBookIds(List<Long> bookIds) {
+        return queryFactory
+                .select(Projections.constructor(BookCategoryDto.class,
+                        bookCategory.book.bookId,
+                        Projections.constructor(CategoryNameResponse.class,
+                                category.categoryId,
+                                category.categoryName)))
+                .from(bookCategory)
+                .leftJoin(bookCategory.category, category)
+                .where(bookCategory.book.bookId.in(bookIds))
+                .fetch();
+    }
+
+    @Override
+    public List<BookTagDto> findTagsByBookIds(List<Long> bookIds) {
+        return queryFactory
+                .select(Projections.constructor(BookTagDto.class,
+                        bookTag.book.bookId,
+                        Projections.constructor(TagInfoResponse.class,
+                                tag.tagId,
+                                tag.tagName)))
+                .from(bookTag)
+                .leftJoin(bookTag.tag, tag)
+                .where(bookTag.book.bookId.in(bookIds))
+                .fetch();
+    }
+
+    @Override
+    public List<BookAuthorDto> findAuthorsByBookIds(List<Long> bookIds) {
+        return queryFactory
+                .select(Projections.constructor(BookAuthorDto.class,
+                        bookAuthor.book.bookId,
+                        Projections.constructor(AuthorNameResponse.class,
+                                author.authorId,
+                                author.authorName)))
+                .from(bookAuthor)
+                .leftJoin(bookAuthor.author, author)
+                .where(bookAuthor.book.bookId.in(bookIds))
                 .fetch();
     }
 

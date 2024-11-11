@@ -19,4 +19,6 @@ public interface BookCommonService {
 
     // 도서 ISBN으로 도서 검색
     BookInfoResponse getBooksByBookIsbn(String isbn);
+
+    Page<BookInfoResponse> getBooksByAuthorId(Pageable pageable, Long authorId);
 }
