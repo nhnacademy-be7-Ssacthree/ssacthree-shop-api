@@ -2,7 +2,6 @@ package com.nhnacademy.ssacthree_shop_api.elastic.client;
 
 import com.nhnacademy.ssacthree_shop_api.config.FeignClientConfig;
 import com.nhnacademy.ssacthree_shop_api.elastic.domain.BookDocument;
-import java.util.List;
 import java.util.Map;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.PostMapping;
