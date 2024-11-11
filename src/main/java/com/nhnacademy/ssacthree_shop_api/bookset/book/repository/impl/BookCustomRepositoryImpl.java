@@ -370,7 +370,7 @@ public class BookCustomRepositoryImpl implements BookCustomRepository {
             .fetch();
     }
 
-}
+
 
     @Override
     public BookBaseResponse findByBookIsbn(String isbn) {
