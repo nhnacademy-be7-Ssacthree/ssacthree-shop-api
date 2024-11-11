@@ -28,4 +28,7 @@ public class BookDocument {
   private String publisherNames;
   private String authorNames;
   private String tagNames;
+  
+  // category 추가해줘야할듯
+
 }

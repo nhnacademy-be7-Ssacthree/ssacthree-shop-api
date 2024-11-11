@@ -52,7 +52,7 @@ public interface BookCustomRepository {
     // 책으로 태그 명 검색
     List<String> findTagNamesByBookId(Long bookId);
 
-    // 책으로 속하는 모든 카테고리 검색
+    // 책으로 속하는 모든 카테고리 검색 ??
     List<String> findCategoryNamesByBookId(Long bookId);
 
 

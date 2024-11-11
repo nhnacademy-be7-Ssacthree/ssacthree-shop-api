@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 @Controller
-@RequestMapping("/Search")  // 검색은 Search로 접근
+@RequestMapping("/search")  // Search 경로로 접근
 public class ElasticController {
 
   private final ElasticService elasticService;
@@ -25,14 +25,14 @@ public class ElasticController {
   }
 
   /**
-   * 검색 결과 페이지
+   * 검색 결과 페이지 표시
    *
    * @param query  검색 키워드
-   * @param page   페이지 번호
+   * @param page   페이지 번호 (기본값: 1)
    * @param sort   정렬 옵션 (예: 조회수, 최신순 등)
-   * @param filters 필터 (출판사, 저자 등)
-   * @param model  모델에 검색 결과 추가
-   * @return 검색 결과를 표시할 HTML 템플릿 (books.html)
+   * @param filters 필터 (출판사, 저자 등 추가 필터링 조건)
+   * @param model  검색 결과를 전달할 모델
+   * @return 검색 결과 페이지 (books.html)
    */
   @GetMapping("/books")
   public String getBooksPage(
@@ -47,30 +47,36 @@ public class ElasticController {
       return "books";
     }
 
-    if (page < 1) {
-      page = 1;
-    }
+    // 페이지 번호가 1보다 작을 경우 1로 설정
+    page = Math.max(page, 1);
 
+    // 검색 결과를 Elasticsearch에서 가져옴
     List<BookDocument> books = elasticService.searchBooks(query, page, sort, filters);
+
+    // 모델에 검색 결과 추가
     model.addAttribute("books", books);
     model.addAttribute("query", query);
     model.addAttribute("page", page);
     model.addAttribute("sort", sort);
 
-    return "books";  // books.html 템플릿으로 이동
+    return "books";  // 검색 결과 페이지로 이동
   }
 
-
-  
-  // 책 이름을 클릭했을 때 넘어가지는 상세 페이지
+  /**
+   * 책 상세 페이지 표시
+   *
+   * @param id    도서 ID
+   * @param model 상세 정보를 전달할 모델
+   * @return 상세 페이지 (bookDetail.html)
+   */
   @GetMapping("/books/{id}")
   public String getBookDetail(@PathVariable Long id, Model model) {
     BookDocument book = elasticService.getBookById(id);
     if (book == null) {
       model.addAttribute("errorMessage", "해당 도서를 찾을 수 없습니다.");
-      return "error"; // error.html 또는 적절한 에러 페이지로 이동
+      return "error"; // 오류 페이지로 이동
     }
     model.addAttribute("book", book);
-    return "bookDetail"; // 상세 보기 템플릿 렌더링
+    return "bookDetail"; // 책 상세 페이지로 이동
   }
 }
