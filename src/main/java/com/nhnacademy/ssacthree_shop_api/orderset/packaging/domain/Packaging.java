@@ -2,11 +2,11 @@ package com.nhnacademy.ssacthree_shop_api.orderset.packaging.domain;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-@AllArgsConstructor
 @NoArgsConstructor
+@Getter
 @Entity
 @Table(name = "packaging")
 public class Packaging {
