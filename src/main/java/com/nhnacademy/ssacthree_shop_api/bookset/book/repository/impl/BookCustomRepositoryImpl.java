@@ -1,5 +1,7 @@
 package com.nhnacademy.ssacthree_shop_api.bookset.book.repository.impl;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nhnacademy.ssacthree_shop_api.bookset.author.domain.Author;
 import com.nhnacademy.ssacthree_shop_api.bookset.author.domain.QAuthor;
 import com.nhnacademy.ssacthree_shop_api.bookset.author.dto.AuthorNameResponse;
@@ -32,6 +34,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -94,6 +97,7 @@ public class BookCustomRepositoryImpl implements BookCustomRepository {
 
         Long count = queryFactory.select(book.count())
                 .from(book)
+                .leftJoin(book.publisher, publisher)
                 .where(isOnSaleOrNoStock())
                 .fetchOne();
 
@@ -141,6 +145,7 @@ public class BookCustomRepositoryImpl implements BookCustomRepository {
 
         Long count = queryFactory.select(book.count())
                 .from(book)
+                .leftJoin(book.publisher, publisher)
                 .where(isOnSaleOrNoStock(),
                         book.bookName.containsIgnoreCase(bookName))
                 .fetchOne();
@@ -186,6 +191,7 @@ public class BookCustomRepositoryImpl implements BookCustomRepository {
 
         Long count = queryFactory.select(book.count())
                 .from(book)
+                .leftJoin(book.publisher, publisher)
                 .where(isOnSaleOrNoStock())
                 .fetchOne();
 
@@ -230,6 +236,7 @@ public class BookCustomRepositoryImpl implements BookCustomRepository {
 
         Long count = queryFactory.select(book.count())
                 .from(book)
+                .leftJoin(book.publisher, publisher)
                 .where(book.bookStatus.eq(BookStatus.NO_STOCK))
                 .fetchOne();
 
@@ -274,6 +281,7 @@ public class BookCustomRepositoryImpl implements BookCustomRepository {
 
         Long count = queryFactory.select(book.count())
                 .from(book)
+                .leftJoin(book.publisher, publisher)
                 .where(book.bookStatus.eq(BookStatus.DISCONTINUED))
                 .fetchOne();
 
@@ -516,6 +524,7 @@ public class BookCustomRepositoryImpl implements BookCustomRepository {
 
         Long count = queryFactory.select(book.count())
                 .from(book)
+                .leftJoin(book.publisher, publisher)
                 .leftJoin(book.bookAuthors, bookAuthor)
                 .leftJoin(bookAuthor.author, author)
                 .where(author.authorId.eq(authorId).and(isOnSaleOrNoStock()))

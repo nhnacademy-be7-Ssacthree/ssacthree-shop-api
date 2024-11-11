@@ -27,6 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -41,9 +42,6 @@ public class BookCommonServiceImpl implements BookCommonService {
      * @param bookBaseResponse 도서 기본 정보(아직 출판사, 카테고리, 태그, 작가 정보 비어 있음)
      */
     private BookInfoResponse addAssociatedDataToBookInfoResponse(BookBaseResponse bookBaseResponse){
-
-        // publisher 설정
-        //bookInfoResponse.setPublisher(new PublisherNameResponse(bookRepository.findPublisherByBookId(bookInfoResponse.getBookId())));
 
         BookInfoResponse bookInfoResponse = new BookInfoResponse(bookBaseResponse);
 
