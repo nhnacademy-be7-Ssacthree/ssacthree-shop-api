@@ -83,6 +83,11 @@ Content-Type: application/json
 GET http://localhost:8083/api/shop/books
 Content-Type: application/json
 
+### 엘라스틱 서치로 키워드 검색
+GET http://localhost:8083/Search/books
+Content-Type: application/json
+
 ### 작가 아이디로 도서 검색
 GET http://localhost:8083/api/shop/books/author/349
 Content-Type: application/json
+
