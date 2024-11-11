@@ -16,7 +16,7 @@ public interface ElasticsearchFeignClient {
   @PostMapping("/ssacthree_books/_search")
   Map<String, Object> searchBooks(@RequestBody Map<String, Object> query);
   
-//   데이터 저장 (bulkAPI로 변경하며 주석처리함 241110_17시)
+//   데이터 저장
   @PostMapping("/ssacthree_books/_doc")
   void saveBook(BookDocument bookDocument);
 
@@ -25,6 +25,7 @@ public interface ElasticsearchFeignClient {
   @PostMapping("/ssacthree_books/_delete_by_query")
   void deleteAllDocuments(@RequestBody Map<String, Object> query);
 
+  // bulk 구현 못함
 //  @PostMapping("/_bulk")
 //  void bulkSave(@RequestBody String bulkRequest);
 }
