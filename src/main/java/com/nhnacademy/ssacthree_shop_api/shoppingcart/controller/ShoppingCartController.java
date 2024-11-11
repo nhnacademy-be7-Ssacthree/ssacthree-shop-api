@@ -1,12 +1,15 @@
 package com.nhnacademy.ssacthree_shop_api.shoppingcart.controller;
 
 import com.nhnacademy.ssacthree_shop_api.shoppingcart.dto.ShoppingCartItemResponse;
+import com.nhnacademy.ssacthree_shop_api.shoppingcart.dto.ShoppingCartRequest;
 import com.nhnacademy.ssacthree_shop_api.shoppingcart.service.ShoppingCartService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -29,6 +32,12 @@ public class ShoppingCartController {
     public ResponseEntity<ShoppingCartItemResponse> getRandomBook(@PathVariable("bookId") String bookId) {
         ShoppingCartItemResponse cartItem = shoppingCartService.getBookByBookId(bookId);
         return ResponseEntity.ok(cartItem);
+    }
+
+    @PutMapping("/shop")
+    public ResponseEntity<Void> saveCart(@RequestHeader(name = "X-USER-ID") String header, @RequestBody List<ShoppingCartRequest> cartList) {
+        shoppingCartService.saveCart(header,cartList);
+        return (ResponseEntity<Void>) ResponseEntity.ok();
     }
 
 }

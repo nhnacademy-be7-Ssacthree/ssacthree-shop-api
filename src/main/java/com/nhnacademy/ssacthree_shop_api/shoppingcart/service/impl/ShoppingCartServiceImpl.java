@@ -7,9 +7,12 @@ import com.nhnacademy.ssacthree_shop_api.memberset.member.domain.Member;
 import com.nhnacademy.ssacthree_shop_api.memberset.member.exception.MemberNotFoundException;
 import com.nhnacademy.ssacthree_shop_api.memberset.member.repository.MemberRepository;
 import com.nhnacademy.ssacthree_shop_api.shoppingcart.domain.ShoppingCart;
+import com.nhnacademy.ssacthree_shop_api.shoppingcart.domain.ShoppingCartId;
 import com.nhnacademy.ssacthree_shop_api.shoppingcart.dto.ShoppingCartItemResponse;
+import com.nhnacademy.ssacthree_shop_api.shoppingcart.dto.ShoppingCartRequest;
 import com.nhnacademy.ssacthree_shop_api.shoppingcart.repository.ShoppingCartRepository;
 import com.nhnacademy.ssacthree_shop_api.shoppingcart.service.ShoppingCartService;
+import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -31,7 +34,8 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
         Member member = memberRepository.findByMemberLoginId(header)
             .orElseThrow(() -> new MemberNotFoundException("member not found"));
 
-        List<ShoppingCart> shoppingCarts = shoppingCartRepository.findByCustomer_CustomerId(member.getId());
+        List<ShoppingCart> shoppingCarts = shoppingCartRepository.findByCustomer_CustomerId(
+            member.getId());
 
         return shoppingCarts.stream()
             .map(cart -> new ShoppingCartItemResponse(
@@ -49,6 +53,39 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
         Book book = bookRepository.findByBookId(Long.valueOf(bookId))
             .orElseThrow(() -> new BookNotFoundException("book not found"));
 
-        return new ShoppingCartItemResponse(book.getBookId(),book.getBookName(), 1, book.getSalePrice(), book.getBookThumbnailImageUrl());
+        return new ShoppingCartItemResponse(book.getBookId(), book.getBookName(), 1,
+            book.getSalePrice(), book.getBookThumbnailImageUrl());
     }
+
+    @Override
+    public Void saveCart(String header, List<ShoppingCartRequest> cartList) {
+        Member member = memberRepository.findByMemberLoginId(header)
+            .orElseThrow(() -> new MemberNotFoundException("member not found"));
+
+        for (ShoppingCartRequest cartItem : cartList) {
+            // 필요한 개수와 항목 정보 추출
+            int quantity = cartItem.getQuantity();
+            Long bookId = cartItem.getBookId();
+            Book book = bookRepository.findByBookId(bookId)
+                .orElseThrow(() -> new BookNotFoundException("book not found"));
+            ShoppingCartId shoppingCartId = new ShoppingCartId(member.getId(), bookId);
+
+            // ShoppingCartRepository에서 해당 ID로 조회
+            ShoppingCart existingCart = shoppingCartRepository.findById(shoppingCartId)
+                .orElse(null);
+
+            if (existingCart != null) {
+                // 존재할 경우 수량 업데이트
+                existingCart.addBookQuantity(existingCart.getBookQuantity());
+                shoppingCartRepository.save(existingCart);
+            } else {
+                // 존재하지 않을 경우 새로 생성
+                ShoppingCart newCart = new ShoppingCart(shoppingCartId, member.getCustomer(), book,
+                    quantity);
+                shoppingCartRepository.save(newCart);
+            }
+        }
+        return null;
+    }
+
 }
