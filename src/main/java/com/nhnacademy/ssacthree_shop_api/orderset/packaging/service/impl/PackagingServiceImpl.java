@@ -1,7 +1,5 @@
 package com.nhnacademy.ssacthree_shop_api.orderset.packaging.service.impl;
 
-import com.nhnacademy.ssacthree_shop_api.bookset.tag.domain.Tag;
-import com.nhnacademy.ssacthree_shop_api.bookset.tag.exception.TagAlreadyException;
 import com.nhnacademy.ssacthree_shop_api.commons.dto.MessageResponse;
 import com.nhnacademy.ssacthree_shop_api.orderset.packaging.domain.Packaging;
 import com.nhnacademy.ssacthree_shop_api.orderset.packaging.dto.PackagingCreateRequest;
@@ -51,6 +49,7 @@ public class PackagingServiceImpl implements PackagingService {
             throw new PackagingNotFoundException("해당 포장지가 존재하지 않습니다.");
         }
 
+        // TODO : 추후 상태만 is_used를 false로 만드는 소프트 삭제로 변경 필요,
         packagingRepository.deleteById(id);
         MessageResponse messageResponse = new MessageResponse("삭제 성공");
         return messageResponse;
