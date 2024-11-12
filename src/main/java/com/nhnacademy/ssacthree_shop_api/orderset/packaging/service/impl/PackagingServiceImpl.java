@@ -7,6 +7,7 @@ import com.nhnacademy.ssacthree_shop_api.orderset.packaging.domain.Packaging;
 import com.nhnacademy.ssacthree_shop_api.orderset.packaging.dto.PackagingCreateRequest;
 import com.nhnacademy.ssacthree_shop_api.orderset.packaging.dto.PackagingGetResponse;
 import com.nhnacademy.ssacthree_shop_api.orderset.packaging.exception.PackagingAlreadyExistsException;
+import com.nhnacademy.ssacthree_shop_api.orderset.packaging.exception.PackagingNotFoundException;
 import com.nhnacademy.ssacthree_shop_api.orderset.packaging.repository.PackagingRepository;
 import com.nhnacademy.ssacthree_shop_api.orderset.packaging.service.PackagingService;
 import lombok.RequiredArgsConstructor;
@@ -42,4 +43,17 @@ public class PackagingServiceImpl implements PackagingService {
         MessageResponse messageResponse = new MessageResponse("생성 성공");
         return messageResponse;
     }
+
+    @Override
+    public MessageResponse deletePackaging(String packagingId) {
+        long id = Long.parseLong(packagingId);
+        if (!packagingRepository.existsById(id)) {
+            throw new PackagingNotFoundException("해당 포장지가 존재하지 않습니다.");
+        }
+
+        packagingRepository.deleteById(id);
+        MessageResponse messageResponse = new MessageResponse("삭제 성공");
+        return messageResponse;
+    }
+
 }

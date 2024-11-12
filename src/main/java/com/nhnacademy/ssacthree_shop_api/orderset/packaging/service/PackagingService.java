@@ -10,4 +10,6 @@ public interface PackagingService {
     List<PackagingGetResponse> getAllPackaging();
 
     MessageResponse savePackaging(PackagingCreateRequest packagingCreateRequest);
+
+    MessageResponse deletePackaging(String packagingId);
 }

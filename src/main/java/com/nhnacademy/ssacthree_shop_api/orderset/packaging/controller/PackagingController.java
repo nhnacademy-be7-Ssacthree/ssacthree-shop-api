@@ -24,9 +24,15 @@ public class PackagingController {
         return ResponseEntity.ok().body(packaging);
     }
 
-    @PostMapping("/packaging")
+    @PostMapping
     ResponseEntity<MessageResponse> createPackaging(@RequestBody PackagingCreateRequest packagingCreateRequest) {
         MessageResponse messageResponse = packagingService.savePackaging(packagingCreateRequest);
         return ResponseEntity.status(HttpStatus.CREATED).body(messageResponse);
+    }
+
+    @DeleteMapping("/{packaging-id}")
+    public ResponseEntity<MessageResponse> deletePackaging(@PathVariable(value = "packaging-id") String packagingId) {
+        MessageResponse messageResponse = packagingService.deletePackaging(packagingId);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(messageResponse);
     }
 }
