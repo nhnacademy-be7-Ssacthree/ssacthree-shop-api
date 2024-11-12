@@ -1,13 +1,10 @@
 package com.nhnacademy.ssacthree_shop_api.bookset.book.repository.impl;
 
-import com.nhnacademy.ssacthree_shop_api.bookset.author.domain.Author;
 import com.nhnacademy.ssacthree_shop_api.bookset.author.domain.QAuthor;
 import com.nhnacademy.ssacthree_shop_api.bookset.author.dto.AuthorNameResponse;
 import com.nhnacademy.ssacthree_shop_api.bookset.book.domain.BookStatus;
 import com.nhnacademy.ssacthree_shop_api.bookset.book.domain.QBook;
-import com.nhnacademy.ssacthree_shop_api.bookset.book.domain.converter.BookStatusConverter;
 import com.nhnacademy.ssacthree_shop_api.bookset.book.dto.response.BookBaseResponse;
-import com.nhnacademy.ssacthree_shop_api.bookset.book.dto.response.BookInfoResponse;
 import com.nhnacademy.ssacthree_shop_api.bookset.book.repository.BookCustomRepository;
 import com.nhnacademy.ssacthree_shop_api.bookset.bookauthor.domain.QBookAuthor;
 import com.nhnacademy.ssacthree_shop_api.bookset.bookauthor.dto.BookAuthorDto;
@@ -15,13 +12,11 @@ import com.nhnacademy.ssacthree_shop_api.bookset.bookcategory.domain.QBookCatego
 import com.nhnacademy.ssacthree_shop_api.bookset.bookcategory.dto.BookCategoryDto;
 import com.nhnacademy.ssacthree_shop_api.bookset.booktag.domain.QBookTag;
 import com.nhnacademy.ssacthree_shop_api.bookset.booktag.dto.BookTagDto;
-import com.nhnacademy.ssacthree_shop_api.bookset.category.domain.Category;
 import com.nhnacademy.ssacthree_shop_api.bookset.category.domain.QCategory;
 import com.nhnacademy.ssacthree_shop_api.bookset.category.dto.response.CategoryNameResponse;
 import com.nhnacademy.ssacthree_shop_api.bookset.publisher.domain.QPublisher;
 import com.nhnacademy.ssacthree_shop_api.bookset.publisher.dto.PublisherNameResponse;
 import com.nhnacademy.ssacthree_shop_api.bookset.tag.domain.QTag;
-import com.nhnacademy.ssacthree_shop_api.bookset.tag.domain.Tag;
 import com.nhnacademy.ssacthree_shop_api.bookset.tag.dto.response.TagInfoResponse;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
@@ -37,7 +32,6 @@ import java.util.List;
 import java.util.Map;
 
 import static com.querydsl.core.group.GroupBy.groupBy;
-import static com.querydsl.core.group.GroupBy.list;
 
 @Repository
 @RequiredArgsConstructor
@@ -94,6 +88,7 @@ public class BookCustomRepositoryImpl implements BookCustomRepository {
 
         Long count = queryFactory.select(book.count())
                 .from(book)
+                .leftJoin(book.publisher, publisher)
                 .where(isOnSaleOrNoStock())
                 .fetchOne();
 
@@ -141,6 +136,7 @@ public class BookCustomRepositoryImpl implements BookCustomRepository {
 
         Long count = queryFactory.select(book.count())
                 .from(book)
+                .leftJoin(book.publisher, publisher)
                 .where(isOnSaleOrNoStock(),
                         book.bookName.containsIgnoreCase(bookName))
                 .fetchOne();
@@ -186,6 +182,7 @@ public class BookCustomRepositoryImpl implements BookCustomRepository {
 
         Long count = queryFactory.select(book.count())
                 .from(book)
+                .leftJoin(book.publisher, publisher)
                 .where(isOnSaleOrNoStock())
                 .fetchOne();
 
@@ -230,6 +227,7 @@ public class BookCustomRepositoryImpl implements BookCustomRepository {
 
         Long count = queryFactory.select(book.count())
                 .from(book)
+                .leftJoin(book.publisher, publisher)
                 .where(book.bookStatus.eq(BookStatus.NO_STOCK))
                 .fetchOne();
 
@@ -274,6 +272,7 @@ public class BookCustomRepositoryImpl implements BookCustomRepository {
 
         Long count = queryFactory.select(book.count())
                 .from(book)
+                .leftJoin(book.publisher, publisher)
                 .where(book.bookStatus.eq(BookStatus.DISCONTINUED))
                 .fetchOne();
 
@@ -516,6 +515,7 @@ public class BookCustomRepositoryImpl implements BookCustomRepository {
 
         Long count = queryFactory.select(book.count())
                 .from(book)
+                .leftJoin(book.publisher, publisher)
                 .leftJoin(book.bookAuthors, bookAuthor)
                 .leftJoin(bookAuthor.author, author)
                 .where(author.authorId.eq(authorId).and(isOnSaleOrNoStock()))

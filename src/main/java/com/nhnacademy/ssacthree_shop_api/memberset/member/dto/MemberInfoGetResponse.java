@@ -21,7 +21,8 @@ public class MemberInfoGetResponse {
         this.customerEmail = member.getCustomer().getCustomerEmail();
         this.memberBirthdate = member.getMemberBirthdate();
         this.memberPoint = member.getMemberPoint();
-
+        this.memberGradeName = member.getMemberGrade().getMemberGradeName();
+        this.memberGradePointSave = member.getMemberGrade().getMemberGradePointSave();
     }
 
 
@@ -31,5 +32,7 @@ public class MemberInfoGetResponse {
     private String customerEmail;
     private String memberBirthdate;
     private int memberPoint;
+    private String memberGradeName;
+    private float memberGradePointSave;
 
 }
