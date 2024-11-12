@@ -15,8 +15,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
-@Setter
-@AllArgsConstructor
 @NoArgsConstructor
 public class BookSaveRequest {
     private String bookName;
@@ -46,9 +44,5 @@ public class BookSaveRequest {
 
     public boolean getIsPacked() {
         return isPacked;
-    }
-
-    public void setIsPacked(boolean isPacked) {
-        this.isPacked = isPacked;
     }
 }

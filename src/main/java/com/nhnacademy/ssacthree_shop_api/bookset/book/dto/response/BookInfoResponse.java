@@ -1,18 +1,22 @@
 package com.nhnacademy.ssacthree_shop_api.bookset.book.dto.response;
 
+import com.nhnacademy.ssacthree_shop_api.bookset.author.dto.AuthorNameResponse;
 import com.nhnacademy.ssacthree_shop_api.bookset.book.domain.Book;
 import com.nhnacademy.ssacthree_shop_api.bookset.book.domain.converter.BookStatusConverter;
-import com.querydsl.core.annotations.QueryProjection;
-import lombok.AllArgsConstructor;
+import com.nhnacademy.ssacthree_shop_api.bookset.category.dto.response.CategoryNameResponse;
+import com.nhnacademy.ssacthree_shop_api.bookset.publisher.dto.PublisherNameResponse;
+import com.nhnacademy.ssacthree_shop_api.bookset.tag.dto.response.TagInfoResponse;
+
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 @Getter
-@AllArgsConstructor
 @NoArgsConstructor
 public class BookInfoResponse {
     private Long bookId;
@@ -32,13 +36,20 @@ public class BookInfoResponse {
     private String bookStatus; // 배송 상태
 
     // FK
-    private String publisherName;
+    @Setter
+    private PublisherNameResponse publisher;
 
-    private List<String> categoryNameList;
-    private List<String> tagNameList;
-    private List<String> authorNameList;
+    @Setter
+    private List<CategoryNameResponse> categories;
 
-    public BookInfoResponse(Book book, List<String> categoryNameList, List<String> tagNameList, List<String> authorNameList) {
+    @Setter
+    private List<TagInfoResponse> tags;
+
+    @Setter
+    private List<AuthorNameResponse> authors;
+
+
+    public BookInfoResponse(Book book) {
         this.bookId = book.getBookId();
         this.bookName = book.getBookName();
         this.bookIndex = book.getBookIndex();
@@ -56,11 +67,38 @@ public class BookInfoResponse {
         BookStatusConverter converter = new BookStatusConverter();
         this.bookStatus = converter.convertToDatabaseColumn(book.getBookStatus());
 
-        this.publisherName = book.getPublisher().getPublisherName();
+        this.publisher = new PublisherNameResponse(book.getPublisher());
 
-        this.categoryNameList = categoryNameList;
-        this.tagNameList = tagNameList;
-        this.authorNameList = authorNameList;
+        // book의 bookCategory set을 stream() 메소드를 통해
+        // bookCategory 요소 하나씩 CategoryNameResponse로 변환 후
+        // collect를 통해 리스트로 묶어서 반환
+        this.categories = book.getBookCategories().stream()
+                .map(bookCategory -> new CategoryNameResponse(bookCategory.getCategory()))
+                .collect(Collectors.toList());
+
+        this.tags = book.getBookTags().stream()
+                .map(bookTag -> new TagInfoResponse(bookTag.getTag()))
+                .collect(Collectors.toList());
+
+        this.authors = book.getBookAuthors().stream()
+                .map(bookAuthor -> new AuthorNameResponse(bookAuthor.getAuthor()))
+                .collect(Collectors.toList());
     }
 
+    public BookInfoResponse(BookBaseResponse bookBaseResponse) {
+        this.bookId = bookBaseResponse.getBookId();
+        this.bookName = bookBaseResponse.getBookName();
+        this.bookIndex = bookBaseResponse.getBookIndex();
+        this.bookInfo = bookBaseResponse.getBookInfo();
+        this.bookIsbn = bookBaseResponse.getBookIsbn();
+        this.publicationDate = bookBaseResponse.getPublicationDate();
+        this.regularPrice = bookBaseResponse.getRegularPrice();
+        this.salePrice = bookBaseResponse.getSalePrice();
+        this.isPacked = bookBaseResponse.isPacked();
+        this.stock = bookBaseResponse.getStock();
+        this.bookThumbnailImageUrl = bookBaseResponse.getBookThumbnailImageUrl();
+        this.bookViewCount = bookBaseResponse.getBookViewCount();
+        this.bookDiscount = bookBaseResponse.getBookDiscount();
+        this.bookStatus = bookBaseResponse.getBookStatus();
+    }
 }

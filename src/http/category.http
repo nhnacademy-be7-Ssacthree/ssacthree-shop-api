@@ -105,3 +105,13 @@ Content-Type: application/json
 DELETE http://localhost:8083/api/shop/categories/6
 Content-Type: application/json
 
+### 과학 카테고리 생성- 중복 생성 불가능 확인
+POST http://localhost:8083/api/shop/admin/categories
+Content-Type: application/json
+
+{
+  "categoryName": "과학",
+  "categoryIsUsed": true,
+  "superCategoryId": null
+}
+

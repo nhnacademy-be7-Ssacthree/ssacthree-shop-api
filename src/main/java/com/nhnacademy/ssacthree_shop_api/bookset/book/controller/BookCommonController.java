@@ -3,6 +3,7 @@ package com.nhnacademy.ssacthree_shop_api.bookset.book.controller;
 import com.nhnacademy.ssacthree_shop_api.bookset.book.dto.response.BookInfoResponse;
 import com.nhnacademy.ssacthree_shop_api.bookset.book.service.BookCommonService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.actuate.autoconfigure.observation.ObservationProperties;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -59,6 +60,19 @@ public class BookCommonController {
     @GetMapping("/search")
     public ResponseEntity<Page<BookInfoResponse>> getBooksByTitle(Pageable pageable, @RequestParam String title) {
         Page<BookInfoResponse> books = bookCommonService.getBooksByBookName(pageable, title);
+        return new ResponseEntity<>(books, HttpStatus.OK);
+    }
+
+    /**
+     * 작가 아이디로 작가의 도서를 조회합니다.
+     * @param pageable 페이징 처리
+     * @param authorId 작가 아이디
+     * @return 작가의 도서 페이지
+     */
+    //todo:@RequestParam 써서 해봐야겠다.
+    @GetMapping("/author/{author-id}")
+    public ResponseEntity<Page<BookInfoResponse>> getBookByAuthorId(Pageable pageable, @PathVariable(name = "author-id") Long authorId) {
+        Page<BookInfoResponse> books = bookCommonService.getBooksByAuthorId(pageable, authorId);
         return new ResponseEntity<>(books, HttpStatus.OK);
     }
 }

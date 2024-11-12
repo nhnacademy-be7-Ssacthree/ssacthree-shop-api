@@ -10,7 +10,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class PublisherGetResponse {
-    private long publisherId;
+    private Long publisherId;
     private String publisherName;
     private boolean publisherIsUsed;
 }

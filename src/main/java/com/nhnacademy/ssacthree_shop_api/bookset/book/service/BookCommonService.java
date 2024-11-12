@@ -12,8 +12,13 @@ public interface BookCommonService {
     BookInfoResponse getBook(Long bookId);
 
     // 도서 최신순 검색
-    Page<BookInfoResponse> getRecentBooks (Pageable pageable);
+    Page<BookInfoResponse> getRecentBooks(Pageable pageable);
 
     // 도서 이름 검색
     Page<BookInfoResponse> getBooksByBookName(Pageable pageable, String bookName);
+
+    // 도서 ISBN으로 도서 검색
+    BookInfoResponse getBooksByBookIsbn(String isbn);
+
+    Page<BookInfoResponse> getBooksByAuthorId(Pageable pageable, Long authorId);
 }

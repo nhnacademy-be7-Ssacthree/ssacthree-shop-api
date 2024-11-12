@@ -45,10 +45,4 @@ Content-Type: application/json
 
 ### 태그 생성(도 아직 없네..)
 
-
-### 아직 미구현
-# GET 요청 테스트
-GET http://localhost:8082/search/books?query=asdf
-Accept: application/json
-
-
+GET http://localhost:8080/Search/books
