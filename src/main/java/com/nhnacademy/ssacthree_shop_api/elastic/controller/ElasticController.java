@@ -69,8 +69,8 @@ public class ElasticController {
    * @param model 상세 정보를 전달할 모델
    * @return 상세 페이지 (bookDetail.html)
    */
-  @GetMapping("/books/{id}")
-  public String getBookDetail(@PathVariable Long id, Model model) {
+  @GetMapping("/books/{book-id}")
+  public String getBookDetail(@PathVariable(name = "book-id") Long id, Model model) {
     BookDocument book = elasticService.getBookById(id);
     if (book == null) {
       model.addAttribute("errorMessage", "해당 도서를 찾을 수 없습니다.");
