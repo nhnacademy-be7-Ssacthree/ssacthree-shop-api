@@ -21,9 +21,11 @@ import com.nhnacademy.ssacthree_shop_api.memberset.membergrade.repository.Member
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class MemberServiceImpl implements MemberService {
 
     private final MemberRepository memberRepository;
@@ -37,7 +39,7 @@ public class MemberServiceImpl implements MemberService {
     public MessageResponse registerMember(MemberRegisterRequest memberRegisterRequest) {
 
         if(memberRepository.existsByMemberLoginId(memberRegisterRequest.getLoginId())) {
-            throw new AlreadyMemberException("멤버가 이미 존재합니다!");
+            throw new AlreadyMemberException("아이디가 이미 사용중입니다.");
         }
 
         CustomerCreateRequest customerCreateRequest = new CustomerCreateRequest(
@@ -62,6 +64,7 @@ public class MemberServiceImpl implements MemberService {
         return messageResponse;
     }
 
+    @Transactional(readOnly = true)
     @Override
     public MemberInfoGetResponse getMemberInfoById(String memberLoginId) {
         MemberInfoGetResponse memberInfoGetResponse = memberCustomRepository.getMemberWithCustomer(memberLoginId);

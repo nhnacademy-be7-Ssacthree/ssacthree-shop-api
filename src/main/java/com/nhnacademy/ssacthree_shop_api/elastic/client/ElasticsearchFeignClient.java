@@ -2,6 +2,7 @@ package com.nhnacademy.ssacthree_shop_api.elastic.client;
 
 import com.nhnacademy.ssacthree_shop_api.config.FeignClientConfig;
 import com.nhnacademy.ssacthree_shop_api.elastic.domain.BookDocument;
+import java.util.List;
 import java.util.Map;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -15,7 +16,7 @@ public interface ElasticsearchFeignClient {
   @PostMapping("/ssacthree_books/_search")
   Map<String, Object> searchBooks(@RequestBody Map<String, Object> query);
   
-//   데이터 저장
+//   데이터 저장 (bulkAPI로 변경하며 주석처리함 241110_17시)
   @PostMapping("/ssacthree_books/_doc")
   void saveBook(BookDocument bookDocument);
 
@@ -24,7 +25,6 @@ public interface ElasticsearchFeignClient {
   @PostMapping("/ssacthree_books/_delete_by_query")
   void deleteAllDocuments(@RequestBody Map<String, Object> query);
 
-  // bulk 구현 못함
 //  @PostMapping("/_bulk")
 //  void bulkSave(@RequestBody String bulkRequest);
 }

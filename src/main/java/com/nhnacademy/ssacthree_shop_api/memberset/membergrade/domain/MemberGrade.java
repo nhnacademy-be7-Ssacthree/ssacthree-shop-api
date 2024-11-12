@@ -29,9 +29,6 @@ public class MemberGrade {
         this.memberGradePointSave = memberGradePointSave;
     }
 
-    // table은 jpa로 생성하나요?
-    // ddl로 미리 테이블은 안만드는 건가요?
-    @Size(min = 1, max = 20)
     @Setter
     private String memberGradeName;
 
