@@ -6,6 +6,8 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.elasticsearch.annotations.Document;
 
+import java.util.List;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -27,5 +29,9 @@ public class BookDocument {
   private int bookDiscount;
   private String publisherNames;
   private String authorNames;
-  private String tagNames;
+
+  // 여러 태그를 저장할 수 있도록 List<String> 타입
+  private List<String> tagNames;
+  // 여러 카테고리를 저장할 수 있도록 List<String> 타입
+  private List<String> category;
 }
