@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @NoArgsConstructor
 @Getter
@@ -23,12 +24,15 @@ public class Packaging {
 
     @NotNull
     @Column(name = "packaging_name")
+    @Setter
     private String packagingName;
 
     @NotNull
     @Column(name = "packaging_price")
+    @Setter
     private int packagingPrice;
 
     @Column(name = "packaging_image_url", columnDefinition = "TEXT")
+    @Setter
     private String packagingImageUrl;
 }

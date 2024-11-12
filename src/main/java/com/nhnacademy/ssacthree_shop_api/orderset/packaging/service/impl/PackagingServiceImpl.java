@@ -4,6 +4,7 @@ import com.nhnacademy.ssacthree_shop_api.commons.dto.MessageResponse;
 import com.nhnacademy.ssacthree_shop_api.orderset.packaging.domain.Packaging;
 import com.nhnacademy.ssacthree_shop_api.orderset.packaging.dto.PackagingCreateRequest;
 import com.nhnacademy.ssacthree_shop_api.orderset.packaging.dto.PackagingGetResponse;
+import com.nhnacademy.ssacthree_shop_api.orderset.packaging.dto.PackagingUpdateRequest;
 import com.nhnacademy.ssacthree_shop_api.orderset.packaging.exception.PackagingAlreadyExistsException;
 import com.nhnacademy.ssacthree_shop_api.orderset.packaging.exception.PackagingNotFoundException;
 import com.nhnacademy.ssacthree_shop_api.orderset.packaging.repository.PackagingRepository;
@@ -43,11 +44,26 @@ public class PackagingServiceImpl implements PackagingService {
     }
 
     @Override
+    public MessageResponse updatePackaging(String id, PackagingUpdateRequest packagingUpdateRequest) {
+        long packagingId = Long.parseLong(id);
+        Packaging packaging = packagingRepository.findById(packagingId)
+                .orElseThrow(() -> new PackagingNotFoundException("해당 포장지가 존재하지 않습니다."));
+
+        packaging.setPackagingName(packagingUpdateRequest.getPackagingName());
+        packaging.setPackagingPrice(packagingUpdateRequest.getPackagingPrice());
+        packaging.setPackagingImageUrl(packagingUpdateRequest.getPackagingImageUrl());
+
+        packagingRepository.save(packaging);
+
+        MessageResponse messageResponse = new MessageResponse("수정 성공");
+        return messageResponse;
+    }
+
+    @Override
     public MessageResponse deletePackaging(String packagingId) {
         long id = Long.parseLong(packagingId);
-        if (!packagingRepository.existsById(id)) {
-            throw new PackagingNotFoundException("해당 포장지가 존재하지 않습니다.");
-        }
+        Packaging packaging = packagingRepository.findById(id)
+                .orElseThrow(() -> new PackagingNotFoundException("해당 포장지가 존재하지 않습니다."));
 
         // TODO : 추후 상태만 is_used를 false로 만드는 소프트 삭제로 변경 필요,
         packagingRepository.deleteById(id);

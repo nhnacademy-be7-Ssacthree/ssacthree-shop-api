@@ -3,6 +3,7 @@ package com.nhnacademy.ssacthree_shop_api.orderset.packaging.controller;
 import com.nhnacademy.ssacthree_shop_api.commons.dto.MessageResponse;
 import com.nhnacademy.ssacthree_shop_api.orderset.packaging.dto.PackagingCreateRequest;
 import com.nhnacademy.ssacthree_shop_api.orderset.packaging.dto.PackagingGetResponse;
+import com.nhnacademy.ssacthree_shop_api.orderset.packaging.dto.PackagingUpdateRequest;
 import com.nhnacademy.ssacthree_shop_api.orderset.packaging.service.PackagingService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -25,9 +26,15 @@ public class PackagingController {
     }
 
     @PostMapping
-    ResponseEntity<MessageResponse> createPackaging(@RequestBody PackagingCreateRequest packagingCreateRequest) {
+    public ResponseEntity<MessageResponse> createPackaging(@RequestBody PackagingCreateRequest packagingCreateRequest) {
         MessageResponse messageResponse = packagingService.savePackaging(packagingCreateRequest);
         return ResponseEntity.status(HttpStatus.CREATED).body(messageResponse);
+    }
+
+    @PutMapping("/{packaging-id}")
+    public ResponseEntity<MessageResponse> updatePackaging(@PathVariable("packaging-id") String packagingId, @RequestBody PackagingUpdateRequest packagingUpdateRequest) {
+        MessageResponse messageResponse = packagingService.updatePackaging(packagingId, packagingUpdateRequest);
+        return ResponseEntity.status(HttpStatus.OK).body(messageResponse);
     }
 
     @DeleteMapping("/{packaging-id}")
