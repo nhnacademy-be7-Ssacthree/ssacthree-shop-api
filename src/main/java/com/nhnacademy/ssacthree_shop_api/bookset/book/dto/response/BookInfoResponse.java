@@ -100,5 +100,6 @@ public class BookInfoResponse {
         this.bookViewCount = bookBaseResponse.getBookViewCount();
         this.bookDiscount = bookBaseResponse.getBookDiscount();
         this.bookStatus = bookBaseResponse.getBookStatus();
+        this.publisher = bookBaseResponse.getPublisher();
     }
 }

@@ -38,11 +38,12 @@ Content-Type: application/json
   "authorIdList": [1]
 }
 
-### 도서 검색(최신순)
 
+### 작가 아이디로 도서 검색
+GET http://localhost:8083/api/shop/books/author/365
+Content-Type: application/json
 
-### 출판사 생성(아직 없네..ㅠ)
+### 도서 아이디로 도서 검색
+GET http://localhost:8083/api/shop/books/474
+Content-Type: application/json
 
-### 태그 생성(도 아직 없네..)
-
-GET http://localhost:8080/Search/books
