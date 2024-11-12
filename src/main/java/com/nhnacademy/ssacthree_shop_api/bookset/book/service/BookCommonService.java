@@ -1,8 +1,13 @@
 package com.nhnacademy.ssacthree_shop_api.bookset.book.service;
 
+import com.nhnacademy.ssacthree_shop_api.bookset.author.dto.AuthorNameResponse;
 import com.nhnacademy.ssacthree_shop_api.bookset.book.dto.response.BookInfoResponse;
+import com.nhnacademy.ssacthree_shop_api.bookset.category.dto.response.CategoryNameResponse;
+import com.nhnacademy.ssacthree_shop_api.bookset.tag.dto.response.TagInfoResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+
+import java.util.List;
 
 public interface BookCommonService {
     // 도서 전체 조회(판매 중, 재고 없음)
@@ -21,4 +26,6 @@ public interface BookCommonService {
     BookInfoResponse getBooksByBookIsbn(String isbn);
 
     Page<BookInfoResponse> getBooksByAuthorId(Pageable pageable, Long authorId);
+
+    List<CategoryNameResponse> getCategoriesByBookId(Long bookId);
 }
