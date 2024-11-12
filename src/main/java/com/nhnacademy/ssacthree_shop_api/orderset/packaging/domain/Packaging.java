@@ -10,6 +10,11 @@ import lombok.NoArgsConstructor;
 @Entity
 @Table(name = "packaging")
 public class Packaging {
+    public Packaging(String name, int price, String imageUrl) {
+        this.packagingName = name;
+        this.packagingPrice = price;
+        this.packagingImageUrl = imageUrl;
+    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
