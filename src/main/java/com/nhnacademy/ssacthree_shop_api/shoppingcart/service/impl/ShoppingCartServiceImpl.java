@@ -63,6 +63,16 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
     @Override
     public void saveCart(List<ShoppingCartRequest> cartList, Long customerId) {
 
+        if (cartList == null || cartList.isEmpty()) {
+            Customer customer = customerRepository.findById(customerId).orElse(null);
+            // 고객의 모든 쇼핑 카트 삭제
+            List<ShoppingCart> existingCarts = shoppingCartRepository.findAllByCustomer(customer);
+            if (!existingCarts.isEmpty()) {
+                shoppingCartRepository.deleteAll(existingCarts);
+            }
+            return;
+        }
+
         for (ShoppingCartRequest cartItem : cartList) {
             // 필요한 개수와 항목 정보 추출
             int quantity = cartItem.getQuantity();
