@@ -97,7 +97,16 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
                 shoppingCartRepository.save(newCart);
             }
         }
-        return;
+
+    }
+
+    @Override
+    public void saveCartonLogout(String header, List<ShoppingCartRequest> cartList) {
+        Member member = memberRepository.findByMemberLoginId(header)
+            .orElseThrow(() -> new MemberNotFoundException("member not found"));
+        Long customerId = member.getCustomer().getCustomerId();
+
+        saveCart(cartList,customerId);
     }
 
 }

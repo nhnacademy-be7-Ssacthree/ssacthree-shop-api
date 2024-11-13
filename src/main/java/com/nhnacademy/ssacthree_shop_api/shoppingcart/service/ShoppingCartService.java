@@ -12,4 +12,6 @@ public interface ShoppingCartService {
     ShoppingCartItemResponse getBookByBookId(Long bookId);
 
     void saveCart(List<ShoppingCartRequest> cartList, Long customerId);
+
+    void saveCartonLogout(String header, List<ShoppingCartRequest> cartList);
 }

@@ -48,4 +48,10 @@ public class ShoppingCartController {
         return ResponseEntity.ok(cartItem);
     }
 
+    @PostMapping("logout")
+    public ResponseEntity<Void> saveCartonLogout(@RequestHeader(name = "X-USER-ID") String header, @RequestBody List<ShoppingCartRequest> cartList) {
+        shoppingCartService.saveCartonLogout(header,cartList);
+        return ResponseEntity.ok().build();
+    }
+
 }
