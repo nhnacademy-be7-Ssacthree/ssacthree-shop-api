@@ -1,8 +1,9 @@
 package com.nhnacademy.ssacthree_shop_api.memberset.membergrade.repository.impl;
 
-import com.nhnacademy.ssacthree_shop_api.memberset.membergrade.domain.MemberGrade;
 import com.nhnacademy.ssacthree_shop_api.memberset.membergrade.domain.QMemberGrade;
+import com.nhnacademy.ssacthree_shop_api.memberset.membergrade.dto.MemberGradeGetResponse;
 import com.nhnacademy.ssacthree_shop_api.memberset.membergrade.repository.MemberGradeCustomRepository;
+import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -17,8 +18,14 @@ public class MemberGradeCustomRepositoryImpl implements MemberGradeCustomReposit
 
 
     @Override
-    public List<MemberGrade> findAvailableMemberGrade() {
-        return queryFactory.selectFrom(qMemberGrade)
+    public List<MemberGradeGetResponse> findAvailableMemberGrade() {
+        return queryFactory.select(Projections.fields(MemberGradeGetResponse.class,
+                qMemberGrade.memberGradeId,
+                qMemberGrade.memberGradeName,
+                qMemberGrade.memberGradePointSave,
+                qMemberGrade.memberGradeIsUsed,
+                qMemberGrade.memberGradeCreateAt))
+            .from(qMemberGrade)
             .where(qMemberGrade.memberGradeIsUsed.eq(Boolean.TRUE))
             .fetch();
     }
