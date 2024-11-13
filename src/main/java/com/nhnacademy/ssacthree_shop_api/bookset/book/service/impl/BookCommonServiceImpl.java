@@ -146,4 +146,18 @@ public class BookCommonServiceImpl implements BookCommonService {
         return new PageImpl<>(bookInfoResponses, pageable, booksPage.getTotalElements());
     }
 
+    /**
+     * 도서 아이디로 카테고리 리스트 가져오기
+     * @param bookId 도서 아이디
+     * @return 카테고리 리스트
+     */
+    @Override
+    public List<CategoryNameResponse> getCategoriesByBookId(Long bookId) {
+        if(bookRepository.findById(bookId).isEmpty()) {
+            throw new NotFoundException("해당 도서가 존재하지 않습니다.");
+        }
+
+        return bookRepository.findCategoriesByBookId(bookId);
+    }
+
 }
