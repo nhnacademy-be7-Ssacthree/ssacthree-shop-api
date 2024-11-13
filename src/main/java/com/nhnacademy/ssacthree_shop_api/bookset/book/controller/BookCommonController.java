@@ -60,8 +60,8 @@ public class BookCommonController {
      * @param bookId 도서 아이디
      * @return 도서 정보
      */
-    @GetMapping("/{book-Id}")
-    public ResponseEntity<BookInfoResponse> getBookById(@PathVariable(name="book-Id") Long bookId) {
+    @GetMapping("/{book-id}")
+    public ResponseEntity<BookInfoResponse> getBookById(@PathVariable(name="book-id") Long bookId) {
         BookInfoResponse book = bookCommonService.getBook(bookId);
         return new ResponseEntity<>(book, HttpStatus.OK);
     }
