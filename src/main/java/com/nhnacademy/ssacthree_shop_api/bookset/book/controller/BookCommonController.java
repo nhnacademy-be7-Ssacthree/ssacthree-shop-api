@@ -2,6 +2,7 @@ package com.nhnacademy.ssacthree_shop_api.bookset.book.controller;
 
 import com.nhnacademy.ssacthree_shop_api.bookset.book.dto.response.BookInfoResponse;
 import com.nhnacademy.ssacthree_shop_api.bookset.book.service.BookCommonService;
+import com.nhnacademy.ssacthree_shop_api.bookset.category.dto.response.CategoryNameResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.actuate.autoconfigure.observation.ObservationProperties;
 import org.springframework.data.domain.Page;
@@ -11,6 +12,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -24,7 +27,7 @@ public class BookCommonController {
      * @param page 현재 요청하려는 페이지 번호
      * @param size 한 페이지에 표시할 데이터의 개수
      * @param sort 정렬 조건 (여러개의 정렬 조건을 설정 가능하도록 배열 형태로)
-     * @return
+     * @return ResponseEntity<Page<BookInfoResponse>>
      */
     //todo: 도서 조회 기본이 최근 출판 정보로 하는게 나으려나..? 일단 그렇게 했는데.. 추후 변경할 수도.
     @GetMapping
@@ -57,8 +60,8 @@ public class BookCommonController {
      * @param bookId 도서 아이디
      * @return 도서 정보
      */
-    @GetMapping("/{bookId}")
-    public ResponseEntity<BookInfoResponse> getBookById(@PathVariable Long bookId) {
+    @GetMapping("/{book-id}")
+    public ResponseEntity<BookInfoResponse> getBookById(@PathVariable(name="book-id") Long bookId) {
         BookInfoResponse book = bookCommonService.getBook(bookId);
         return new ResponseEntity<>(book, HttpStatus.OK);
     }
@@ -98,5 +101,11 @@ public class BookCommonController {
         Pageable pageable = PageRequest.of(page, size, Sort.by(sort));
         Page<BookInfoResponse> books = bookCommonService.getBooksByAuthorId(pageable, authorId);
         return new ResponseEntity<>(books, HttpStatus.OK);
+    }
+
+    @GetMapping("/{book-id}/categories")
+    public ResponseEntity<List<CategoryNameResponse>> getCategoriesByBookId(@PathVariable(name = "book-id") Long bookId) {
+        List<CategoryNameResponse> categories = bookCommonService.getCategoriesByBookId(bookId);
+        return new ResponseEntity<>(categories, HttpStatus.OK);
     }
 }
