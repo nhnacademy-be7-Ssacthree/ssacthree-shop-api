@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("api/shop")
+@RequestMapping("api/shop/carts")
 @RequiredArgsConstructor
 public class ShoppingCartController {
 
@@ -31,15 +31,21 @@ public class ShoppingCartController {
     }
 
     @GetMapping("{bookId}")
-    public ResponseEntity<ShoppingCartItemResponse> getRandomBook(@PathVariable("bookId") String bookId) {
+    public ResponseEntity<ShoppingCartItemResponse> getRandomBook(@PathVariable("bookId") Long bookId) {
         ShoppingCartItemResponse cartItem = shoppingCartService.getBookByBookId(bookId);
         return ResponseEntity.ok(cartItem);
     }
 
-    @PostMapping("carts")
+    @PostMapping("cart")
     public ResponseEntity<Void> saveCart(@RequestBody List<ShoppingCartRequest> cartList, @RequestParam Long customerId) {
         shoppingCartService.saveCart(cartList,customerId);
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/add")
+    public ResponseEntity<ShoppingCartItemResponse> getBook(@RequestParam Long bookId) {
+        ShoppingCartItemResponse cartItem = shoppingCartService.getBookByBookId(bookId);
+        return ResponseEntity.ok(cartItem);
     }
 
 }

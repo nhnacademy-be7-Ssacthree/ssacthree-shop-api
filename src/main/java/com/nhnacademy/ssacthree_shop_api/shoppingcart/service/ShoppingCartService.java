@@ -9,7 +9,7 @@ public interface ShoppingCartService {
 
     List<ShoppingCartItemResponse> getShoppingCartItemsBycustomerId(String header);
 
-    ShoppingCartItemResponse getBookByBookId(String bookId);
+    ShoppingCartItemResponse getBookByBookId(Long bookId);
 
     void saveCart(List<ShoppingCartRequest> cartList, Long customerId);
 }

@@ -52,8 +52,8 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
     }
 
     @Override
-    public ShoppingCartItemResponse getBookByBookId(String bookId) {
-        Book book = bookRepository.findByBookId(Long.valueOf(bookId))
+    public ShoppingCartItemResponse getBookByBookId(Long bookId) {
+        Book book = bookRepository.findByBookId(bookId)
             .orElseThrow(() -> new BookNotFoundException("book not found"));
 
         return new ShoppingCartItemResponse(book.getBookId(), book.getBookName(), 1,
