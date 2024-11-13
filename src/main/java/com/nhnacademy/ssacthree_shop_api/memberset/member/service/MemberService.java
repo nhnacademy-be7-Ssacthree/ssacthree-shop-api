@@ -15,6 +15,5 @@ public interface MemberService {
 
     MessageResponse deleteMember(String memberLoginId);
 
-
-
+    Long getCustomerIdByMemberLoginId(String memberId);
 }
