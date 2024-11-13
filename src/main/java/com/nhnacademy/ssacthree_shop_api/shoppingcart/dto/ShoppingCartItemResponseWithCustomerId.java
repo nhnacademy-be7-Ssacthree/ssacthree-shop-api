@@ -4,10 +4,10 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
 @Getter
-public class ShoppingCartItemResponse {
+public class ShoppingCartItemResponseWithCustomerId {
 
     private Long id; //도서 id
 
@@ -18,5 +18,7 @@ public class ShoppingCartItemResponse {
     private int price; // 가격(int 수정)
 
     private String image; //이미지
+
+    private Long customerId;
 
 }
