@@ -5,14 +5,18 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.elasticsearch.annotations.Document;
-
 import java.util.List;
+
+/**
+ * elasticsearch 검색 인덱스와 맞는 Document DTO 입니다.
+ */
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Document(indexName = "books")  // Elasticsearch 인덱스 설정
+@Document(indexName = "ssacthree_books")  // Elasticsearch 인덱스 설정
 public class BookDocument {
+
   @Id
   private long bookId;
   private String bookName;
