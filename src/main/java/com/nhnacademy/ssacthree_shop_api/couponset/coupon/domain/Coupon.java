@@ -1,9 +1,7 @@
 package com.nhnacademy.ssacthree_shop_api.couponset.coupon.domain;
 
 import com.nhnacademy.ssacthree_shop_api.couponset.couponrule.domain.CouponRule;
-import com.nhnacademy.ssacthree_shop_api.couponset.membercoupon.domain.MemberCoupon;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.AccessLevel;
@@ -12,7 +10,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Entity
 @Getter
