@@ -12,12 +12,17 @@ import org.springframework.web.bind.annotation.RequestBody;
 @FeignClient(name = "elasticsearch", url = "${elasticsearch.url}", configuration = FeignClientConfig.class)
 public interface ElasticsearchFeignClient {
 
+  // 검색 시 모든 요청 GET 으로 통일
+  
   // 데이터 검색, Elasticsearch 쿼리 요청을 받는 POST 엔드포인트
   @GetMapping("/ssacthree_books/_search")
   Map<String, Object> searchBooks(@RequestBody Map<String, Object> query);
   
-//   데이터 저장 (bulkAPI로 변경하며 주석처리함 241110_17시)
+//   단일 데이터 저장
   @PostMapping("/ssacthree_books/_doc")
   void saveBook(BookDocument bookDocument);
 
+  // Health Check
+  @GetMapping("/_cluster/health")
+  Map<String, Object> getHealthStatus();
 }

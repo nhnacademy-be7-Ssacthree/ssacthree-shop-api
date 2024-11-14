@@ -6,17 +6,31 @@ import com.nhnacademy.ssacthree_shop_api.elastic.dto.SearchRequest;
 import java.util.HashMap;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ElasticService {
 
   private final ElasticsearchFeignClient elasticsearchFeignClient;
+
+  public boolean checkElasticsearchHealth() {
+    try {
+      Map<String, Object> healthResponse = elasticsearchFeignClient.getHealthStatus();
+      String status = (String) healthResponse.get("status");
+      return "green".equalsIgnoreCase(status) || "yellow".equalsIgnoreCase(status); // Green and yellow indicate a healthy state
+    } catch (Exception e) {
+      log.info("Elasticsearch health check failed", e);
+      return false;
+    }
+  }
+
 
   /**
    * 책 검색을 수행하는 메서드
@@ -45,35 +59,34 @@ public class ElasticService {
 
     // Multi-match 쿼리 설정
     multiMatch.put("query", searchRequest.getKeyword());
-    multiMatch.put("fields", List.of("bookName^100", "bookInfo^10", "tags^50"));
+    multiMatch.put("fields", List.of("bookName^100", "bookInfo^30", "tags^50", "category^3"));
     query.put("query", Map.of("multi_match", multiMatch));
 
     // 페이지네이션 설정
-    query.put("from", (searchRequest.getPage() - 1) * 20);
-    query.put("size", 20);
+    int pageSize = searchRequest.getPageSize();
+    query.put("from", (searchRequest.getPage() - 1) * pageSize);
+    query.put("size", pageSize);
 
     // 정렬 기준 설정: 정렬 필드와 오름/내림차순 설정
     if (searchRequest.getSort() != null) {
-      String sortField;
-      String sortOrder;
+      List<Map<String, Object>> sortCriteria = new ArrayList<>();
       switch (searchRequest.getSort()) {
         case "newest":
-          sortField = "publicationDate";
-          sortOrder = "desc";  // 최신순은 내림차순
+          sortCriteria.add(Map.of("publicationDate", Map.of("order", "desc")));
           break;
         case "priceLow":
-          sortField = "salePrice";
-          sortOrder = "asc";  // 낮은 가격순은 오름차순
+          sortCriteria.add(Map.of("salePrice", Map.of("order", "asc")));
           break;
         case "priceHigh":
-          sortField = "salePrice";
-          sortOrder = "desc";  // 높은 가격순은 내림차순
+          sortCriteria.add(Map.of("salePrice", Map.of("order", "desc")));
+          break;
+        case "popularity":
+          sortCriteria.add(Map.of("bookViewCount", Map.of("order", "desc")));
           break;
         default:
-          sortField = "bookViewCount";  // 인기도 순서 (조회수 기준)
-          sortOrder = "desc";
+          sortCriteria.add(Map.of("_score", Map.of("order", "desc")));
       }
-      query.put("sort", List.of(Map.of(sortField, Map.of("order", sortOrder))));
+      query.put("sort", sortCriteria);
     }
 
     // 필터 조건 설정
@@ -90,7 +103,7 @@ public class ElasticService {
     }
 
     // 디버그용 쿼리 출력
-    System.out.println("GeneratedElasticsearchQuery: " + query);
+    System.out.println("Generated Elasticsearch Query: " + query);
     return query;
   }
 
@@ -122,20 +135,25 @@ public class ElasticService {
       Map<String, Object> source = (Map<String, Object>) hit.get("_source");
       BookDocument book = new BookDocument();
 
-      // BookDocument 필드에 Elasticsearch 응답 데이터를 매핑
-      book.setBookId((Long) source.get("bookId"));
+      // BookDocument 필드에 Elasticsearch 응답 데이터를 매핑 / 각 결과들을 캐스팅해서 저장해야 제대로 저장 됩니다.
+      book.setBookId(source.get("bookId") != null ? ((Number) source.get("bookId")).longValue() : null);
       book.setBookName((String) source.get("bookName"));
       book.setBookIndex((String) source.get("bookIndex"));
       book.setBookInfo((String) source.get("bookInfo"));
       book.setBookIsbn((String) source.get("bookIsbn"));
-      book.setPublicationDate((String) source.get("publicationDate")); // 날짜 형식에 맞춰 필요 시 파싱
-      book.setRegularPrice((Integer) source.get("regularPrice"));
-      book.setSalePrice((Integer) source.get("salePrice"));
-      book.setPacked((Boolean) source.getOrDefault("isPacked", source.get("packed"))); // isPacked와 packed 둘 다 확인
-      book.setStock((Integer) source.get("stock"));
+
+      // 날짜 형식에 맞춰 필요 시 파싱
+      if (source.get("publicationDate") != null) {
+        book.setPublicationDate(source.get("publicationDate").toString());
+      }
+
+      book.setRegularPrice(source.get("regularPrice") != null ? ((Number) source.get("regularPrice")).intValue() : null);
+      book.setSalePrice(source.get("salePrice") != null ? ((Number) source.get("salePrice")).intValue() : null);
+      book.setPacked((Boolean) source.getOrDefault("isPacked", source.get("packed")));
+      book.setStock(source.get("stock") != null ? ((Number) source.get("stock")).intValue() : null);
       book.setBookThumbnailImageUrl((String) source.get("bookThumbnailImageUrl"));
-      book.setBookViewCount((Integer) source.get("bookViewCount"));
-      book.setBookDiscount((Integer) source.get("bookDiscount"));
+      book.setBookViewCount(source.get("bookViewCount") != null ? ((Number) source.get("bookViewCount")).intValue() : null);
+      book.setBookDiscount(source.get("bookDiscount") != null ? ((Number) source.get("bookDiscount")).intValue() : null);
       book.setPublisherNames((String) source.get("publisherNames"));
       book.setAuthorNames((String) source.get("authorNames"));
 

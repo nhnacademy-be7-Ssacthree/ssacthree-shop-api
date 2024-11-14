@@ -24,13 +24,13 @@ public class BookDocument {
   private String bookInfo;
   private String bookIsbn;
   private String publicationDate;
-  private int regularPrice;
-  private int salePrice;
+  private Integer regularPrice;
+  private Integer salePrice;
   private boolean isPacked;
-  private int stock;
+  private Integer stock;
   private String bookThumbnailImageUrl;
-  private int bookViewCount;
-  private int bookDiscount;
+  private Integer bookViewCount;
+  private Integer bookDiscount;
   private String publisherNames;
   private String authorNames;
 
