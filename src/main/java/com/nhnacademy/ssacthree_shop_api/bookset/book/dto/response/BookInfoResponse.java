@@ -7,6 +7,7 @@ import com.nhnacademy.ssacthree_shop_api.bookset.category.dto.response.CategoryN
 import com.nhnacademy.ssacthree_shop_api.bookset.publisher.dto.PublisherNameResponse;
 import com.nhnacademy.ssacthree_shop_api.bookset.tag.dto.response.TagInfoResponse;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -18,6 +19,7 @@ import java.util.stream.Collectors;
 
 @Getter
 @NoArgsConstructor
+@AllArgsConstructor
 public class BookInfoResponse {
     private Long bookId;
     private String bookName;
@@ -100,5 +102,7 @@ public class BookInfoResponse {
         this.bookViewCount = bookBaseResponse.getBookViewCount();
         this.bookDiscount = bookBaseResponse.getBookDiscount();
         this.bookStatus = bookBaseResponse.getBookStatus();
+        this.publisher = bookBaseResponse.getPublisher();
     }
+
 }

@@ -16,4 +16,9 @@ public class AuthorNameResponse {
         this.authorId = author.getAuthorId();
         this.authorName = author.getAuthorName();
     }
+
+    //책 전체 조회 시 필요한 생성자
+    public AuthorNameResponse(String authorName){
+        this.authorName = authorName;
+    }
 }

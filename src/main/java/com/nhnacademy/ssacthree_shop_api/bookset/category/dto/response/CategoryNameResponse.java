@@ -16,4 +16,5 @@ public class CategoryNameResponse {
         this.categoryId = category.getCategoryId();
         this.categoryName = category.getCategoryName();
     }
+
 }

@@ -1,13 +1,10 @@
 package com.nhnacademy.ssacthree_shop_api.bookset.book.repository.impl;
 
-import com.nhnacademy.ssacthree_shop_api.bookset.author.domain.Author;
 import com.nhnacademy.ssacthree_shop_api.bookset.author.domain.QAuthor;
 import com.nhnacademy.ssacthree_shop_api.bookset.author.dto.AuthorNameResponse;
 import com.nhnacademy.ssacthree_shop_api.bookset.book.domain.BookStatus;
 import com.nhnacademy.ssacthree_shop_api.bookset.book.domain.QBook;
-import com.nhnacademy.ssacthree_shop_api.bookset.book.domain.converter.BookStatusConverter;
 import com.nhnacademy.ssacthree_shop_api.bookset.book.dto.response.BookBaseResponse;
-import com.nhnacademy.ssacthree_shop_api.bookset.book.dto.response.BookInfoResponse;
 import com.nhnacademy.ssacthree_shop_api.bookset.book.repository.BookCustomRepository;
 import com.nhnacademy.ssacthree_shop_api.bookset.bookauthor.domain.QBookAuthor;
 import com.nhnacademy.ssacthree_shop_api.bookset.bookauthor.dto.BookAuthorDto;
@@ -15,13 +12,11 @@ import com.nhnacademy.ssacthree_shop_api.bookset.bookcategory.domain.QBookCatego
 import com.nhnacademy.ssacthree_shop_api.bookset.bookcategory.dto.BookCategoryDto;
 import com.nhnacademy.ssacthree_shop_api.bookset.booktag.domain.QBookTag;
 import com.nhnacademy.ssacthree_shop_api.bookset.booktag.dto.BookTagDto;
-import com.nhnacademy.ssacthree_shop_api.bookset.category.domain.Category;
 import com.nhnacademy.ssacthree_shop_api.bookset.category.domain.QCategory;
 import com.nhnacademy.ssacthree_shop_api.bookset.category.dto.response.CategoryNameResponse;
 import com.nhnacademy.ssacthree_shop_api.bookset.publisher.domain.QPublisher;
 import com.nhnacademy.ssacthree_shop_api.bookset.publisher.dto.PublisherNameResponse;
 import com.nhnacademy.ssacthree_shop_api.bookset.tag.domain.QTag;
-import com.nhnacademy.ssacthree_shop_api.bookset.tag.domain.Tag;
 import com.nhnacademy.ssacthree_shop_api.bookset.tag.dto.response.TagInfoResponse;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
@@ -37,7 +32,6 @@ import java.util.List;
 import java.util.Map;
 
 import static com.querydsl.core.group.GroupBy.groupBy;
-import static com.querydsl.core.group.GroupBy.list;
 
 @Repository
 @RequiredArgsConstructor
@@ -94,6 +88,7 @@ public class BookCustomRepositoryImpl implements BookCustomRepository {
 
         Long count = queryFactory.select(book.count())
                 .from(book)
+                .leftJoin(book.publisher, publisher)
                 .where(isOnSaleOrNoStock())
                 .fetchOne();
 
@@ -141,6 +136,7 @@ public class BookCustomRepositoryImpl implements BookCustomRepository {
 
         Long count = queryFactory.select(book.count())
                 .from(book)
+                .leftJoin(book.publisher, publisher)
                 .where(isOnSaleOrNoStock(),
                         book.bookName.containsIgnoreCase(bookName))
                 .fetchOne();
@@ -186,6 +182,7 @@ public class BookCustomRepositoryImpl implements BookCustomRepository {
 
         Long count = queryFactory.select(book.count())
                 .from(book)
+                .leftJoin(book.publisher, publisher)
                 .where(isOnSaleOrNoStock())
                 .fetchOne();
 
@@ -230,6 +227,7 @@ public class BookCustomRepositoryImpl implements BookCustomRepository {
 
         Long count = queryFactory.select(book.count())
                 .from(book)
+                .leftJoin(book.publisher, publisher)
                 .where(book.bookStatus.eq(BookStatus.NO_STOCK))
                 .fetchOne();
 
@@ -274,6 +272,7 @@ public class BookCustomRepositoryImpl implements BookCustomRepository {
 
         Long count = queryFactory.select(book.count())
                 .from(book)
+                .leftJoin(book.publisher, publisher)
                 .where(book.bookStatus.eq(BookStatus.DISCONTINUED))
                 .fetchOne();
 
@@ -294,6 +293,83 @@ public class BookCustomRepositoryImpl implements BookCustomRepository {
                 .where(book.bookId.eq(bookId))
                 .fetchOne();
     }
+
+
+    /**
+     * 책 ID로 책의 작가(이름)를 가져옵니다.
+     * @param bookId 책 아이디
+     * @return 작가 이름
+     */
+    @Override
+    public List<String> findAuthorNamesByBookId(Long bookId) {
+        QBook book = QBook.book;
+        QAuthor author = QAuthor.author;
+        QBookAuthor bookAuthor = QBookAuthor.bookAuthor;
+
+        return queryFactory
+            .select(author.authorName)
+            .from(book)
+            .join(bookAuthor).on(book.bookId.eq(bookAuthor.book.bookId))
+            .join(author).on(author.authorId.eq(bookAuthor.author.authorId))
+            .where(book.bookId.eq(bookId))
+            .fetch();
+    }
+
+
+    /**
+     * 책으로 출판사명을 가져옴.
+     * @param bookId
+     * @return 출판사명
+     */
+    @Override
+    public String findPublisherNameByBookId(Long bookId) {
+        QBook book = QBook.book;
+        return queryFactory
+            .select(book.publisher.publisherName)
+            .from(book)
+            .where(book.bookId.eq(bookId))
+            .fetchOne();
+    }
+
+
+    /**
+     * 책으로 태그들의 name을 조회
+     * @param bookId
+     * @return 태그명 반환 (없다면 null을 그대로 저장)
+     */
+    @Override
+    public List<String> findTagNamesByBookId(Long bookId){
+        QBookTag qBookTag = QBookTag.bookTag;
+        QTag tag = QTag.tag;
+
+        return queryFactory
+            .select(tag.tagName)
+            .from(bookTag)
+            .join(bookTag.tag, tag)
+            .where(bookTag.book.bookId.eq(bookId))
+            .fetch();
+    }
+
+
+    /**
+     * 책으로 카테고리들의 name을 조회
+     * @param bookId
+     * @return
+     */
+    @Override
+    public List<String> findCategoryNamesByBookId(Long bookId){
+        QBookCategory bookCategory = QBookCategory.bookCategory;
+        QCategory category = QCategory.category;
+
+        return queryFactory
+            .select(category.categoryName)
+            .from(bookCategory)
+            .join(bookCategory.category, category)
+            .where(bookCategory.book.bookId.eq(bookId))
+            .fetch();
+    }
+
+
 
     @Override
     public BookBaseResponse findByBookIsbn(String isbn) {
@@ -426,7 +502,11 @@ public class BookCustomRepositoryImpl implements BookCustomRepository {
                 book.bookStatus.stringValue(),
                 Projections.constructor(PublisherNameResponse.class,
                         publisher.publisherId,
-                        publisher.publisherName)
+                        publisher.publisherName),
+                Projections.constructor(AuthorNameResponse.class,
+                        author.authorId,
+                        author.authorName)
+
                 ))
                 .from(book)
                 .leftJoin(book.publisher, publisher)
@@ -439,6 +519,7 @@ public class BookCustomRepositoryImpl implements BookCustomRepository {
 
         Long count = queryFactory.select(book.count())
                 .from(book)
+                .leftJoin(book.publisher, publisher)
                 .leftJoin(book.bookAuthors, bookAuthor)
                 .leftJoin(bookAuthor.author, author)
                 .where(author.authorId.eq(authorId).and(isOnSaleOrNoStock()))
@@ -449,3 +530,4 @@ public class BookCustomRepositoryImpl implements BookCustomRepository {
         return new PageImpl<>(books, pageable, count);
     }
 }
+

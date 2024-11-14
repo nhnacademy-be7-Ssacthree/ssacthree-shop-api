@@ -7,7 +7,6 @@ import com.nhnacademy.ssacthree_shop_api.bookset.author.service.AuthorService;
 import com.nhnacademy.ssacthree_shop_api.commons.dto.MessageResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.apache.coyote.Response;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
