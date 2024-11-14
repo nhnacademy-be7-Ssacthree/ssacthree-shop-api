@@ -40,13 +40,14 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
         List<ShoppingCart> shoppingCarts = shoppingCartRepository.findByCustomer_CustomerId(
             member.getId());
 
+
         return shoppingCarts.stream()
             .map(cart -> new ShoppingCartItemResponse(
                 cart.getBook().getBookId(),               // 도서 ID
                 cart.getBook().getBookName(),            // 도서 제목
                 cart.getBookQuantity(),               // 도서 수량
                 cart.getBook().getSalePrice(),            // 도서 가격
-                cart.getBook().getBookThumbnailImageUrl()             // 도서 이미지
+                cart.getBook().getBookThumbnailImageUrl()  // 도서 이미지
             ))
             .collect(Collectors.toList());
     }
