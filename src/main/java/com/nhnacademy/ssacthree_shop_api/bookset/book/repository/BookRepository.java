@@ -6,6 +6,7 @@ import com.nhnacademy.ssacthree_shop_api.bookset.book.dto.response.BookInfoRespo
 import com.nhnacademy.ssacthree_shop_api.bookset.category.domain.Category;
 import com.nhnacademy.ssacthree_shop_api.bookset.publisher.domain.Publisher;
 import com.nhnacademy.ssacthree_shop_api.bookset.tag.domain.Tag;
+import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -21,4 +22,5 @@ public interface BookRepository extends JpaRepository<Book, Long>, BookCustomRep
     // 도서 조회수 검색
     Integer findBookViewCountByBookId(Long bookId);
 
+    Optional<Book> findByBookId(Long bookId);
 }
