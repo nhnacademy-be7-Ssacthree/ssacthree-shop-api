@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 public interface ElasticsearchFeignClient {
 
   // 검색 시 모든 요청 GET 으로 통일
-  
   // 데이터 검색, Elasticsearch 쿼리 요청을 받는 POST 엔드포인트
   @GetMapping("/ssacthree_books/_search")
   Map<String, Object> searchBooks(@RequestBody Map<String, Object> query);

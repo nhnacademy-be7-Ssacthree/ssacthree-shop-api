@@ -102,7 +102,7 @@ public class ElasticService {
       }
     }
 
-    // 디버그용 쿼리 출력
+    // 디버그용 쿼리 출력 #TODO 삭제하기!!!
     System.out.println("Generated Elasticsearch Query: " + query);
     return query;
   }
