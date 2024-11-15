@@ -17,6 +17,6 @@ public class ShoppingCartItemResponse {
 
     private int price; // 가격(int 수정)
 
-    private String image; //이미지
+    private String bookThumbnailImageUrl; //이미지
 
 }
