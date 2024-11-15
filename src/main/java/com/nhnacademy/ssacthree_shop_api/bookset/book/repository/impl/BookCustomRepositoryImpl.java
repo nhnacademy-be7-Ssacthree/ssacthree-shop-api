@@ -63,6 +63,8 @@ public class BookCustomRepositoryImpl implements BookCustomRepository {
                 .from(book)
                 .leftJoin(book.publisher, publisher)
                 .where(isOnSaleOrNoStock())
+                .offset(pageable.getOffset()) // 추가
+                .limit(pageable.getPageSize()) // 추가
                 .transform(groupBy(book.bookId).as(
                         Projections.constructor(BookBaseResponse.class,
                                 book.bookId,
@@ -111,6 +113,8 @@ public class BookCustomRepositoryImpl implements BookCustomRepository {
                 .leftJoin(book.publisher, publisher)
                 .where(isOnSaleOrNoStock()
                         .and(book.bookName.containsIgnoreCase(bookName)))
+                .offset(pageable.getOffset()) // 추가
+                .limit(pageable.getPageSize()) // 추가
                 .transform(groupBy(book.bookId).as(
                         Projections.constructor(BookBaseResponse.class,
                                 book.bookId,
@@ -157,6 +161,8 @@ public class BookCustomRepositoryImpl implements BookCustomRepository {
                 .from(book)
                 .leftJoin(book.publisher, publisher)
                 .where(isOnSaleOrNoStock())
+                .offset(pageable.getOffset()) // 추가
+                .limit(pageable.getPageSize()) // 추가
                 .transform(groupBy(book.bookId).as(
                         Projections.constructor(BookBaseResponse.class,
                                 book.bookId,
@@ -202,6 +208,8 @@ public class BookCustomRepositoryImpl implements BookCustomRepository {
                 .from(book)
                 .leftJoin(book.publisher, publisher)
                 .where(book.bookStatus.eq(BookStatus.NO_STOCK))
+                .offset(pageable.getOffset()) // 추가
+                .limit(pageable.getPageSize()) // 추가
                 .transform(groupBy(book.bookId).as(
                         Projections.constructor(BookBaseResponse.class,
                                 book.bookId,
@@ -247,6 +255,8 @@ public class BookCustomRepositoryImpl implements BookCustomRepository {
                 .from(book)
                 .leftJoin(book.publisher, publisher)
                 .where(book.bookStatus.eq(BookStatus.DISCONTINUED))
+                .offset(pageable.getOffset()) // 추가
+                .limit(pageable.getPageSize()) // 추가
                 .transform(groupBy(book.bookId).as(
                         Projections.constructor(BookBaseResponse.class,
                                 book.bookId,
