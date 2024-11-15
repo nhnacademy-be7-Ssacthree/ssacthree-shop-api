@@ -9,8 +9,6 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 public interface ShoppingCartRepository extends JpaRepository<ShoppingCart, ShoppingCartId> {
-
-    @Query("SELECT sc FROM ShoppingCart sc JOIN FETCH sc.book WHERE sc.customer.customerId = :customerId")
     List<ShoppingCart> findByCustomer_CustomerId(@Param("customerId") Long customerId);
 
     List<ShoppingCart> findAllByCustomer(Customer customer);

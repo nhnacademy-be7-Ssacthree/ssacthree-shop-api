@@ -22,7 +22,7 @@ public class ShoppingCart {
     @JoinColumn(name = "customer_id")
     private Customer customer;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @MapsId("bookId")
     @JoinColumn(name = "book_id")
     private Book book;
