@@ -20,6 +20,16 @@ public class ElasticService {
 
   private final ElasticsearchFeignClient elasticsearchFeignClient;
 
+  // 상수 정의
+  private static final String QUERY = "query";
+  private static final String ORDER = "order";
+  private static final String DESC = "desc";
+  private static final String ASC = "asc";
+  private static final String PUBLICATION_DATE = "publicationDate";
+  private static final String SALE_PRICE = "salePrice";
+  private static final String BOOK_VIEW_COUNT = "bookViewCount";
+  private static final String SCORE = "_score";
+
   public boolean checkElasticsearchHealth() {
     try {
       Map<String, Object> healthResponse = elasticsearchFeignClient.getHealthStatus();
@@ -58,9 +68,9 @@ public class ElasticService {
     Map<String, Object> multiMatch = new HashMap<>();
 
     // Multi-match 쿼리 설정
-    multiMatch.put("query", searchRequest.getKeyword());
+    multiMatch.put(QUERY, searchRequest.getKeyword());
     multiMatch.put("fields", List.of("bookName^100", "bookInfo^30", "tags^50", "category^3"));
-    query.put("query", Map.of("multi_match", multiMatch));
+    query.put(QUERY, Map.of("multi_match", multiMatch));
 
     // 페이지네이션 설정
     int pageSize = searchRequest.getPageSize();
@@ -72,19 +82,19 @@ public class ElasticService {
       List<Map<String, Object>> sortCriteria = new ArrayList<>();
       switch (searchRequest.getSort()) {
         case "newest":
-          sortCriteria.add(Map.of("publicationDate", Map.of("order", "desc")));
+          sortCriteria.add(Map.of(PUBLICATION_DATE, Map.of(ORDER, DESC)));
           break;
         case "priceLow":
-          sortCriteria.add(Map.of("salePrice", Map.of("order", "asc")));
+          sortCriteria.add(Map.of(SALE_PRICE, Map.of(ORDER, ASC)));
           break;
         case "priceHigh":
-          sortCriteria.add(Map.of("salePrice", Map.of("order", "desc")));
+          sortCriteria.add(Map.of(SALE_PRICE, Map.of(ORDER, DESC)));
           break;
         case "popularity":
-          sortCriteria.add(Map.of("bookViewCount", Map.of("order", "desc")));
+          sortCriteria.add(Map.of(BOOK_VIEW_COUNT, Map.of(ORDER, DESC)));
           break;
         default:
-          sortCriteria.add(Map.of("_score", Map.of("order", "desc")));
+          sortCriteria.add(Map.of(SCORE, Map.of(ORDER, DESC)));
       }
       query.put("sort", sortCriteria);
     }
@@ -102,8 +112,6 @@ public class ElasticService {
       }
     }
 
-    // 디버그용 쿼리 출력 #TODO 삭제하기!!!
-    System.out.println("Generated Elasticsearch Query: " + query);
     return query;
   }
 

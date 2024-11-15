@@ -14,7 +14,7 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Document(indexName = "ssacthree_books")  // Elasticsearch 인덱스 설정
+//@Document(indexName = "ssacthree_books")  // Elasticsearch 인덱스 설정
 public class BookDocument {
 
   @Id
