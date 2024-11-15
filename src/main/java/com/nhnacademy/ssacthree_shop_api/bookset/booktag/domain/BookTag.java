@@ -26,7 +26,7 @@ public class BookTag {
     @JsonBackReference
     private Book book;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @MapsId("tagId")
     @JoinColumn(name = "tag_id")
     private Tag tag;
