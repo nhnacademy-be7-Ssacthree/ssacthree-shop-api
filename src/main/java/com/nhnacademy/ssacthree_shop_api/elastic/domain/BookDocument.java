@@ -5,14 +5,18 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.elasticsearch.annotations.Document;
-
 import java.util.List;
+
+/**
+ * elasticsearch 검색 인덱스와 맞는 Document DTO 입니다.
+ */
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Document(indexName = "books")  // Elasticsearch 인덱스 설정
+@Document(indexName = "ssacthree_books")  // Elasticsearch 인덱스 설정
 public class BookDocument {
+
   @Id
   private long bookId;
   private String bookName;
@@ -20,13 +24,13 @@ public class BookDocument {
   private String bookInfo;
   private String bookIsbn;
   private String publicationDate;
-  private int regularPrice;
-  private int salePrice;
+  private Integer regularPrice;
+  private Integer salePrice;
   private boolean isPacked;
-  private int stock;
+  private Integer stock;
   private String bookThumbnailImageUrl;
-  private int bookViewCount;
-  private int bookDiscount;
+  private Integer bookViewCount;
+  private Integer bookDiscount;
   private String publisherNames;
   private String authorNames;
 
