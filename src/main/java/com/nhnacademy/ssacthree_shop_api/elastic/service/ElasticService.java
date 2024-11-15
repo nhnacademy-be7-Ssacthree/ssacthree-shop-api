@@ -63,7 +63,7 @@ public class ElasticService {
    * @param searchRequest 검색 요청 정보
    * @return Elasticsearch 쿼리 Map 객체
    */
-  private Map<String, Object> buildElasticsearchQuery(SearchRequest searchRequest) {
+  public Map<String, Object> buildElasticsearchQuery(SearchRequest searchRequest) {
     Map<String, Object> query = new HashMap<>();
     Map<String, Object> multiMatch = new HashMap<>();
 
