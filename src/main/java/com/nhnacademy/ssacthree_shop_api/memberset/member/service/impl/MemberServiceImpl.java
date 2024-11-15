@@ -122,4 +122,12 @@ public class MemberServiceImpl implements MemberService {
 
         return new MessageResponse("삭제 성공");
     }
+
+    @Override
+    public Long getCustomerIdByMemberLoginId(String memberId) {
+        Member member = memberRepository.findByMemberLoginId(memberId).orElse(null);
+
+        assert member != null;
+        return member.getId();
+    }
 }

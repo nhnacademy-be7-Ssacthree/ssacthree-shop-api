@@ -2,9 +2,9 @@ package com.nhnacademy.ssacthree_shop_api.elastic.client;
 
 import com.nhnacademy.ssacthree_shop_api.config.FeignClientConfig;
 import com.nhnacademy.ssacthree_shop_api.elastic.domain.BookDocument;
-import java.util.List;
 import java.util.Map;
 import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -12,19 +12,16 @@ import org.springframework.web.bind.annotation.RequestBody;
 @FeignClient(name = "elasticsearch", url = "${elasticsearch.url}", configuration = FeignClientConfig.class)
 public interface ElasticsearchFeignClient {
 
-  // 데이터 검색
-  @PostMapping("/ssacthree_books/_search")
+  // 검색 시 모든 요청 GET 으로 통일
+  // 데이터 검색, Elasticsearch 쿼리 요청을 받는 POST 엔드포인트
+  @GetMapping("/ssacthree_books/_search")
   Map<String, Object> searchBooks(@RequestBody Map<String, Object> query);
   
-//   데이터 저장 (bulkAPI로 변경하며 주석처리함 241110_17시)
+//   단일 데이터 저장
   @PostMapping("/ssacthree_books/_doc")
   void saveBook(BookDocument bookDocument);
 
-  // ElasticSearch 인덱스 내의 자료를 삭제하는 매핑 (데이터 싱크를 위해 사용)
-  // 현재 싱크를 맞추는 방식: 삭제 후 재생성
-  @PostMapping("/ssacthree_books/_delete_by_query")
-  void deleteAllDocuments(@RequestBody Map<String, Object> query);
-
-//  @PostMapping("/_bulk")
-//  void bulkSave(@RequestBody String bulkRequest);
+  // Health Check
+  @GetMapping("/_cluster/health")
+  Map<String, Object> getHealthStatus();
 }

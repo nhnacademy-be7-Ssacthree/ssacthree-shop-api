@@ -30,6 +30,10 @@ public class ShoppingCart {
     @NotNull
     private int bookQuantity;
 
+    public ShoppingCart addBookQuantity(int quantity) {
+        this.bookQuantity = quantity;
+        return this;
+    }
 
 
 }

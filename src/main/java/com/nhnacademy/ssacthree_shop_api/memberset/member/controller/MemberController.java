@@ -55,4 +55,10 @@ public class MemberController {
         MessageResponse messageResponse = memberService.updateMember(memberId, memberInfoUpdateRequest);
         return ResponseEntity.status(HttpStatus.OK).body(messageResponse);
     }
+
+    @GetMapping("/id")
+    public ResponseEntity<Long> getCustomerId(@RequestHeader(name = "X-USER-ID") String memberId){
+        Long customerId = memberService.getCustomerIdByMemberLoginId(memberId);
+        return ResponseEntity.status(HttpStatus.OK).body(customerId);
+    }
 }
