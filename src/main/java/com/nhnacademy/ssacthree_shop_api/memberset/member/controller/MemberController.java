@@ -5,7 +5,6 @@ import com.nhnacademy.ssacthree_shop_api.memberset.member.dto.MemberInfoGetRespo
 import com.nhnacademy.ssacthree_shop_api.memberset.member.dto.MemberInfoUpdateRequest;
 import com.nhnacademy.ssacthree_shop_api.memberset.member.dto.MemberRegisterRequest;
 import com.nhnacademy.ssacthree_shop_api.memberset.member.service.MemberService;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -37,13 +36,15 @@ public class MemberController {
     }
 
     @DeleteMapping
-    public ResponseEntity<MessageResponse> deleteMember(@RequestHeader(name="X-USER-ID") String memberId) {
+    public ResponseEntity<MessageResponse> deleteMember(
+        @RequestHeader(name = "X-USER-ID") String memberId) {
         return ResponseEntity.status(HttpStatus.OK).body(memberService.deleteMember(memberId));
     }
 
 
     @GetMapping("/my-page")
-    public ResponseEntity<MemberInfoGetResponse> getMemberInfo(@RequestHeader(name = "X-USER-ID") String memberId) {
+    public ResponseEntity<MemberInfoGetResponse> getMemberInfo(
+        @RequestHeader(name = "X-USER-ID") String memberId) {
 
         MemberInfoGetResponse memberInfoGetResponse = memberService.getMemberInfoById(memberId);
         return ResponseEntity.status(HttpStatus.OK).body(memberInfoGetResponse);
@@ -51,13 +52,16 @@ public class MemberController {
     }
 
     @PutMapping("/my-page")
-    public ResponseEntity<MessageResponse> updateMemberInfo(@RequestHeader(name = "X-USER-ID") String memberId, @RequestBody MemberInfoUpdateRequest  memberInfoUpdateRequest) {
-        MessageResponse messageResponse = memberService.updateMember(memberId, memberInfoUpdateRequest);
+    public ResponseEntity<MessageResponse> updateMemberInfo(
+        @RequestHeader(name = "X-USER-ID") String memberId,
+        @RequestBody MemberInfoUpdateRequest memberInfoUpdateRequest) {
+        MessageResponse messageResponse = memberService.updateMember(memberId,
+            memberInfoUpdateRequest);
         return ResponseEntity.status(HttpStatus.OK).body(messageResponse);
     }
 
     @GetMapping("/id")
-    public ResponseEntity<Long> getCustomerId(@RequestHeader(name = "X-USER-ID") String memberId){
+    public ResponseEntity<Long> getCustomerId(@RequestHeader(name = "X-USER-ID") String memberId) {
         Long customerId = memberService.getCustomerIdByMemberLoginId(memberId);
         return ResponseEntity.status(HttpStatus.OK).body(customerId);
     }

@@ -9,8 +9,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Getter
 public class PointHistoryGetResponse {
-
-    private Long pointHistoryId;
+    
     private Integer pointAmount;
     private LocalDateTime pointChangeDate;
     private String pointChangeReason;
