@@ -20,9 +20,6 @@ import java.util.List;
 
 public interface BookCustomRepository {
 
-    // 제일 최신에 출판한 책 순서로 조회
-    Page<BookBaseResponse> findRecentBooks(Pageable pageable);
-
     // 판매 중, 재고 없는 책을 제목으로 검색
     Page<BookBaseResponse> findBooksByBookName(Pageable pageable, String bookName);
 
