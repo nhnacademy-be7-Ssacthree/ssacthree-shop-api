@@ -12,7 +12,7 @@ import lombok.Setter;
 @AllArgsConstructor
 public class AuthorUpdateRequest {
     @NotNull
-    private long authorId;
+    private Long authorId;
     @NotNull
     private String authorName;
     @NotNull
