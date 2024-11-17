@@ -32,9 +32,6 @@ public interface BookCustomRepository {
     // 판매 중단 책 전체 검색
     Page<BookBaseResponse> findStatusDiscontinued(Pageable pageable);
 
-    // 책 상세 정보 조회(조회 시 조회 수 증가)
-    String findBookInfoByBookId(Long bookId);
-
     // 도서 고유 번호로 도서 찾기
     BookBaseResponse findByBookIsbn(String isbn);
 

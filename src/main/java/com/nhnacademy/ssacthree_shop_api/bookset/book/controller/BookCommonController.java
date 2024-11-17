@@ -22,6 +22,31 @@ public class BookCommonController {
 
     private final BookCommonService bookCommonService;
 
+    private Pageable createPageable(int page, int size, String[] sortParams) {
+        Sort sort = Sort.unsorted();
+
+        if (sortParams != null && sortParams.length > 0) {
+            for (String sortParam : sortParams) {
+                String[] parts = sortParam.split(":"); // "field,direction" 형식 분리
+                if (parts.length == 2) {
+                    String property = parts[0].trim(); // 정렬 기준 필드
+                    String direction = parts[1].trim(); // asc 또는 desc
+                    sort = sort.and(Sort.by(Sort.Direction.fromString(direction), property));
+                }else if(parts.length == 1){
+                    String property = parts[0].trim();
+                    sort = sort.and(Sort.by(Sort.Direction.ASC, property));
+                }else{
+                    throw new IllegalStateException("잘못된 정렬 설정: " + sortParam +
+                            ". 올바른 형식은 '필드명' 또는 '필드명,정렬방향'입니다. (예: bookName 또는 bookName,asc)");
+                }
+            }
+        }else{
+            sort = sort.and(Sort.by(Sort.Direction.ASC, "bookName"));
+        }
+
+        return PageRequest.of(page, size, sort);
+    }
+
     /**
      * 책을 불러옵니다. (판매 중, 재고 없음 경우만 표시)
      * @param page 현재 요청하려는 페이지 번호
@@ -31,8 +56,9 @@ public class BookCommonController {
     @GetMapping
     public ResponseEntity<Page<BookInfoResponse>> getAllAvailableBooks(@RequestParam(defaultValue = "0") int page,
                                                                  @RequestParam(defaultValue = "10") int size,
-                                                                 @RequestParam(defaultValue = "bookName") String[] sort) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by(sort));
+                                                                 @RequestParam(defaultValue = "bookName:asc") String[] sort) {
+//        Pageable pageable = PageRequest.of(page, size, Sort.by(sort));
+        Pageable pageable = createPageable(page, size, sort);
         Page<BookInfoResponse> books = bookCommonService.getAllAvailableBooks(pageable);
         return new ResponseEntity<>(books, HttpStatus.OK);
     }
@@ -59,9 +85,10 @@ public class BookCommonController {
     @GetMapping("/search")
     public ResponseEntity<Page<BookInfoResponse>> getBooksByTitle(@RequestParam(defaultValue = "0") int page,
                                                                   @RequestParam(defaultValue = "10") int size,
-                                                                  @RequestParam(defaultValue = "bookName") String[] sort,
+                                                                  @RequestParam(defaultValue = "bookName:asc") String[] sort,
                                                                   @RequestParam String title) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by(sort));
+//        Pageable pageable = PageRequest.of(page, size, Sort.by(sort));
+        Pageable pageable = createPageable(page, size, sort);
         Page<BookInfoResponse> books = bookCommonService.getBooksByBookName(pageable, title);
         return new ResponseEntity<>(books, HttpStatus.OK);
     }
@@ -78,9 +105,10 @@ public class BookCommonController {
     @GetMapping("/author/{author-id}")
     public ResponseEntity<Page<BookInfoResponse>> getBookByAuthorId(@RequestParam(defaultValue = "0") int page,
                                                                     @RequestParam(defaultValue = "10") int size,
-                                                                    @RequestParam(defaultValue = "bookName") String[] sort,
+                                                                    @RequestParam(defaultValue = "bookName:asc") String[] sort,
                                                                     @PathVariable(name = "author-id") Long authorId) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by(sort));
+//        Pageable pageable = PageRequest.of(page, size, Sort.by(sort));
+        Pageable pageable = createPageable(page, size, sort);
         Page<BookInfoResponse> books = bookCommonService.getBooksByAuthorId(pageable, authorId);
         return new ResponseEntity<>(books, HttpStatus.OK);
     }
