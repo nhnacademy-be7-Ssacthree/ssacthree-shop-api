@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/shop/members/my-page/point-histories")
+@RequestMapping("/api/shop/members/point-histories")
 @RequiredArgsConstructor
 public class PointHistoryController {
 
