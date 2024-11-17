@@ -88,9 +88,8 @@ public class MemberServiceImpl implements MemberService {
     @Transactional(readOnly = true)
     @Override
     public MemberInfoGetResponse getMemberInfoById(String memberLoginId) {
-        MemberInfoGetResponse memberInfoGetResponse = memberCustomRepository.getMemberWithCustomer(
+        return memberCustomRepository.getMemberWithCustomer(
             memberLoginId);
-        return memberInfoGetResponse;
     }
 
 //    @Override
@@ -109,11 +108,8 @@ public class MemberServiceImpl implements MemberService {
     public MessageResponse updateMember(String memberLoginId,
         MemberInfoUpdateRequest memberInfoUpdateRequest) {
         // Hibernate --> 기본키를 Set 하는 경우 에러를 발생 시킴, 그래서 멤버를 빼와서 변경시키는 방향으로 수정 함 ㅠ
-        Member member = memberRepository.findByMemberLoginId(memberLoginId).orElse(null);
-
-        if (member == null) {
-            throw new MemberNotFoundException("멤버를 찾을 수 없습니다.");
-        }
+        Member member = memberRepository.findByMemberLoginId(memberLoginId)
+            .orElseThrow(() -> new MemberNotFoundException("멤버를 찾을 수 없습니다."));
 
         Customer customer = member.getCustomer();
         customer.setCustomerName(memberInfoUpdateRequest.getCustomerName());
@@ -133,11 +129,8 @@ public class MemberServiceImpl implements MemberService {
      */
     @Override
     public MessageResponse deleteMember(String memberLoginId) {
-        Member member = memberRepository.findByMemberLoginId(memberLoginId).orElse(null);
-
-        if (member == null) {
-            throw new MemberNotFoundException("멤버를 찾을 수 없습니다.");
-        }
+        Member member = memberRepository.findByMemberLoginId(memberLoginId)
+            .orElseThrow(() -> new MemberNotFoundException("멤버를 찾을 수 없습니다."));
 
         member.setMemberStatus(MemberStatus.WITHDRAW);
         memberRepository.save(member);

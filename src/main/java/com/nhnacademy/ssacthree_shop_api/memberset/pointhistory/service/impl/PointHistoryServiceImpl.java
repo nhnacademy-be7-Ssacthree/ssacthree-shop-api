@@ -4,6 +4,7 @@ import com.nhnacademy.ssacthree_shop_api.memberset.member.domain.Member;
 import com.nhnacademy.ssacthree_shop_api.memberset.pointhistory.domain.PointHistory;
 import com.nhnacademy.ssacthree_shop_api.memberset.pointhistory.dto.PointHistoryGetResponse;
 import com.nhnacademy.ssacthree_shop_api.memberset.pointhistory.dto.PointHistorySaveRequest;
+import com.nhnacademy.ssacthree_shop_api.memberset.pointhistory.repository.PointHistoryCustomRepository;
 import com.nhnacademy.ssacthree_shop_api.memberset.pointhistory.repository.PointHistoryRepository;
 import com.nhnacademy.ssacthree_shop_api.memberset.pointhistory.service.PointHistoryService;
 import com.nhnacademy.ssacthree_shop_api.memberset.pointsaverule.domain.PointSaveRule;
@@ -19,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class PointHistoryServiceImpl implements PointHistoryService {
 
     private final PointHistoryRepository pointHistoryRepository;
+    private final PointHistoryCustomRepository pointHistoryCustomRepository;
 
     @Override
     public PointHistory savePointHistory(PointSaveRule pointSaveRule, Member member,
@@ -33,7 +35,7 @@ public class PointHistoryServiceImpl implements PointHistoryService {
     @Transactional(readOnly = true)
     public Page<PointHistoryGetResponse> getMemberPointHistories(Long customerId,
         Pageable pageable) {
-
-        return null;
+        return pointHistoryCustomRepository.findAllPointHistoryByCustomerId(
+            customerId, pageable);
     }
 }
