@@ -5,8 +5,11 @@ import com.nhnacademy.ssacthree_shop_api.bookset.publisher.dto.PublisherGetRespo
 import com.nhnacademy.ssacthree_shop_api.bookset.publisher.dto.PublisherUpdateRequest;
 import com.nhnacademy.ssacthree_shop_api.bookset.publisher.service.PublisherService;
 import com.nhnacademy.ssacthree_shop_api.commons.dto.MessageResponse;
+import com.nhnacademy.ssacthree_shop_api.commons.paging.PageRequestBuilder;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,8 +24,12 @@ public class PublisherController {
     private final PublisherService publisherService;
 
     @GetMapping
-    public ResponseEntity<List<PublisherGetResponse>> getAllPublishers() {
-        return ResponseEntity.ok().body(publisherService.getAllPublishers());
+    public ResponseEntity<Page<PublisherGetResponse>> getAllPublishers(@RequestParam(defaultValue = "0") int page,
+                                                                       @RequestParam(defaultValue = "10") int size,
+                                                                       @RequestParam(defaultValue = "authorName:asc") String[] sort) {
+        Pageable pageable = PageRequestBuilder.createPageable(page, size, sort);
+        Page<PublisherGetResponse> publishers = publisherService.getAllPublishers(pageable);
+        return new ResponseEntity<>(publishers, HttpStatus.OK);
     }
 
     @PutMapping

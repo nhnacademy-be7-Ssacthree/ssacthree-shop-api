@@ -25,6 +25,8 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -39,20 +41,8 @@ public class PublisherService {
 
     private final PublisherRepository publisherRepository;
 
-    public List<PublisherGetResponse> getAllPublishers() {
-        QPublisher publisher = QPublisher.publisher;
-
-        return new JPAQueryFactory(entityManager)
-                .select(Projections.constructor(
-                        PublisherGetResponse.class,
-                        publisher.publisherId,
-                        publisher.publisherName,
-                        publisher.publisherIsUsed
-                ))
-                .from(publisher)
-                .orderBy(publisher.publisherIsUsed.desc())
-                .orderBy(publisher.publisherId.asc())
-                .fetch();
+    public Page<PublisherGetResponse> getAllPublishers(Pageable pageable) {
+        return publisherRepository.findAllPublisher(pageable);
     }
 
     public Publisher createPublisher(PublisherCreateRequest publisherCreateRequest) {
