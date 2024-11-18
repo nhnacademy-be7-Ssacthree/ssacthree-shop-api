@@ -5,14 +5,14 @@ import com.nhnacademy.ssacthree_shop_api.bookset.tag.dto.response.TagInfoRespons
 import com.nhnacademy.ssacthree_shop_api.bookset.tag.service.TagService;
 import com.nhnacademy.ssacthree_shop_api.commons.dto.MessageResponse;
 import java.util.List;
+
+import com.nhnacademy.ssacthree_shop_api.commons.paging.PageRequestBuilder;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/shop/admin/tags")
@@ -28,8 +28,12 @@ public class TagController {
     }
 
     @GetMapping
-    public ResponseEntity<List<TagInfoResponse>> getAllTags() {
-        return ResponseEntity.status(HttpStatus.OK).body(tagService.getAllTags());
+    public ResponseEntity<Page<TagInfoResponse>> getAllTags(@RequestParam(defaultValue = "0") int page,
+                                                            @RequestParam(defaultValue = "10") int size,
+                                                            @RequestParam(defaultValue = "authorName:asc") String[] sort) {
+        Pageable pageable = PageRequestBuilder.createPageable(page, size, sort);
+        Page<TagInfoResponse> tags = tagService.getAllTags(pageable);
+        return new ResponseEntity<>(tags, HttpStatus.OK);
     }
 
 }
