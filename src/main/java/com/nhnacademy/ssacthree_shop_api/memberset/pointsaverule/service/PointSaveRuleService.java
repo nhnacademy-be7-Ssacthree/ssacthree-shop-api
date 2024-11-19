@@ -13,7 +13,5 @@ public interface PointSaveRuleService {
 
     PointSaveRule createPointSaveRule(PointSaveRuleCreateRequest pointSaveRuleCreateRequest);
 
-    PointSaveRule getSelectedPointSaveRule();
-
     PointSaveRule updatePointSaveRule(PointSaveRuleUpdateRequest pointSaveRuleUpdateRequest);
 }

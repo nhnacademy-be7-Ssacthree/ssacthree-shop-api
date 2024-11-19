@@ -4,7 +4,7 @@ import com.nhnacademy.ssacthree_shop_api.commons.dto.MessageResponse;
 import com.nhnacademy.ssacthree_shop_api.couponset.couponrule.dto.CouponRuleCreateRequest;
 import com.nhnacademy.ssacthree_shop_api.couponset.couponrule.dto.CouponRuleGetResponse;
 import com.nhnacademy.ssacthree_shop_api.couponset.couponrule.dto.CouponRuleUpdateRequest;
-import com.nhnacademy.ssacthree_shop_api.couponset.couponrule.service.impl.CouponRuleServiceImpl;
+import com.nhnacademy.ssacthree_shop_api.couponset.couponrule.service.CouponRuleService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -18,11 +18,16 @@ import java.util.List;
 @RequiredArgsConstructor
 public class CouponRuleController {
 
-    private final CouponRuleServiceImpl couponRuleService;
+    private final CouponRuleService couponRuleService;
 
     @GetMapping
     public ResponseEntity<List<CouponRuleGetResponse>> getAllCouponRules() {
         return ResponseEntity.ok().body(couponRuleService.getAllCouponRules());
+    }
+
+    @GetMapping("/selected")
+    public ResponseEntity<List<CouponRuleGetResponse>> getAllSelectedCouponRules() {
+        return ResponseEntity.ok().body(couponRuleService.getAllSelectedCouponRules());
     }
 
     @PutMapping

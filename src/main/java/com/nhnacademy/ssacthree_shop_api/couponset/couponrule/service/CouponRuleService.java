@@ -6,13 +6,14 @@ import com.nhnacademy.ssacthree_shop_api.couponset.couponrule.dto.CouponRuleGetR
 import com.nhnacademy.ssacthree_shop_api.couponset.couponrule.dto.CouponRuleUpdateRequest;
 
 import java.util.List;
+import java.util.Map;
 
 public interface CouponRuleService {
+    List<CouponRuleGetResponse> getAllCouponRules();
+
+    List<CouponRuleGetResponse> getAllSelectedCouponRules();
+
     CouponRule createCouponRule(CouponRuleCreateRequest couponRuleCreateRequest);
 
-    CouponRule getSelectedCouponRule();
-
     CouponRule updateCouponRule(CouponRuleUpdateRequest couponRuleUpdateRequest);
-
-    List<CouponRuleGetResponse> getAllCouponRules();
 }

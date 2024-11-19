@@ -20,7 +20,6 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
 public class PointSaveRuleServiceImpl implements PointSaveRuleService {
 
     @PersistenceContext
@@ -61,16 +60,6 @@ public class PointSaveRuleServiceImpl implements PointSaveRuleService {
         }
 
         return pointSaveRuleRepository.save(pointSaveRule);
-    }
-
-    @Transactional(readOnly = true)
-    @Override
-    public PointSaveRule getSelectedPointSaveRule() {
-        return pointSaveRuleRepository.findAll()
-                .stream()
-                .filter(PointSaveRule::isPointSaveRuleIsSelected)
-                .findFirst()
-                .orElseThrow(() -> new PointSaveRuleNotFoundException("선택된 포인트 적립 정책이 없습니다."));
     }
 
     @Override
