@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nhnacademy.ssacthree_shop_api.elastic.client.ElasticsearchFeignClient;
 import com.nhnacademy.ssacthree_shop_api.elastic.domain.BookDocument;
 import com.nhnacademy.ssacthree_shop_api.elastic.dto.SearchRequest;
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -184,7 +185,7 @@ public class ElasticService {
       book.setBookIndex((String) source.get("bookIndex"));
       book.setBookInfo((String) source.get("bookInfo"));
       book.setBookIsbn((String) source.get("bookIsbn"));
-      book.setPublicationDate(source.get("publicationDate") != null ? source.get("publicationDate").toString() : null);
+      convertToLocaldate(book, source.get("publicationDate") != null ? source.get("publicationDate").toString() : null); // 날짜형식 변환 후 저장.
       book.setRegularPrice(source.get("regularPrice") != null ? ((Number) source.get("regularPrice")).intValue() : null);
       book.setSalePrice(source.get("salePrice") != null ? ((Number) source.get("salePrice")).intValue() : null);
       book.setPacked((Boolean) source.getOrDefault("isPacked", source.get("packed")));
@@ -194,6 +195,9 @@ public class ElasticService {
       book.setBookDiscount(source.get("bookDiscount") != null ? ((Number) source.get("bookDiscount")).intValue() : null);
       book.setPublisherNames((String) source.get("publisherNames"));
       book.setAuthorNames((String) source.get("authorNames"));
+
+
+
 
       // `tagNames`와 `category` 리스트 변환
       book.setTagNames(
@@ -221,8 +225,22 @@ public class ElasticService {
   }
 
 
-
-
+  /**
+   * 날짜 문자열을 "yyyy-MM-dd" 형식으로 변환한 후,
+   * BookDocument 객체의 publicationDate 필드에 설정합니다.
+   * @param bookDocument Elasticsearch 쿼리 맵 객체
+   * @param publicationDateStr ISO 8601 형식의 날짜 문자열 (예: "2024-01-15T00:00:00.000Z").
+   *                            null은 빈 값 그대로 사용
+   */
+  public void convertToLocaldate(BookDocument bookDocument, String publicationDateStr){
+    if (publicationDateStr != null) {
+      // ISO 8601 형식 문자열을 LocalDate로 변환 후 다시 문자열로 넣어줌 (시간 제외)
+      String publicationDate = String.valueOf(LocalDate.parse(publicationDateStr.split("T")[0]));
+      bookDocument.setPublicationDate(publicationDate);
+    } else {
+      bookDocument.setPublicationDate(null); // null인 경우 처리
+    }
+  }
 
   /**
    * Elasticsearch 쿼리를 JSON 형식으로 변환하여 로그로 출력
