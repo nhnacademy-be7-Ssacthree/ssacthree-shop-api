@@ -17,7 +17,7 @@ public interface ElasticsearchFeignClient {
   @GetMapping("/ssacthree_books/_search")
   Map<String, Object> searchBooks(@RequestBody Map<String, Object> query);
   
-//   단일 데이터 저장
+  // 단일 데이터 저장 쓸지 안쓸지 모르겠음
   @PostMapping("/ssacthree_books/_doc")
   void saveBook(BookDocument bookDocument);
 

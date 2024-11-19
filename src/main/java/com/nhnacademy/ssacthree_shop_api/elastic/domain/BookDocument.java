@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.elasticsearch.annotations.Document;
 import java.util.List;
 
 /**
@@ -14,7 +13,7 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Document(indexName = "ssacthree_books")  // Elasticsearch 인덱스 설정
+//@Document(indexName = "ssacthree_books")  // Elasticsearch 인덱스 설정
 public class BookDocument {
 
   @Id
