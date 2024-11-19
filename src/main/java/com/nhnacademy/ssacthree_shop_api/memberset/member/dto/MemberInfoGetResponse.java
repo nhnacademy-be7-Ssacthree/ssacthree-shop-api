@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 public class MemberInfoGetResponse {
 
     public MemberInfoGetResponse(Member member) {
-
+        this.customerId = member.getCustomer().getCustomerId();
         this.memberLoginId = member.getMemberLoginId();
         this.customerName = member.getCustomer().getCustomerName();
         this.customerPhoneNumber = member.getCustomer().getCustomerPhoneNumber();
@@ -25,7 +25,7 @@ public class MemberInfoGetResponse {
         this.memberGradePointSave = member.getMemberGrade().getMemberGradePointSave();
     }
 
-
+    private Long customerId;
     private String memberLoginId;
     private String customerName;
     private String customerPhoneNumber;
