@@ -28,8 +28,6 @@ public class BookMapper {
         book.setBookThumbnailImageUrl(bookSaveRequest.getBookThumbnailImageUrl());
         book.setBookViewCount(bookSaveRequest.getBookViewCount());
         book.setBookDiscount(bookSaveRequest.getBookDiscount());
-        //todo: book 등록할 때 상태를 직접 설정할지, 아니면 무조건 "판매 중"으로 할지 정해야함. 현재는 무조건 "판매 중"
-        //book.setBookStatus(converter.convertToEntityAttribute(bookSaveRequest.getBookStatus()));
         return book;
     }
 

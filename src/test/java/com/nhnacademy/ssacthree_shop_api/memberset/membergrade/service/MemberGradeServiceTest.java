@@ -11,6 +11,7 @@ import com.nhnacademy.ssacthree_shop_api.memberset.membergrade.dto.MemberGradeUp
 import com.nhnacademy.ssacthree_shop_api.memberset.membergrade.exception.MemberGradeNotFoundException;
 import com.nhnacademy.ssacthree_shop_api.memberset.membergrade.repository.MemberGradeCustomRepository;
 import com.nhnacademy.ssacthree_shop_api.memberset.membergrade.repository.MemberGradeRepository;
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -56,7 +57,6 @@ public class MemberGradeServiceTest {
 
         when(memberGradeRepository.findById(memberGradeId)).thenReturn(
             Optional.of(existingMemberGrade));
-        when(memberGradeRepository.existsById(memberGradeId)).thenReturn(true);
 
         // when
         memberGradeService.updateMemberGrade(memberGradeId, updateRequest);
@@ -75,9 +75,9 @@ public class MemberGradeServiceTest {
             memberGradeService.updateMemberGrade(0L, null);
         });
 
+        when(memberGradeRepository.findById(1L)).thenReturn(Optional.empty());
         Assertions.assertThrows(MemberGradeNotFoundException.class, () -> {
-            when(memberGradeRepository.existsById(1L)).thenReturn(false);
-            memberGradeService.updateMemberGrade(1L, null);
+            memberGradeService.updateMemberGrade(1L, new MemberGradeUpdateResponse());
         });
     }
 
@@ -94,7 +94,7 @@ public class MemberGradeServiceTest {
         memberGradeService.deleteMemberGradeById(memberGradeId);
 
         //then
-        verify(memberGradeRepository).save(existingMemberGrade);
+        Assertions.assertFalse(existingMemberGrade.isMemberGradeIsUsed());
     }
 
     @Test
@@ -120,7 +120,6 @@ public class MemberGradeServiceTest {
         MemberGrade existingMemberGrade = new MemberGrade("test1", true, 0.01f);
         when(memberGradeRepository.findById(memberGradeId)).thenReturn(
             Optional.of(existingMemberGrade));
-        when(memberGradeRepository.existsById(memberGradeId)).thenReturn(true);
 
         memberGradeService.getMemberGradeById(memberGradeId);
         verify(memberGradeRepository).findById(memberGradeId);
@@ -137,17 +136,17 @@ public class MemberGradeServiceTest {
         });
 
         Assertions.assertThrows(MemberGradeNotFoundException.class, () -> {
-            when(memberGradeRepository.existsById(1L)).thenReturn(false);
-            memberGradeService.getMemberGradeById(1L);
+            when(memberGradeRepository.findById(1L)).thenReturn(Optional.empty());
+            memberGradeService.deleteMemberGradeById(1L);
         });
     }
 
     @Test
     void getAllMemberGrades() {
         // given
-        List<MemberGrade> memberGrades = Arrays.asList(
-            new MemberGrade("test1", true, 0.01f),
-            new MemberGrade("test2", true, 0.02f)
+        List<MemberGradeGetResponse> memberGrades = Arrays.asList(
+            new MemberGradeGetResponse(1L, "test1", true, LocalDateTime.now(), 0.01f),
+            new MemberGradeGetResponse(2L, "test2", true, LocalDateTime.now(), 0.02f)
         );
 
         when(memberGradeCustomRepository.findAvailableMemberGrade()).thenReturn(memberGrades);

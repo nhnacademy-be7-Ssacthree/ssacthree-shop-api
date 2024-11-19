@@ -29,6 +29,7 @@ public class MemberCustomerRepositoryImpl implements MemberCustomRepository {
             .on(qMember.memberGrade.memberGradeId.eq(qMemberGrade.memberGradeId))
             .fetchJoin()
             .select(Projections.fields(MemberInfoGetResponse.class,
+                qMember.customer.customerId,
                 qMember.memberLoginId,
                         qCustomer.customerName,
                         qCustomer.customerPhoneNumber,

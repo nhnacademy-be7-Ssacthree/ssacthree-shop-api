@@ -10,7 +10,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class AuthorDto {
-    private long authorId;
+    private Long authorId;
     private String authorName;
     private String authorInfo;
 }

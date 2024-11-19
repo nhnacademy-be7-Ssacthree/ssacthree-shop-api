@@ -90,23 +90,6 @@ public class BookCommonServiceImpl implements BookCommonService {
     }
 
     /**
-     * 최신 출판 순서대로 도서 조회
-     * @param pageable 페이징 처리
-     * @return Page<BookInfoResponse>
-     */
-    @Override
-    @Transactional(readOnly = true)
-    public Page<BookInfoResponse> getRecentBooks(Pageable pageable) {
-        Page<BookBaseResponse> booksPage = bookRepository.findRecentBooks(pageable);
-
-        List<BookInfoResponse> bookInfoResponses = booksPage.getContent().stream()
-                .map(this::addAssociatedDataToBookInfoResponse)
-                .collect(Collectors.toList());
-
-        return new PageImpl<>(bookInfoResponses, pageable, booksPage.getTotalElements());
-    }
-
-    /**
      * 도서 이름으로 도서를 검색합니다.
      * @param bookName 도서 이름
      * @param pageable 페이징 처리
