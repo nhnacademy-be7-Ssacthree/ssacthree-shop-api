@@ -13,13 +13,11 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
 public class CouponRuleServiceImpl implements CouponRuleService {
 
     @PersistenceContext
@@ -49,14 +47,26 @@ public class CouponRuleServiceImpl implements CouponRuleService {
                 .fetch();
     }
 
-    @Transactional(readOnly = true)
     @Override
-    public CouponRule getSelectedCouponRule() {
-        return couponRuleRepository.findAll()
-                .stream()
-                .filter(CouponRule::isCouponIsUsed)
-                .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("선택된 쿠폰 정책이 없습니다."));
+    public List<CouponRuleGetResponse> getAllSelectedCouponRules() {
+        QCouponRule couponRule = QCouponRule.couponRule;
+
+        return new JPAQueryFactory(entityManager)
+                .select(Projections.constructor(
+                        CouponRuleGetResponse.class,
+                        couponRule.id,
+                        couponRule.couponType,
+                        couponRule.couponMinOrderPrice,
+                        couponRule.maxDiscountPrice,
+                        couponRule.couponDiscountPrice,
+                        couponRule.couponRuleName,
+                        couponRule.couponIsUsed,
+                        couponRule.couponRuleCreatedAt
+                ))
+                .from(couponRule)
+                .where(couponRule.couponIsUsed.eq(true))
+                .orderBy(couponRule.couponRuleCreatedAt.asc())
+                .fetch();
     }
 
     @Override

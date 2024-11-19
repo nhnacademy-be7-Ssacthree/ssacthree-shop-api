@@ -8,11 +8,11 @@ import com.nhnacademy.ssacthree_shop_api.couponset.couponrule.dto.CouponRuleUpda
 import java.util.List;
 
 public interface CouponRuleService {
+    List<CouponRuleGetResponse> getAllCouponRules();
+
+    List<CouponRuleGetResponse> getAllSelectedCouponRules();
+
     CouponRule createCouponRule(CouponRuleCreateRequest couponRuleCreateRequest);
 
-    CouponRule getSelectedCouponRule();
-
     CouponRule updateCouponRule(CouponRuleUpdateRequest couponRuleUpdateRequest);
-
-    List<CouponRuleGetResponse> getAllCouponRules();
 }
