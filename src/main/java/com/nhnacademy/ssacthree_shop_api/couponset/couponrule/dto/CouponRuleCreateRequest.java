@@ -30,14 +30,31 @@ public class CouponRuleCreateRequest {
     @Min(0)
     private int couponDiscountPrice;
 
-    @AssertTrue(message = "최대 할인 금액은 쿠폰 할인 금액보다 작을 수 없습니다.")
+    @AssertTrue(message = "RATIO 쿠폰일 때 쿠폰 할인 금액이 0~100이어야 합니다.")
     public boolean isMaxDiscountPriceValid() {
-        return maxDiscountPrice >= couponDiscountPrice;
+        if (couponType == CouponType.RATIO) {
+            return couponDiscountPrice <= 100;
+        }
+
+        return true;
+    }
+
+    @AssertTrue(message = "CASH 쿠폰일 때 최대 할인 금액은 쿠폰 할인 금액과 같아야 합니다.")
+    public boolean isMaxDiscountPriceEqualForCash() {
+        if (couponType == CouponType.CASH) {
+            return maxDiscountPrice == couponDiscountPrice;
+        }
+
+        return true;
     }
 
     @AssertTrue(message = "최소 주문 금액은 쿠폰 할인 금액보다 작을 수 없습니다.")
     public boolean isCouponMinOrderPriceValid() {
-        return couponMinOrderPrice >= couponDiscountPrice;
+        if (couponType == CouponType.CASH) {
+            return couponMinOrderPrice >= couponDiscountPrice;
+        }
+
+        return true;
     }
 
     @AssertTrue(message= "최대 할인 금액은 최소 주문 금액보다 클 수 없습니다.")
