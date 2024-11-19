@@ -42,7 +42,9 @@ public class BookCommonServiceImpl implements BookCommonService {
      * @param bookBaseResponse 도서 기본 정보(아직 출판사, 카테고리, 태그, 작가 정보 비어 있음)
      */
     private BookInfoResponse addAssociatedDataToBookInfoResponse(BookBaseResponse bookBaseResponse){
-
+        if(bookBaseResponse == null){
+            throw new NotFoundException("해당 도서를 찾을 수 없습니다");
+        }
         BookInfoResponse bookInfoResponse = new BookInfoResponse(bookBaseResponse);
 
         // 카테고리 설정
@@ -83,10 +85,8 @@ public class BookCommonServiceImpl implements BookCommonService {
      * @return
      */
     @Override
-    @Transactional(readOnly = true)
     public BookInfoResponse getBook(Long bookId) {
-        Book book = bookRepository.findById(bookId).orElseThrow(() -> new NotFoundException("해당 도서가 존재하지 않습니다."));
-        return new BookInfoResponse(book);
+        return addAssociatedDataToBookInfoResponse(bookRepository.findBookById(bookId));
     }
 
     /**
