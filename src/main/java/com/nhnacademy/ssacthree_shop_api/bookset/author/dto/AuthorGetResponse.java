@@ -6,7 +6,7 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public class AuthorGetResponse {
-    private long authorId;
+    private Long authorId;
     private String authorName;
     private String authorInfo;
 }

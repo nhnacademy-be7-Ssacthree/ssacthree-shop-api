@@ -1,22 +1,20 @@
 package com.nhnacademy.ssacthree_shop_api.bookset.author.service.impl;
 
 import com.nhnacademy.ssacthree_shop_api.bookset.author.domain.Author;
-import com.nhnacademy.ssacthree_shop_api.bookset.author.domain.QAuthor;
 import com.nhnacademy.ssacthree_shop_api.bookset.author.dto.AuthorCreateRequest;
 import com.nhnacademy.ssacthree_shop_api.bookset.author.dto.AuthorGetResponse;
 import com.nhnacademy.ssacthree_shop_api.bookset.author.dto.AuthorUpdateRequest;
 import com.nhnacademy.ssacthree_shop_api.bookset.author.exception.AuthorNotFoundException;
 import com.nhnacademy.ssacthree_shop_api.bookset.author.repository.AuthorRepository;
 import com.nhnacademy.ssacthree_shop_api.bookset.author.service.AuthorService;
-import com.querydsl.core.types.Projections;
-import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Objects;
 
 @Service
@@ -49,7 +47,7 @@ public class AuthorServiceImpl implements AuthorService {
 
     @Override
     public Author updateAuthor(AuthorUpdateRequest authorUpdateRequest) {
-        long authorId = authorUpdateRequest.getAuthorId();
+        Long authorId = authorUpdateRequest.getAuthorId();
         if(authorId < 1){
             throw new AuthorNotFoundException(AUTHOR_ID_ERROR_MESSAGE);
         }
@@ -64,39 +62,17 @@ public class AuthorServiceImpl implements AuthorService {
     }
 
     @Override
-    public List<AuthorGetResponse> getAllAuthors() {
-        QAuthor qAuthor = QAuthor.author;
-
-        return new JPAQueryFactory(entityManager)
-                .select(Projections.constructor(
-                        AuthorGetResponse.class,
-                        qAuthor.authorId,
-                        qAuthor.authorName,
-                        qAuthor.authorInfo
-                ))
-                .from(qAuthor)
-                .orderBy(qAuthor.authorId.asc())
-                .fetch();
+    public Page<AuthorGetResponse> getAllAuthors(Pageable pageable) {
+        return authorRepository.findAllAuthors(pageable);
     }
 
     @Override
-    public AuthorGetResponse getAuthorById(long authorId) {
-        QAuthor qAuthor = QAuthor.author;
-
-        return new JPAQueryFactory(entityManager)
-                .select(Projections.constructor(
-                        AuthorGetResponse.class,
-                        qAuthor.authorId,
-                        qAuthor.authorName,
-                        qAuthor.authorInfo
-                ))
-                .from(qAuthor)
-                .where(qAuthor.authorId.eq(authorId))
-                .fetchOne();
+    public AuthorGetResponse getAuthorById(Long authorId) {
+        return authorRepository.findAuthorById(authorId);
     }
 
     @Override
-    public void deleteAuthor(long authorId){
+    public void deleteAuthor(Long authorId){
         if (!authorRepository.existsById(authorId)) {
             throw new AuthorNotFoundException(AUTHOR_NOT_FOUND_MESSAGE + authorId);
         }

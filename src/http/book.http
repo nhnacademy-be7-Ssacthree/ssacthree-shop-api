@@ -54,3 +54,10 @@ Content-Type: application/json
 GET http://localhost:8083/api/shop/books/474
 Content-Type: application/json
 
+### elastic health 체크용
+GET http://localhost:8083/api/shop/search/health
+Accept: application/json
+
+###
+GET http://localhost:8083/api/shop/books?page=0&size=10&sort=bookName;
+Accept: application/json

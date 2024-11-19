@@ -5,10 +5,9 @@ import com.nhnacademy.ssacthree_shop_api.memberset.membergrade.dto.MemberGradeCr
 import com.nhnacademy.ssacthree_shop_api.memberset.membergrade.dto.MemberGradeGetResponse;
 import com.nhnacademy.ssacthree_shop_api.memberset.membergrade.dto.MemberGradeUpdateResponse;
 import com.nhnacademy.ssacthree_shop_api.memberset.membergrade.exception.MemberGradeNotFoundException;
+import com.nhnacademy.ssacthree_shop_api.memberset.membergrade.repository.MemberGradeCustomRepository;
 import com.nhnacademy.ssacthree_shop_api.memberset.membergrade.repository.MemberGradeRepository;
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,11 +18,12 @@ import org.springframework.transaction.annotation.Transactional;
 public class MemberGradeService {
 
     private final MemberGradeRepository memberGradeRepository;
+    private final MemberGradeCustomRepository memberGradeCustomRepository;
 
     public void createMemberGrade(MemberGradeCreateRequest memberGradeCreateRequest) {
 
         MemberGrade memberGrade = new MemberGrade(memberGradeCreateRequest.getMemberGradeName(),
-            memberGradeCreateRequest.isMemberGradeIsUsed(),
+            true,
             memberGradeCreateRequest.getMemberGradePointSave());
 
         memberGradeRepository.save(memberGrade);
@@ -36,11 +36,9 @@ public class MemberGradeService {
             throw new IllegalArgumentException("memberGradeId는 0이하일 수 없습니다.");
         }
 
-        if (!memberGradeRepository.existsById(memberGradeId)) {
-            throw new MemberGradeNotFoundException(memberGradeId + "를 찾을 수 없습니다.");
-        }
         // 찾은 엔티티의 값을 변경해줌
-        MemberGrade memberGrade = memberGradeRepository.findById(memberGradeId).orElse(null);
+        MemberGrade memberGrade = memberGradeRepository.findById(memberGradeId)
+            .orElseThrow(() -> new MemberGradeNotFoundException(memberGradeId + "를 찾을 수 없습니다."));
         memberGrade.setMemberGradeIsUsed(memberGradeUpdateResponse.isMemberGradeIsUsed());
         memberGrade.setMemberGradeName(memberGradeUpdateResponse.getMemberGradeName());
         memberGrade.setMemberGradePointSave(memberGradeUpdateResponse.getMemberGradePointSave());
@@ -48,14 +46,13 @@ public class MemberGradeService {
         memberGradeRepository.save(memberGrade);
     }
 
+    @Transactional(readOnly = true)
     public MemberGradeGetResponse getMemberGradeById(Long memberGradeId) {
         if (memberGradeId <= 0) {
             throw new IllegalArgumentException("memberGradeId는 0이하일 수 없습니다.");
         }
-        if (!memberGradeRepository.existsById(memberGradeId)) {
-            throw new MemberGradeNotFoundException(memberGradeId + "를 찾을 수 없습니다.");
-        }
-        MemberGrade foundMemberGrade = memberGradeRepository.findById(memberGradeId).orElse(null);
+        MemberGrade foundMemberGrade = memberGradeRepository.findById(memberGradeId)
+            .orElseThrow(() -> new MemberGradeNotFoundException(memberGradeId + "를 찾을 수 없습니다."));
         return new MemberGradeGetResponse(
             foundMemberGrade.getMemberGradeId(),
             foundMemberGrade.getMemberGradeName(),
@@ -69,28 +66,15 @@ public class MemberGradeService {
         if (memberGradeId <= 0) {
             throw new IllegalArgumentException("memberGradeId는 0이하일 수 없습니다.");
         }
-        if (!memberGradeRepository.existsById(memberGradeId)) {
-            throw new MemberGradeNotFoundException(memberGradeId + "를 찾을 수 없습니다.");
-        }
-        memberGradeRepository.deleteById(memberGradeId);
+        MemberGrade foundMemberGrade = memberGradeRepository.findById(memberGradeId)
+            .orElseThrow(() -> new MemberGradeNotFoundException(memberGradeId + "를 찾을 수 없습니다."));
+        foundMemberGrade.setMemberGradeIsUsed(false);
     }
 
     // 등록된 멤버 등급이 없으면 empty한 리스트를 반환 해 줘야해서 따로 예외처리 안함.
+    @Transactional(readOnly = true)
     public List<MemberGradeGetResponse> getAllMemberGrades() {
-        List<MemberGrade> memberGradeList = memberGradeRepository.findAll();
-
-        List<MemberGradeGetResponse> memberGradeGetResponseList = memberGradeList.stream()
-            .map(memberGrade ->
-                new MemberGradeGetResponse(
-                    memberGrade.getMemberGradeId(),
-                    memberGrade.getMemberGradeName(),
-                    memberGrade.isMemberGradeIsUsed(),
-                    memberGrade.getMemberGradeCreateAt(),
-                    memberGrade.getMemberGradePointSave()
-                )
-            ).collect(Collectors.toList());
-
-        return memberGradeGetResponseList;
+        return memberGradeCustomRepository.findAvailableMemberGrade();
     }
 
 }

@@ -13,7 +13,7 @@ import lombok.Setter;
 @NoArgsConstructor
 public class MemberGradeGetResponse {
 
-    private long memberGradeId;
+    private Long memberGradeId;
 
     private String memberGradeName;
 
@@ -21,5 +21,5 @@ public class MemberGradeGetResponse {
 
     private LocalDateTime memberGradeCreateAt;
 
-    private float memberGradePointSave;
+    private Float memberGradePointSave;
 }

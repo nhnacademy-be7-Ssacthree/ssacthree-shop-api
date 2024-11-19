@@ -2,6 +2,8 @@ package com.nhnacademy.ssacthree_shop_api.bookset.book.controller;
 
 import com.nhnacademy.ssacthree_shop_api.bookset.book.dto.response.BookInfoResponse;
 import com.nhnacademy.ssacthree_shop_api.bookset.book.service.BookCommonService;
+import com.nhnacademy.ssacthree_shop_api.bookset.category.dto.response.CategoryNameResponse;
+import com.nhnacademy.ssacthree_shop_api.commons.paging.PageRequestBuilder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.actuate.autoconfigure.observation.ObservationProperties;
 import org.springframework.data.domain.Page;
@@ -12,6 +14,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/shop/books")
@@ -20,34 +24,16 @@ public class BookCommonController {
     private final BookCommonService bookCommonService;
 
     /**
-     * 최근에 출판한 순서대로 책을 불러옵니다. (판매 중, 재고 없음 경우만 표시)
+     * 책을 불러옵니다. (판매 중, 재고 없음 경우만 표시)
      * @param page 현재 요청하려는 페이지 번호
      * @param size 한 페이지에 표시할 데이터의 개수
-     * @param sort 정렬 조건 (여러개의 정렬 조건을 설정 가능하도록 배열 형태로)
-     * @return
+     * @return ResponseEntity<Page<BookInfoResponse>>
      */
-    //todo: 도서 조회 기본이 최근 출판 정보로 하는게 나으려나..? 일단 그렇게 했는데.. 추후 변경할 수도.
     @GetMapping
-    public ResponseEntity<Page<BookInfoResponse>> getRecentBooks(@RequestParam(defaultValue = "0") int page,
+    public ResponseEntity<Page<BookInfoResponse>> getAllAvailableBooks(@RequestParam(defaultValue = "0") int page,
                                                                  @RequestParam(defaultValue = "10") int size,
-                                                                 @RequestParam(defaultValue = "bookName") String[] sort) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by(sort));
-        Page<BookInfoResponse> books = bookCommonService.getRecentBooks(pageable);
-        return new ResponseEntity<>(books, HttpStatus.OK);
-    }
-
-    /**
-     * 도서 아이디 순서대로 책을 불러옵니다. (판매 중, 재고 없을 경우만 표시)
-     * @param page 현재 요청하려는 페이지 번호
-     * @param size 한 페이지에 표시할 데이터의 개수
-     * @param sort 정렬 조건 (여러개의 정렬 조건을 설정 가능하도록 배열 형태로)
-     * @return 도서 아이디 순서대로 도서를 페이징
-     */
-    @GetMapping("/available-books")
-    public ResponseEntity<Page<BookInfoResponse>> getAvailableBooks(@RequestParam(defaultValue = "0") int page,
-                                                                    @RequestParam(defaultValue = "10") int size,
-                                                                    @RequestParam(defaultValue = "bookName") String[] sort) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by(sort));
+                                                                 @RequestParam(defaultValue = "bookName:asc") String[] sort) {
+        Pageable pageable = PageRequestBuilder.createPageable(page, size, sort);
         Page<BookInfoResponse> books = bookCommonService.getAllAvailableBooks(pageable);
         return new ResponseEntity<>(books, HttpStatus.OK);
     }
@@ -57,8 +43,8 @@ public class BookCommonController {
      * @param bookId 도서 아이디
      * @return 도서 정보
      */
-    @GetMapping("/{bookId}")
-    public ResponseEntity<BookInfoResponse> getBookById(@PathVariable Long bookId) {
+    @GetMapping("/{book-id}")
+    public ResponseEntity<BookInfoResponse> getBookById(@PathVariable(name="book-id") Long bookId) {
         BookInfoResponse book = bookCommonService.getBook(bookId);
         return new ResponseEntity<>(book, HttpStatus.OK);
     }
@@ -74,9 +60,9 @@ public class BookCommonController {
     @GetMapping("/search")
     public ResponseEntity<Page<BookInfoResponse>> getBooksByTitle(@RequestParam(defaultValue = "0") int page,
                                                                   @RequestParam(defaultValue = "10") int size,
-                                                                  @RequestParam(defaultValue = "bookName") String[] sort,
+                                                                  @RequestParam(defaultValue = "bookName:asc") String[] sort,
                                                                   @RequestParam String title) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by(sort));
+        Pageable pageable = PageRequestBuilder.createPageable(page, size, sort);
         Page<BookInfoResponse> books = bookCommonService.getBooksByBookName(pageable, title);
         return new ResponseEntity<>(books, HttpStatus.OK);
     }
@@ -93,10 +79,16 @@ public class BookCommonController {
     @GetMapping("/author/{author-id}")
     public ResponseEntity<Page<BookInfoResponse>> getBookByAuthorId(@RequestParam(defaultValue = "0") int page,
                                                                     @RequestParam(defaultValue = "10") int size,
-                                                                    @RequestParam(defaultValue = "bookName") String[] sort,
+                                                                    @RequestParam(defaultValue = "bookName:asc") String[] sort,
                                                                     @PathVariable(name = "author-id") Long authorId) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by(sort));
+        Pageable pageable = PageRequestBuilder.createPageable(page, size, sort);
         Page<BookInfoResponse> books = bookCommonService.getBooksByAuthorId(pageable, authorId);
         return new ResponseEntity<>(books, HttpStatus.OK);
+    }
+
+    @GetMapping("/{book-id}/categories")
+    public ResponseEntity<List<CategoryNameResponse>> getCategoriesByBookId(@PathVariable(name = "book-id") Long bookId) {
+        List<CategoryNameResponse> categories = bookCommonService.getCategoriesByBookId(bookId);
+        return new ResponseEntity<>(categories, HttpStatus.OK);
     }
 }

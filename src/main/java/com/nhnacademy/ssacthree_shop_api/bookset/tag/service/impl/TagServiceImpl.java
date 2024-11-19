@@ -12,6 +12,8 @@ import com.nhnacademy.ssacthree_shop_api.commons.dto.MessageResponse;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -34,10 +36,7 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
-    public List<TagInfoResponse> getAllTags() {
-        List<Tag> tagList = tagRepository.findAll();
-
-        return tagList.stream()
-            .map(TagInfoResponse::new).collect(Collectors.toList());
+    public Page<TagInfoResponse> getAllTags(Pageable pageable) {
+        return tagRepository.findAllTags(pageable);
     }
 }
