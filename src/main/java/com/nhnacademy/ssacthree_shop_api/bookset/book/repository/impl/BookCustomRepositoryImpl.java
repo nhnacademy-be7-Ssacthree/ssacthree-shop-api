@@ -18,15 +18,19 @@ import com.nhnacademy.ssacthree_shop_api.bookset.publisher.domain.QPublisher;
 import com.nhnacademy.ssacthree_shop_api.bookset.publisher.dto.PublisherNameResponse;
 import com.nhnacademy.ssacthree_shop_api.bookset.tag.domain.QTag;
 import com.nhnacademy.ssacthree_shop_api.bookset.tag.dto.response.TagInfoResponse;
-import com.querydsl.core.types.Projections;
+import com.querydsl.core.types.*;
 import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.core.types.dsl.PathBuilder;
+import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -47,261 +51,468 @@ public class BookCustomRepositoryImpl implements BookCustomRepository {
     private static final QTag tag = QTag.tag;
     private static final QAuthor author = QAuthor.author;
 
+    /**
+     * 도서 상태가 판매중이거나 재고 없음인지 판별합니다.
+     * @return '판매중/재고없음'인지 아닌지에 대한 BooleanExpression
+     */
     private BooleanExpression isOnSaleOrNoStock() {
         return book.bookStatus.eq(BookStatus.ON_SALE)
                 .or(book.bookStatus.eq(BookStatus.NO_STOCK));
     }
 
     /**
-     * 판매 중, 재고 없음 상태의 책을 최신 출판 순으로 불러옴.
-     * @param pageable 페이징 설정
-     * @return Page<BookInfoResponse>
+     * 조인 조건을 동적으로 처리하기 위한 인터페이스
      */
-    @Override
-    public Page<BookBaseResponse> findRecentBooks(Pageable pageable) {
-        Map<Long, BookBaseResponse> bookMap = queryFactory
-                .from(book)
-                .leftJoin(book.publisher, publisher)
-                .where(isOnSaleOrNoStock())
-                .offset(pageable.getOffset()) // 추가
-                .limit(pageable.getPageSize()) // 추가
-                .transform(groupBy(book.bookId).as(
-                        Projections.constructor(BookBaseResponse.class,
-                                book.bookId,
-                                book.bookName,
-                                book.bookIndex,
-                                book.bookInfo,
-                                book.bookIsbn,
-                                book.publicationDate,
-                                book.regularPrice,
-                                book.salePrice,
-                                book.isPacked,
-                                book.stock,
-                                book.bookThumbnailImageUrl,
-                                book.bookViewCount,
-                                book.bookDiscount,
-                                book.bookStatus.stringValue(),
-                                Projections.constructor(PublisherNameResponse.class,
-                                        publisher.publisherId,
-                                        publisher.publisherName)
-                        )));
+    @FunctionalInterface
+    private interface JoinClause {
+        void apply(JPAQuery<?> query);
+    }
 
-        List<BookBaseResponse> books = new ArrayList<>(bookMap.values());
+
+    private List<OrderSpecifier<?>> parseSort(Sort sort) {
+        List<OrderSpecifier<?>> orders = new ArrayList<>();
+
+        sort.stream().forEach(order -> {
+           Order direction = order.isAscending() ? Order.ASC : Order.DESC; // 정렬 방향
+           String prop = order.getProperty(); // 정렬 대상 필드 가져옴
+           PathBuilder orderByExpression = new PathBuilder(QBook.book.getType(), QBook.book.getMetadata());
+           try {
+               orders.add(new OrderSpecifier<>(direction, orderByExpression.get(prop)));
+           } catch (IllegalArgumentException e) {
+               throw new IllegalArgumentException("Invalid sort property: " + prop, e);
+           }
+        });
+
+        return orders;
+    }
+
+
+
+
+    private void applyOrderBy(JPAQuery<?> query, Sort sort) {
+        List<OrderSpecifier<?>> orderSpecifiers = parseSort(sort);
+        if (!orderSpecifiers.isEmpty()) {
+            query.orderBy(orderSpecifiers.toArray(new OrderSpecifier[0]));
+        }
+    }
+
+    /**
+     * 공통 메소드 처리
+     * @param pageable
+     * @param condition
+     * @param joinConditions
+     * @return
+     */
+    private Page<BookBaseResponse> findBooksByCondition(
+            Pageable pageable,
+            Predicate condition,
+            List<JoinClause> joinConditions
+    ) {
+        JPAQuery<BookBaseResponse> query = queryFactory
+                .select(Projections.constructor(BookBaseResponse.class,
+                        book.bookId,
+                        book.bookName,
+                        book.bookIndex,
+                        book.bookInfo,
+                        book.bookIsbn,
+                        book.publicationDate,
+                        book.regularPrice,
+                        book.salePrice,
+                        book.isPacked,
+                        book.stock,
+                        book.bookThumbnailImageUrl,
+                        book.bookViewCount,
+                        book.bookDiscount,
+                        book.bookStatus.stringValue(),
+                        Projections.constructor(PublisherNameResponse.class,
+                                publisher.publisherId,
+                                publisher.publisherName)
+                ))
+                .from(book)
+                .leftJoin(book.publisher, publisher);
+
+        // 동적 조인 조건 추가
+        for (JoinClause join : joinConditions) {
+            join.apply(query);
+        }
+
+        // 정렬 조건 적용
+        applyOrderBy(query, pageable.getSort());
+
+        // 페이징 처리 및 결과 조회
+        List<BookBaseResponse> books = query
+                .where(condition)
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
 
         Long count = queryFactory.select(book.count())
                 .from(book)
                 .leftJoin(book.publisher, publisher)
-                .where(isOnSaleOrNoStock())
+                .where(condition)
                 .fetchOne();
 
-        count = (count == null ? 0 : count);
+        count = count != null ? count : 0L; // Null 체크 후 기본값 설정
+
 
         return new PageImpl<>(books, pageable, count);
     }
 
 
-    /**
-     * 책 이름을 포함하고 있는 책을 검색합니다.
-     * @param pageable 페이징 처리
-     * @param bookName 찾고자 하는 책 이름
-     * @return Page<BookInfoResponse>
-     */
+
+
+//    /**
+//     * 책 이름을 포함하고 있는 책을 검색합니다.
+//     * @param pageable 페이징 처리
+//     * @param bookName 찾고자 하는 책 이름
+//     * @return Page<BookBaseResponse>
+//     */
+//    @Override
+//    public Page<BookBaseResponse> findBooksByBookName(Pageable pageable, String bookName) {
+//        // 책 정보를 가져오기
+//        List<BookBaseResponse> books = queryFactory
+//                .select(Projections.constructor(BookBaseResponse.class,
+//                        book.bookId,
+//                        book.bookName,
+//                        book.bookIndex,
+//                        book.bookInfo,
+//                        book.bookIsbn,
+//                        book.publicationDate,
+//                        book.regularPrice,
+//                        book.salePrice,
+//                        book.isPacked,
+//                        book.stock,
+//                        book.bookThumbnailImageUrl,
+//                        book.bookViewCount,
+//                        book.bookDiscount,
+//                        book.bookStatus.stringValue(),
+//                        Projections.constructor(PublisherNameResponse.class,
+//                                publisher.publisherId,
+//                                publisher.publisherName)
+//                ))
+//                .from(book)
+//                .leftJoin(book.publisher, publisher)
+//                .where(isOnSaleOrNoStock()
+//                        .and(book.bookName.containsIgnoreCase(bookName)))
+//                .offset(pageable.getOffset())
+//                .limit(pageable.getPageSize())
+//                .fetch();
+//
+//        // 총 개수 가져오기
+//        Long count = queryFactory.select(book.count())
+//                .from(book)
+//                .leftJoin(book.publisher, publisher)
+//                .where(isOnSaleOrNoStock()
+//                        .and(book.bookName.containsIgnoreCase(bookName)))
+//                .fetchOne();
+//
+//        // count가 null일 경우 0으로 설정
+//        count = (count == null ? 0 : count);
+//
+//        // Page 객체 생성
+//        return new PageImpl<>(books, pageable, count);
+//    }
+//
+//    /**
+//     * 판매 중, 재고 없는 상태의 모든 책을 조회합니다.
+//     * @param pageable 페이징 처리
+//     * @return Page<BookInfoResponse>
+//     */
+//    @Override
+//    public Page<BookBaseResponse> findAllAvailableBooks(Pageable pageable) {
+//        List<BookBaseResponse> books = queryFactory
+//                .select(Projections.constructor(BookBaseResponse.class,
+//                        book.bookId,
+//                        book.bookName,
+//                        book.bookIndex,
+//                        book.bookInfo,
+//                        book.bookIsbn,
+//                        book.publicationDate,
+//                        book.regularPrice,
+//                        book.salePrice,
+//                        book.isPacked,
+//                        book.stock,
+//                        book.bookThumbnailImageUrl,
+//                        book.bookViewCount,
+//                        book.bookDiscount,
+//                        book.bookStatus.stringValue(),
+//                        Projections.constructor(PublisherNameResponse.class,
+//                                publisher.publisherId,
+//                                publisher.publisherName)
+//                ))
+//                .from(book)
+//                .leftJoin(book.publisher, publisher)
+//                .where(isOnSaleOrNoStock())
+//                .offset(pageable.getOffset())
+//                .limit(pageable.getPageSize())
+//                .fetch();
+//
+//        Long count = queryFactory.select(book.count())
+//                .from(book)
+//                .leftJoin(book.publisher, publisher)
+//                .where(isOnSaleOrNoStock())
+//                .fetchOne();
+//
+//        count = (count == null) ? 0 : count;
+//
+//        return new PageImpl<>(books, pageable, count);
+//    }
+//
+//    /**
+//     * 재고가 없는 모든 책을 조회합니다.
+//     * @param pageable 페이징 처리
+//     * @return Page<BookBaseResponse>
+//     */
+//    @Override
+//    public Page<BookBaseResponse> findAllBooksByStatusNoStock(Pageable pageable) {
+//        // 책 정보 가져오기
+//        List<BookBaseResponse> books = queryFactory
+//                .select(Projections.constructor(BookBaseResponse.class,
+//                        book.bookId,
+//                        book.bookName,
+//                        book.bookIndex,
+//                        book.bookInfo,
+//                        book.bookIsbn,
+//                        book.publicationDate,
+//                        book.regularPrice,
+//                        book.salePrice,
+//                        book.isPacked,
+//                        book.stock,
+//                        book.bookThumbnailImageUrl,
+//                        book.bookViewCount,
+//                        book.bookDiscount,
+//                        book.bookStatus.stringValue(),
+//                        Projections.constructor(PublisherNameResponse.class,
+//                                publisher.publisherId,
+//                                publisher.publisherName)
+//                ))
+//                .from(book)
+//                .leftJoin(book.publisher, publisher)
+//                .where(book.bookStatus.eq(BookStatus.NO_STOCK))
+//                .offset(pageable.getOffset())
+//                .limit(pageable.getPageSize())
+//                .fetch();
+//
+//        // 총 개수 가져오기
+//        Long count = queryFactory.select(book.count())
+//                .from(book)
+//                .leftJoin(book.publisher, publisher)
+//                .where(book.bookStatus.eq(BookStatus.NO_STOCK))
+//                .fetchOne();
+//
+//        count = (count == null ? 0 : count);
+//
+//        return new PageImpl<>(books, pageable, count);
+//    }
+//
+//    /**
+//     * 판매 중단된 책을 모두 검색합니다.
+//     * @param pageable 페이징 처리
+//     * @return Page<BookBaseResponse>
+//     */
+//    @Override
+//    public Page<BookBaseResponse> findStatusDiscontinued(Pageable pageable) {
+//        // 책 정보 가져오기
+//        List<BookBaseResponse> books = queryFactory
+//                .select(Projections.constructor(BookBaseResponse.class,
+//                        book.bookId,
+//                        book.bookName,
+//                        book.bookIndex,
+//                        book.bookInfo,
+//                        book.bookIsbn,
+//                        book.publicationDate,
+//                        book.regularPrice,
+//                        book.salePrice,
+//                        book.isPacked,
+//                        book.stock,
+//                        book.bookThumbnailImageUrl,
+//                        book.bookViewCount,
+//                        book.bookDiscount,
+//                        book.bookStatus.stringValue(),
+//                        Projections.constructor(PublisherNameResponse.class,
+//                                publisher.publisherId,
+//                                publisher.publisherName)
+//                ))
+//                .from(book)
+//                .leftJoin(book.publisher, publisher)
+//                .where(book.bookStatus.eq(BookStatus.DISCONTINUED))
+//                .offset(pageable.getOffset())
+//                .limit(pageable.getPageSize())
+//                .fetch();
+//
+//        // 총 개수 가져오기
+//        Long count = queryFactory.select(book.count())
+//                .from(book)
+//                .leftJoin(book.publisher, publisher)
+//                .where(book.bookStatus.eq(BookStatus.DISCONTINUED))
+//                .fetchOne();
+//
+//        count = (count == null ? 0 : count);
+//
+//        return new PageImpl<>(books, pageable, count);
+//    }
+//
+    // 작가 아이디로 책 찾기
+    @Override
+    public Page<BookBaseResponse> findBooksByAuthorId(Long authorId, Pageable pageable) {
+        List<BookBaseResponse> books = queryFactory.select(Projections.constructor(BookBaseResponse.class,
+                        book.bookId,
+                        book.bookName,
+                        book.bookIndex,
+                        book.bookInfo,
+                        book.bookIsbn,
+                        book.publicationDate,
+                        book.regularPrice,
+                        book.salePrice,
+                        book.isPacked,
+                        book.stock,
+                        book.bookThumbnailImageUrl,
+                        book.bookViewCount,
+                        book.bookDiscount,
+                        book.bookStatus.stringValue(),
+                        Projections.constructor(PublisherNameResponse.class,
+                                publisher.publisherId,
+                                publisher.publisherName)
+                ))
+                .from(book)
+                .leftJoin(book.publisher, publisher)
+                .leftJoin(book.bookAuthors, bookAuthor)
+                .leftJoin(bookAuthor.author, author)
+                .where(author.authorId.eq(authorId).and(isOnSaleOrNoStock()))
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
+
+        Long count = queryFactory.select(book.count())
+                .from(book)
+                .leftJoin(book.publisher, publisher)
+                .leftJoin(book.bookAuthors, bookAuthor)
+                .leftJoin(bookAuthor.author, author)
+                .where(author.authorId.eq(authorId).and(isOnSaleOrNoStock()))
+                .fetchOne();
+
+        count = (count == null) ? 0 : count;
+
+        return new PageImpl<>(books, pageable, count);
+    }
+
     @Override
     public Page<BookBaseResponse> findBooksByBookName(Pageable pageable, String bookName) {
-        Map<Long, BookBaseResponse> bookMap = queryFactory
-                .from(book)
-                .leftJoin(book.publisher, publisher)
-                .where(isOnSaleOrNoStock()
-                        .and(book.bookName.containsIgnoreCase(bookName)))
-                .offset(pageable.getOffset()) // 추가
-                .limit(pageable.getPageSize()) // 추가
-                .transform(groupBy(book.bookId).as(
-                        Projections.constructor(BookBaseResponse.class,
-                                book.bookId,
-                                book.bookName,
-                                book.bookIndex,
-                                book.bookInfo,
-                                book.bookIsbn,
-                                book.publicationDate,
-                                book.regularPrice,
-                                book.salePrice,
-                                book.isPacked,
-                                book.stock,
-                                book.bookThumbnailImageUrl,
-                                book.bookViewCount,
-                                book.bookDiscount,
-                                book.bookStatus.stringValue(),
-                                Projections.constructor(PublisherNameResponse.class,
-                                        publisher.publisherId,
-                                        publisher.publisherName)
-                        )));
-
-        List<BookBaseResponse> books = new ArrayList<>(bookMap.values());
-
-        Long count = queryFactory.select(book.count())
-                .from(book)
-                .leftJoin(book.publisher, publisher)
-                .where(isOnSaleOrNoStock(),
-                        book.bookName.containsIgnoreCase(bookName))
-                .fetchOne();
-
-        count = (count == null ? 0 : count);
-
-        return new PageImpl<>(books, pageable, count);
+        Predicate condition = isOnSaleOrNoStock().and(book.bookName.containsIgnoreCase(bookName));
+        return findBooksByCondition(pageable, condition, List.of());
     }
 
-    /**
-     * 판매 중, 재고 없는 상태의 모든 책을 조회합니다.
-     * @param pageable 페이징 처리
-     * @return Page<BookInfoResponse>
-     */
     @Override
     public Page<BookBaseResponse> findAllAvailableBooks(Pageable pageable) {
-        Map<Long, BookBaseResponse> bookMap = queryFactory
-                .from(book)
-                .leftJoin(book.publisher, publisher)
-                .where(isOnSaleOrNoStock())
-                .offset(pageable.getOffset()) // 추가
-                .limit(pageable.getPageSize()) // 추가
-                .transform(groupBy(book.bookId).as(
-                        Projections.constructor(BookBaseResponse.class,
-                                book.bookId,
-                                book.bookName,
-                                book.bookIndex,
-                                book.bookInfo,
-                                book.bookIsbn,
-                                book.publicationDate,
-                                book.regularPrice,
-                                book.salePrice,
-                                book.isPacked,
-                                book.stock,
-                                book.bookThumbnailImageUrl,
-                                book.bookViewCount,
-                                book.bookDiscount,
-                                book.bookStatus.stringValue(),
-                                Projections.constructor(PublisherNameResponse.class,
-                                        publisher.publisherId,
-                                        publisher.publisherName)
-                        )));
-
-        List<BookBaseResponse> books = new ArrayList<>(bookMap.values());
-
-        Long count = queryFactory.select(book.count())
-                .from(book)
-                .leftJoin(book.publisher, publisher)
-                .where(isOnSaleOrNoStock())
-                .fetchOne();
-
-        count = (count == null ? 0 : count);
-
-        return new PageImpl<>(books, pageable, count);
+        Predicate condition = isOnSaleOrNoStock();
+        return findBooksByCondition(pageable, condition, List.of());
     }
 
-    /**
-     * 재고가 없는 모든 책을 조회합니다.
-     * @param pageable 페이징 처리
-     * @return Page<BookInfoResponse>
-     */
     @Override
     public Page<BookBaseResponse> findAllBooksByStatusNoStock(Pageable pageable) {
-        Map<Long, BookBaseResponse> bookMap = queryFactory
-                .from(book)
-                .leftJoin(book.publisher, publisher)
-                .where(book.bookStatus.eq(BookStatus.NO_STOCK))
-                .offset(pageable.getOffset()) // 추가
-                .limit(pageable.getPageSize()) // 추가
-                .transform(groupBy(book.bookId).as(
-                        Projections.constructor(BookBaseResponse.class,
-                                book.bookId,
-                                book.bookName,
-                                book.bookIndex,
-                                book.bookInfo,
-                                book.bookIsbn,
-                                book.publicationDate,
-                                book.regularPrice,
-                                book.salePrice,
-                                book.isPacked,
-                                book.stock,
-                                book.bookThumbnailImageUrl,
-                                book.bookViewCount,
-                                book.bookDiscount,
-                                book.bookStatus.stringValue(),
-                                Projections.constructor(PublisherNameResponse.class,
-                                        publisher.publisherId,
-                                        publisher.publisherName)
-                        )));
-
-        List<BookBaseResponse> books = new ArrayList<>(bookMap.values());
-
-        Long count = queryFactory.select(book.count())
-                .from(book)
-                .leftJoin(book.publisher, publisher)
-                .where(book.bookStatus.eq(BookStatus.NO_STOCK))
-                .fetchOne();
-
-        count = (count == null ? 0 : count);
-
-        return new PageImpl<>(books, pageable, count);
+        Predicate condition = book.bookStatus.eq(BookStatus.NO_STOCK);
+        return findBooksByCondition(pageable, condition, List.of());
     }
 
-    /**
-     * 판매 중단된 책을 모두 검색합니다.
-     * @param pageable 페이징 처리
-     * @return Page<BookInfoResponse>
-     */
     @Override
     public Page<BookBaseResponse> findStatusDiscontinued(Pageable pageable) {
-        Map<Long, BookBaseResponse> bookMap = queryFactory
+        Predicate condition = book.bookStatus.eq(BookStatus.DISCONTINUED);
+        return findBooksByCondition(pageable, condition, List.of());
+    }
+
+//    @Override
+//    public Page<BookBaseResponse> findBooksByAuthorId(Long authorId, Pageable pageable) {
+//        List<JoinClause> joinConditions = List.of(
+//                query -> query.leftJoin(book.bookAuthors, bookAuthor).leftJoin(bookAuthor.author, author)
+//        );
+//        Predicate condition = author.authorId.eq(authorId).and(isOnSaleOrNoStock());
+//        return findBooksByCondition(pageable, condition, joinConditions);
+//    }
+
+    /**
+     * isbn으로 도서를 검색합니다.
+     * @param isbn 도서 isbn
+     * @return 도서 기본 정보
+     */
+    @Override
+    public BookBaseResponse findByBookIsbn(String isbn) {
+        return queryFactory.select(Projections.constructor(BookBaseResponse.class,
+                        book.bookId,
+                        book.bookName,
+                        book.bookIndex,
+                        book.bookInfo,
+                        book.bookIsbn,
+                        book.publicationDate,
+                        book.regularPrice,
+                        book.salePrice,
+                        book.isPacked,
+                        book.stock,
+                        book.bookThumbnailImageUrl,
+                        book.bookViewCount,
+                        book.bookDiscount,
+                        book.bookStatus.stringValue(),
+                        Projections.constructor(PublisherNameResponse.class,
+                                publisher.publisherId,
+                                publisher.publisherName)
+                ))
                 .from(book)
                 .leftJoin(book.publisher, publisher)
-                .where(book.bookStatus.eq(BookStatus.DISCONTINUED))
-                .offset(pageable.getOffset()) // 추가
-                .limit(pageable.getPageSize()) // 추가
-                .transform(groupBy(book.bookId).as(
-                        Projections.constructor(BookBaseResponse.class,
-                                book.bookId,
-                                book.bookName,
-                                book.bookIndex,
-                                book.bookInfo,
-                                book.bookIsbn,
-                                book.publicationDate,
-                                book.regularPrice,
-                                book.salePrice,
-                                book.isPacked,
-                                book.stock,
-                                book.bookThumbnailImageUrl,
-                                book.bookViewCount,
-                                book.bookDiscount,
-                                book.bookStatus.stringValue(),
-                                Projections.constructor(PublisherNameResponse.class,
-                                        publisher.publisherId,
-                                        publisher.publisherName)
-                        )));
-
-        List<BookBaseResponse> books = new ArrayList<>(bookMap.values());
-
-        Long count = queryFactory.select(book.count())
-                .from(book)
-                .leftJoin(book.publisher, publisher)
-                .where(book.bookStatus.eq(BookStatus.DISCONTINUED))
+                .where(book.bookIsbn.eq(isbn))
                 .fetchOne();
-
-        count = (count == null ? 0 : count);
-
-        return new PageImpl<>(books, pageable, count);
     }
 
     /**
-     * 특정 책 정보를 가져옵니다.
+     * 책 아이디로 책의 카테고리들을 가져옵니다.
      * @param bookId 책 아이디
-     * @return 책 정보
+     * @return 책의 카테고리 리스트
      */
     @Override
-    public String findBookInfoByBookId(Long bookId) {
-        return queryFactory.select(book.bookInfo)
-                .from(book)
-                .where(book.bookId.eq(bookId))
-                .fetchOne();
+    public List<CategoryNameResponse> findCategoriesByBookId(Long bookId) {
+        return queryFactory
+                .select(Projections.constructor(CategoryNameResponse.class,
+                        category.categoryId,
+                        category.categoryName
+                ))
+                .from(bookCategory)
+                .leftJoin(bookCategory.category, category)
+                .where(bookCategory.book.bookId.eq(bookId))
+                .fetch();
+    }
+
+    /**
+     * 책 아이디로 책의 태그들을 가져옵니다.
+     * @param bookId 책 아이디
+     * @return 책의 태그 리스트
+     */
+    @Override
+    public List<TagInfoResponse> findTagsByBookId(Long bookId) {
+        return queryFactory
+                .select(Projections.constructor(TagInfoResponse.class,
+                        tag.tagId,
+                        tag.tagName
+                ))
+                .from(bookTag)
+                .leftJoin(bookTag.tag, tag)
+                .where(bookTag.book.bookId.eq(bookId))
+                .fetch();
+    }
+
+    /**
+     * 책 아이디로 책의 작가들을 가져옵니다.
+     * @param bookId 책 아이디
+     * @return 책의 작가 리스트
+     */
+    @Override
+    public List<AuthorNameResponse> findAuthorsByBookId(Long bookId) {
+        return queryFactory
+                .select(Projections.constructor(AuthorNameResponse.class,
+                        author.authorId,
+                        author.authorName
+                ))
+                .from(bookAuthor)
+                .leftJoin(bookAuthor.author, author)
+                .where(bookAuthor.book.bookId.eq(bookId))
+                .fetch();
     }
 
 
@@ -379,74 +590,6 @@ public class BookCustomRepositoryImpl implements BookCustomRepository {
             .fetch();
     }
 
-
-
-    @Override
-    public BookBaseResponse findByBookIsbn(String isbn) {
-        return queryFactory.select(Projections.constructor(BookBaseResponse.class,
-                        book.bookId,
-                        book.bookName,
-                        book.bookIndex,
-                        book.bookInfo,
-                        book.bookIsbn,
-                        book.publicationDate,
-                        book.regularPrice,
-                        book.salePrice,
-                        book.isPacked,
-                        book.stock,
-                        book.bookThumbnailImageUrl,
-                        book.bookViewCount,
-                        book.bookDiscount,
-                        book.bookStatus.stringValue(),
-                        Projections.constructor(PublisherNameResponse.class,
-                                publisher.publisherId,
-                                publisher.publisherName)
-                ))
-                .from(book)
-                .leftJoin(book.publisher, publisher)
-                .where(book.bookIsbn.eq(isbn))
-                .fetchOne();
-    }
-
-    @Override
-    public List<CategoryNameResponse> findCategoriesByBookId(Long bookId) {
-        return queryFactory
-                .select(Projections.constructor(CategoryNameResponse.class,
-                        category.categoryId,
-                        category.categoryName
-                ))
-                .from(bookCategory)
-                .leftJoin(bookCategory.category, category)
-                .where(bookCategory.book.bookId.eq(bookId))
-                .fetch();
-    }
-
-    @Override
-    public List<TagInfoResponse> findTagsByBookId(Long bookId) {
-        return queryFactory
-                .select(Projections.constructor(TagInfoResponse.class,
-                        tag.tagId,
-                        tag.tagName
-                ))
-                .from(bookTag)
-                .leftJoin(bookTag.tag, tag)
-                .where(bookTag.book.bookId.eq(bookId))
-                .fetch();
-    }
-
-    @Override
-    public List<AuthorNameResponse> findAuthorsByBookId(Long bookId) {
-        return queryFactory
-                .select(Projections.constructor(AuthorNameResponse.class,
-                        author.authorId,
-                        author.authorName
-                ))
-                .from(bookAuthor)
-                .leftJoin(bookAuthor.author, author)
-                .where(bookAuthor.book.bookId.eq(bookId))
-                .fetch();
-    }
-
     //todo: 현재 구현되어 있는 카테고리, 태그, 작가 리스트를 불러오는 방식이 N+1 문제를 발생시킬 것 같아서
     // 다른 방식 구현 중
     @Override
@@ -489,51 +632,6 @@ public class BookCustomRepositoryImpl implements BookCustomRepository {
                 .leftJoin(bookAuthor.author, author)
                 .where(bookAuthor.book.bookId.in(bookIds))
                 .fetch();
-    }
-
-
-    // 작가 아이디로 책 찾기
-    @Override
-    public Page<BookBaseResponse> findBooksByAuthorId(Long authorId, Pageable pageable) {
-        List<BookBaseResponse> books = queryFactory.select(Projections.constructor(BookBaseResponse.class,
-                book.bookId,
-                book.bookName,
-                book.bookIndex,
-                book.bookInfo,
-                book.bookIsbn,
-                book.publicationDate,
-                book.regularPrice,
-                book.salePrice,
-                book.isPacked,
-                book.stock,
-                book.bookThumbnailImageUrl,
-                book.bookViewCount,
-                book.bookDiscount,
-                book.bookStatus.stringValue(),
-                Projections.constructor(PublisherNameResponse.class,
-                        publisher.publisherId,
-                        publisher.publisherName)
-                ))
-                .from(book)
-                .leftJoin(book.publisher, publisher)
-                .leftJoin(book.bookAuthors, bookAuthor)
-                .leftJoin(bookAuthor.author, author)
-                .where(author.authorId.eq(authorId).and(isOnSaleOrNoStock()))
-                .offset(pageable.getOffset())
-                .limit(pageable.getPageSize())
-                .fetch();
-
-        Long count = queryFactory.select(book.count())
-                .from(book)
-                .leftJoin(book.publisher, publisher)
-                .leftJoin(book.bookAuthors, bookAuthor)
-                .leftJoin(bookAuthor.author, author)
-                .where(author.authorId.eq(authorId).and(isOnSaleOrNoStock()))
-                .fetchOne();
-
-        count = (count == null) ? 0 : count;
-
-        return new PageImpl<>(books, pageable, count);
     }
 }
 

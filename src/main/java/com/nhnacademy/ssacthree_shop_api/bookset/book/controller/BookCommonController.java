@@ -3,6 +3,7 @@ package com.nhnacademy.ssacthree_shop_api.bookset.book.controller;
 import com.nhnacademy.ssacthree_shop_api.bookset.book.dto.response.BookInfoResponse;
 import com.nhnacademy.ssacthree_shop_api.bookset.book.service.BookCommonService;
 import com.nhnacademy.ssacthree_shop_api.bookset.category.dto.response.CategoryNameResponse;
+import com.nhnacademy.ssacthree_shop_api.commons.paging.PageRequestBuilder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.actuate.autoconfigure.observation.ObservationProperties;
 import org.springframework.data.domain.Page;
@@ -31,8 +32,8 @@ public class BookCommonController {
     @GetMapping
     public ResponseEntity<Page<BookInfoResponse>> getAllAvailableBooks(@RequestParam(defaultValue = "0") int page,
                                                                  @RequestParam(defaultValue = "10") int size,
-                                                                 @RequestParam(defaultValue = "bookName") String[] sort) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by(sort));
+                                                                 @RequestParam(defaultValue = "bookName:asc") String[] sort) {
+        Pageable pageable = PageRequestBuilder.createPageable(page, size, sort);
         Page<BookInfoResponse> books = bookCommonService.getAllAvailableBooks(pageable);
         return new ResponseEntity<>(books, HttpStatus.OK);
     }
@@ -59,9 +60,9 @@ public class BookCommonController {
     @GetMapping("/search")
     public ResponseEntity<Page<BookInfoResponse>> getBooksByTitle(@RequestParam(defaultValue = "0") int page,
                                                                   @RequestParam(defaultValue = "10") int size,
-                                                                  @RequestParam(defaultValue = "bookName") String[] sort,
+                                                                  @RequestParam(defaultValue = "bookName:asc") String[] sort,
                                                                   @RequestParam String title) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by(sort));
+        Pageable pageable = PageRequestBuilder.createPageable(page, size, sort);
         Page<BookInfoResponse> books = bookCommonService.getBooksByBookName(pageable, title);
         return new ResponseEntity<>(books, HttpStatus.OK);
     }
@@ -78,9 +79,9 @@ public class BookCommonController {
     @GetMapping("/author/{author-id}")
     public ResponseEntity<Page<BookInfoResponse>> getBookByAuthorId(@RequestParam(defaultValue = "0") int page,
                                                                     @RequestParam(defaultValue = "10") int size,
-                                                                    @RequestParam(defaultValue = "bookName") String[] sort,
+                                                                    @RequestParam(defaultValue = "bookName:asc") String[] sort,
                                                                     @PathVariable(name = "author-id") Long authorId) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by(sort));
+        Pageable pageable = PageRequestBuilder.createPageable(page, size, sort);
         Page<BookInfoResponse> books = bookCommonService.getBooksByAuthorId(pageable, authorId);
         return new ResponseEntity<>(books, HttpStatus.OK);
     }

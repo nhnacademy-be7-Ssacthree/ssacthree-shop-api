@@ -5,9 +5,12 @@ import com.nhnacademy.ssacthree_shop_api.bookset.author.dto.AuthorGetResponse;
 import com.nhnacademy.ssacthree_shop_api.bookset.author.dto.AuthorUpdateRequest;
 import com.nhnacademy.ssacthree_shop_api.bookset.author.service.AuthorService;
 import com.nhnacademy.ssacthree_shop_api.commons.dto.MessageResponse;
+import com.nhnacademy.ssacthree_shop_api.commons.paging.PageRequestBuilder;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.apache.coyote.Response;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -25,12 +28,16 @@ public class AuthorController {
     private final AuthorService authorService;
 
     @GetMapping
-    public ResponseEntity<List<AuthorGetResponse>> getAllAuthors() {
-        return ResponseEntity.ok().body(authorService.getAllAuthors());
+    public ResponseEntity<Page<AuthorGetResponse>> getAllAuthors(@RequestParam(defaultValue = "0") int page,
+                                                                 @RequestParam(defaultValue = "10") int size,
+                                                                 @RequestParam(defaultValue = "authorId:asc") String[] sort) {
+        Pageable pageable = PageRequestBuilder.createPageable(page, size, sort);
+        Page<AuthorGetResponse> authors = authorService.getAllAuthors(pageable);
+        return new ResponseEntity<>(authors, HttpStatus.OK);
     }
 
     @GetMapping("/{authorId}")
-    public ResponseEntity<AuthorGetResponse> getAuthor(@PathVariable long authorId) {
+    public ResponseEntity<AuthorGetResponse> getAuthor(@PathVariable Long authorId) {
         return ResponseEntity.status(HttpStatus.OK).body(authorService.getAuthorById(authorId));
     }
 
@@ -53,7 +60,7 @@ public class AuthorController {
     }
 
     @DeleteMapping("/{authorId}")
-    public ResponseEntity<MessageResponse> deleteAuthor(@PathVariable long authorId){
+    public ResponseEntity<MessageResponse> deleteAuthor(@PathVariable Long authorId){
         authorService.deleteAuthor(authorId);
         MessageResponse messageResponse = new MessageResponse(AUTHOR_DELETE_SUCCESS_MESSAGE);
 
