@@ -30,7 +30,7 @@ public class TagController {
     @GetMapping
     public ResponseEntity<Page<TagInfoResponse>> getAllTags(@RequestParam(defaultValue = "0") int page,
                                                             @RequestParam(defaultValue = "10") int size,
-                                                            @RequestParam(defaultValue = "authorName:asc") String[] sort) {
+                                                            @RequestParam(defaultValue = "tagId:asc") String[] sort) {
         Pageable pageable = PageRequestBuilder.createPageable(page, size, sort);
         Page<TagInfoResponse> tags = tagService.getAllTags(pageable);
         return new ResponseEntity<>(tags, HttpStatus.OK);

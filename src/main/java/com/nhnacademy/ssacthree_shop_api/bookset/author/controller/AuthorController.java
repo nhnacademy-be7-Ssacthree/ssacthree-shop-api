@@ -30,7 +30,7 @@ public class AuthorController {
     @GetMapping
     public ResponseEntity<Page<AuthorGetResponse>> getAllAuthors(@RequestParam(defaultValue = "0") int page,
                                                                  @RequestParam(defaultValue = "10") int size,
-                                                                 @RequestParam(defaultValue = "authorName:asc") String[] sort) {
+                                                                 @RequestParam(defaultValue = "authorId:asc") String[] sort) {
         Pageable pageable = PageRequestBuilder.createPageable(page, size, sort);
         Page<AuthorGetResponse> authors = authorService.getAllAuthors(pageable);
         return new ResponseEntity<>(authors, HttpStatus.OK);

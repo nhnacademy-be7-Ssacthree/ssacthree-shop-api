@@ -26,7 +26,7 @@ public class PublisherController {
     @GetMapping
     public ResponseEntity<Page<PublisherGetResponse>> getAllPublishers(@RequestParam(defaultValue = "0") int page,
                                                                        @RequestParam(defaultValue = "10") int size,
-                                                                       @RequestParam(defaultValue = "authorName:asc") String[] sort) {
+                                                                       @RequestParam(defaultValue = "publisherId:asc") String[] sort) {
         Pageable pageable = PageRequestBuilder.createPageable(page, size, sort);
         Page<PublisherGetResponse> publishers = publisherService.getAllPublishers(pageable);
         return new ResponseEntity<>(publishers, HttpStatus.OK);
