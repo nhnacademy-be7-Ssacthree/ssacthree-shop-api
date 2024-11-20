@@ -136,6 +136,8 @@ public class BookMgmtServiceImpl implements BookMgmtService {
         Book book = bookRepository.findBookByBookIsbn(bookSaveRequest.getBookIsbn())
                 .orElseThrow(() -> new BookNotFoundException(BOOK_ISBN_NOT_FOUND_MESSAGE));
 
+
+
         // 출판사 설정
         Publisher publisher = publisherRepository.findById(bookSaveRequest.getPublisherId())
                 .orElseThrow(() -> new NotFoundException(PUBLISHER_NOT_FOUND_MESSAGE));
