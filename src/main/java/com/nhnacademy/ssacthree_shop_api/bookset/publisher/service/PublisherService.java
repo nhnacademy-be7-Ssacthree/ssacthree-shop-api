@@ -53,6 +53,10 @@ public class PublisherService {
         return publisherRepository.save(publisher);
     }
 
+    public List<PublisherGetResponse> getAllPublisherList() {
+        return publisherRepository.findAllPublisherList();
+    }
+
     public Publisher updatePublisher(PublisherUpdateRequest publisherUpdateRequest) {
 
         Long publisherId = publisherUpdateRequest.getPublisherId();

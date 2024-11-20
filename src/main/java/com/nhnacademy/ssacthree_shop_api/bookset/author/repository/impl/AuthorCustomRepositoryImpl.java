@@ -5,6 +5,8 @@ import com.nhnacademy.ssacthree_shop_api.bookset.author.dto.AuthorGetResponse;
 import com.nhnacademy.ssacthree_shop_api.bookset.author.repository.AuthorCustomRepository;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -19,6 +21,9 @@ public class AuthorCustomRepositoryImpl implements AuthorCustomRepository {
     private final JPAQueryFactory queryFactory;
 
     private static final QAuthor author = QAuthor.author;
+
+    @PersistenceContext
+    private EntityManager entityManager;
 
     @Override
     public Page<AuthorGetResponse> findAllAuthors(Pageable pageable) {
@@ -42,6 +47,22 @@ public class AuthorCustomRepositoryImpl implements AuthorCustomRepository {
     }
 
     @Override
+    public List<AuthorGetResponse> findAllAuthorList(){
+        QAuthor qAuthor = QAuthor.author;
+
+        return new JPAQueryFactory(entityManager)
+                .select(Projections.constructor(
+                        AuthorGetResponse.class,
+                        qAuthor.authorId,
+                        qAuthor.authorName,
+                        qAuthor.authorInfo
+                ))
+                .from(qAuthor)
+                .orderBy(qAuthor.authorId.asc())
+                .fetch();
+    }
+
+    @Override
     public AuthorGetResponse findAuthorById(Long authorId) {
         return queryFactory.select(Projections.constructor(
                     AuthorGetResponse.class,
@@ -53,6 +74,4 @@ public class AuthorCustomRepositoryImpl implements AuthorCustomRepository {
                 .where(author.authorId.eq(authorId))
                 .fetchOne();
     }
-
-
 }

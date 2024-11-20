@@ -4,4 +4,8 @@ public class CategoryNotFoundException extends RuntimeException {
     public CategoryNotFoundException(long categoryId) {
         super("categoryId: " + categoryId + "과 일치하는 카테고리가 존재하지 않습니다.");
     }
+
+    public CategoryNotFoundException(String message) {
+        super(message);
+    }
 }

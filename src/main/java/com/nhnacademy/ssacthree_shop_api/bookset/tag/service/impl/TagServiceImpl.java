@@ -39,4 +39,9 @@ public class TagServiceImpl implements TagService {
     public Page<TagInfoResponse> getAllTags(Pageable pageable) {
         return tagRepository.findAllTags(pageable);
     }
+
+    @Override
+    public List<TagInfoResponse> getAllTagList(){
+        return tagRepository.findAllTagList();
+    }
 }

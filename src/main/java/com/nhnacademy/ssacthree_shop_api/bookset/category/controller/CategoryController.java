@@ -36,6 +36,16 @@ public class CategoryController {
     }
 
     /**
+     *
+     */
+    @GetMapping("/admin/categories")
+    public ResponseEntity<List<CategoryInfoResponse>> getAllCategoriesForAdmin(){
+        List<CategoryInfoResponse> categoryInfoResponses = categoryService.getAllCategories();
+        return new ResponseEntity<>(categoryInfoResponses, HttpStatus.OK);
+    }
+
+
+    /**
      * 전체 카테고리 트리 조회
      *
      * @return 전체 카테고리 트리 정보

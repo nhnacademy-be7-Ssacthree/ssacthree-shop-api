@@ -1,10 +1,10 @@
 package com.nhnacademy.ssacthree_shop_api.bookset.book.dto.response;
 
+import com.nhnacademy.ssacthree_shop_api.bookset.author.dto.AuthorNameResponse;
 import com.nhnacademy.ssacthree_shop_api.bookset.publisher.dto.PublisherNameResponse;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 import java.time.LocalDateTime;
 
@@ -30,4 +30,6 @@ public class BookBaseResponse {
 
     // FK
     private PublisherNameResponse publisher;
+
+    private AuthorNameResponse authors;
 }

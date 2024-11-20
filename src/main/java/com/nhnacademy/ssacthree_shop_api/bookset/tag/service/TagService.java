@@ -14,4 +14,6 @@ public interface TagService {
     MessageResponse saveTag(TagCreateRequest tagCreateRequest);
 
     Page<TagInfoResponse> getAllTags(Pageable pageable);
+
+    List<TagInfoResponse> getAllTagList();
 }

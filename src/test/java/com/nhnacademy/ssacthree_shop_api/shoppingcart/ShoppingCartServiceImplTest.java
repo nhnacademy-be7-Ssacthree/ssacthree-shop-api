@@ -49,7 +49,7 @@ class ShoppingCartServiceImplTest {
         Book mockBook = new Book(101L, "Test Book", "Index", "Info", "ISBN123", null, 20000, 15000,
             true, 10, "image_url", 100, 25, null, null, null, null, null);
 
-        when(bookRepository.findByBookId(101L)).thenReturn(Optional.of(mockBook));
+        when(bookRepository.findBookByBookId(101L)).thenReturn(Optional.of(mockBook));
 
         // 테스트 실행
         ShoppingCartItemResponse response = shoppingCartService.getBookByBookId(101L);
@@ -57,7 +57,7 @@ class ShoppingCartServiceImplTest {
         // 검증
         assertEquals(101L, response.getId());
         assertEquals("Test Book", response.getTitle());
-        verify(bookRepository, times(1)).findByBookId(101L);
+        verify(bookRepository, times(1)).findBookByBookId(101L);
     }
 
     @Test
@@ -70,7 +70,7 @@ class ShoppingCartServiceImplTest {
         ShoppingCartRequest cartRequest = new ShoppingCartRequest(101L, 2);
 
         when(customerRepository.findById(1L)).thenReturn(Optional.of(mockCustomer));
-        when(bookRepository.findByBookId(101L)).thenReturn(Optional.of(mockBook));
+        when(bookRepository.findBookByBookId(101L)).thenReturn(Optional.of(mockBook));
         when(shoppingCartRepository.findById(any(ShoppingCartId.class))).thenReturn(
             Optional.empty());
 

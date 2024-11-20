@@ -15,6 +15,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Objects;
 
 @Service
@@ -24,8 +25,6 @@ public class AuthorServiceImpl implements AuthorService {
     private final static String AUTHOR_CREATE_ERROR_MESSAGE = "작가 정보 생성에 실패했습니다.";
     private final static String AUTHOR_ID_ERROR_MESSAGE = "authorId는 1보다 작을 수 없습니다.";
     private final static String AUTHOR_NOT_FOUND_MESSAGE = "해당 아이디를 찾을 수 없습니다.:";
-    @PersistenceContext
-    private EntityManager entityManager;
 
     private final AuthorRepository authorRepository;
 
@@ -64,6 +63,11 @@ public class AuthorServiceImpl implements AuthorService {
     @Override
     public Page<AuthorGetResponse> getAllAuthors(Pageable pageable) {
         return authorRepository.findAllAuthors(pageable);
+    }
+
+    @Override
+    public List<AuthorGetResponse> getAllAuthorList(){
+        return authorRepository.findAllAuthorList();
     }
 
     @Override

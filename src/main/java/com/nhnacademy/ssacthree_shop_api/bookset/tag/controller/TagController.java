@@ -9,6 +9,7 @@ import java.util.List;
 import com.nhnacademy.ssacthree_shop_api.commons.paging.PageRequestBuilder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -34,6 +35,11 @@ public class TagController {
         Pageable pageable = PageRequestBuilder.createPageable(page, size, sort);
         Page<TagInfoResponse> tags = tagService.getAllTags(pageable);
         return new ResponseEntity<>(tags, HttpStatus.OK);
+    }
+
+    @GetMapping("/lists")
+    public ResponseEntity<List<TagInfoResponse>> getAllTagList() {
+        return ResponseEntity.ok().body(tagService.getAllTagList());
     }
 
 }

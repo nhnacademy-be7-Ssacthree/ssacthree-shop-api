@@ -12,9 +12,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
-public interface BookRepository extends JpaRepository<Book, Long>, BookCustomRepository {
+public interface BookRepository extends JpaRepository<Book, Long>, BookCustomRepository, BookMgmtRepository {
 
     // 도서 재고 검색
     Integer findStockByBookId(Long bookId);
@@ -22,5 +23,9 @@ public interface BookRepository extends JpaRepository<Book, Long>, BookCustomRep
     // 도서 조회수 검색
     Integer findBookViewCountByBookId(Long bookId);
 
-    Optional<Book> findByBookId(Long bookId);
+    Optional<Book> findBookByBookIsbn(String bookIsbn);
+
+    Optional<Book> findBookByBookId(Long bookId);
+
+
 }
