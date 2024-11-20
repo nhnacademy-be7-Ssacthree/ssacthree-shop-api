@@ -1,6 +1,6 @@
 package com.nhnacademy.ssacthree_shop_api.review.controller;
 
-import com.nhnacademy.ssacthree_shop_api.review.dto.ReviewRequest;
+import com.nhnacademy.ssacthree_shop_api.review.dto.ReviewRequestWithUrl;
 import com.nhnacademy.ssacthree_shop_api.review.dto.ReviewResponse;
 import com.nhnacademy.ssacthree_shop_api.review.service.ReviewService;
 import java.util.List;
@@ -34,7 +34,7 @@ public class ReviewController {
         @RequestHeader(name = "X-USER-ID") String header,
         @RequestParam("book-id") Long bookId,
         @RequestParam("order-id") Long orderId,
-        @RequestBody ReviewRequest reviewRequest) {
+        @RequestBody ReviewRequestWithUrl reviewRequest) {
         ResponseEntity<Void> responseEntity = reviewService.postReviewBook(header,bookId,orderId,reviewRequest);
 
         return responseEntity;

@@ -52,7 +52,6 @@ public class Review {
     @NotNull
     private LocalDateTime reviewCreatedAt = LocalDateTime.now();
 
-    @Null
     private String reviewImageUrl;
 
     public Review(ReviewId reviewId, Order order, Book book, Customer customer, int reviewRate, String reviewTitle,

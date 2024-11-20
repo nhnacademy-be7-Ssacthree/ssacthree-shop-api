@@ -13,11 +13,10 @@ import com.nhnacademy.ssacthree_shop_api.orderset.orderdetail.domain.domain.Orde
 import com.nhnacademy.ssacthree_shop_api.orderset.orderdetail.domain.repo.OrderDetailRepository;
 import com.nhnacademy.ssacthree_shop_api.review.domain.Review;
 import com.nhnacademy.ssacthree_shop_api.review.domain.ReviewId;
-import com.nhnacademy.ssacthree_shop_api.review.dto.ReviewRequest;
+import com.nhnacademy.ssacthree_shop_api.review.dto.ReviewRequestWithUrl;
 import com.nhnacademy.ssacthree_shop_api.review.dto.ReviewResponse;
 import com.nhnacademy.ssacthree_shop_api.review.repository.ReviewRepository;
 import com.nhnacademy.ssacthree_shop_api.review.service.ReviewService;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -57,7 +56,7 @@ public class ReviewServiceImpl implements ReviewService {
 
     @Override //리뷰 작성 저장
     public ResponseEntity<Void> postReviewBook(String header, Long bookId, Long orderId,
-        ReviewRequest reviewRequest) {
+        ReviewRequestWithUrl reviewRequest) {
 
         Member member = memberRepository.findByMemberLoginId(header).orElseThrow(() -> new MemberNotFoundException("member not found"));
         Order order = orderRepository.findById(orderId).orElseThrow(() -> new NotFoundOrderException("order not found"));
@@ -65,7 +64,7 @@ public class ReviewServiceImpl implements ReviewService {
 
         ReviewId reviewId = new ReviewId(orderId,bookId);
 
-        Review review = new Review(reviewId,order,book,member.getCustomer(),reviewRequest.getReviewRate(),reviewRequest.getReviewTitle(),reviewRequest.getReviewContent(),null/*reviewRequest.getReviewImageUrl()*/); //일단 사진 저장 보류
+        Review review = new Review(reviewId,order,book,member.getCustomer(),reviewRequest.getReviewRate(),reviewRequest.getReviewTitle(),reviewRequest.getReviewContent(),reviewRequest.getReviewImageUrl()); //일단 사진 저장 보류
 
         reviewRepository.save(review);
 
