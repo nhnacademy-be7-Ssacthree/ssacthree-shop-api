@@ -31,5 +31,4 @@ public class BookBaseResponse {
     // FK
     private PublisherNameResponse publisher;
 
-    private AuthorNameResponse authors;
 }
