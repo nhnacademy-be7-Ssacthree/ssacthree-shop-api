@@ -40,4 +40,15 @@ public class PublisherCustomRepositoryImpl implements PublisherCustomRepository 
 
         return new PageImpl<>(publishers, pageable, count);
     }
+
+    @Override
+    public List<PublisherGetResponse> findAllPublisherList(){
+        return queryFactory.select(Projections.constructor(
+                        PublisherGetResponse.class,
+                        publisher.publisherId,
+                        publisher.publisherName,
+                        publisher.publisherIsUsed))
+                .from(publisher)
+                .fetch();
+    }
 }

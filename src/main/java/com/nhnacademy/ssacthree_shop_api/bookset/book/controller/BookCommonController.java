@@ -76,13 +76,33 @@ public class BookCommonController {
      * @return 작가의 도서 페이지
      */
     //todo:@RequestParam 써서 해봐야겠다.
-    @GetMapping("/author/{author-id}")
+    @GetMapping("/authors/{author-id}")
     public ResponseEntity<Page<BookInfoResponse>> getBookByAuthorId(@RequestParam(defaultValue = "0") int page,
                                                                     @RequestParam(defaultValue = "10") int size,
                                                                     @RequestParam(defaultValue = "bookName:asc") String[] sort,
                                                                     @PathVariable(name = "author-id") Long authorId) {
         Pageable pageable = PageRequestBuilder.createPageable(page, size, sort);
         Page<BookInfoResponse> books = bookCommonService.getBooksByAuthorId(pageable, authorId);
+        return new ResponseEntity<>(books, HttpStatus.OK);
+    }
+
+    @GetMapping("/categories/{category-id}")
+    public ResponseEntity<Page<BookInfoResponse>> getBooksByCategoryId(@RequestParam(defaultValue = "0") int page,
+                                                                       @RequestParam(defaultValue = "10") int size,
+                                                                       @RequestParam(defaultValue = "bookName:asc") String[] sort,
+                                                                       @PathVariable(name = "category-id") Long categoryId) {
+        Pageable pageable = PageRequestBuilder.createPageable(page, size, sort);
+        Page<BookInfoResponse> books = bookCommonService.getBooksByCategoryId(pageable, categoryId);
+        return new ResponseEntity<>(books, HttpStatus.OK);
+    }
+
+    @GetMapping("/tags/{tag-id}")
+    public ResponseEntity<Page<BookInfoResponse>> getBooksByTagId(@RequestParam(defaultValue = "0") int page,
+                                                                       @RequestParam(defaultValue = "10") int size,
+                                                                       @RequestParam(defaultValue = "bookName:asc") String[] sort,
+                                                                       @PathVariable(name = "tag-id") Long tagId) {
+        Pageable pageable = PageRequestBuilder.createPageable(page, size, sort);
+        Page<BookInfoResponse> books = bookCommonService.getBooksByTagId(pageable, tagId);
         return new ResponseEntity<>(books, HttpStatus.OK);
     }
 

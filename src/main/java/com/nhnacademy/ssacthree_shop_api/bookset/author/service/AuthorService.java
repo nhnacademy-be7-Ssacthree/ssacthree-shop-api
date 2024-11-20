@@ -17,6 +17,8 @@ public interface AuthorService {
 
     Page<AuthorGetResponse> getAllAuthors(Pageable pageable);
 
+    List<AuthorGetResponse> getAllAuthorList();
+
     AuthorGetResponse getAuthorById(Long authorId);
 
     void deleteAuthor(Long authorId);

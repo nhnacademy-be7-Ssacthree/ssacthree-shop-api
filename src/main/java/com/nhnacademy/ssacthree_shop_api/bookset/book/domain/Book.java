@@ -94,5 +94,17 @@ public class Book {
         this.isPacked = isPacked;
     }
 
+    public void clearCategories() {
+        bookCategories.clear();
+    }
+
+    public void clearTags() {
+        bookTags.clear();
+    }
+
+    public void clearAuthors() {
+        bookAuthors.clear();
+    }
+
 
 }

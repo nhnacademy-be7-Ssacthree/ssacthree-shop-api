@@ -40,4 +40,14 @@ public class TagCustomRepositoryImpl implements TagCustomRepository {
 
         return new PageImpl<>(tags, pageable, count);
     }
+
+    @Override
+    public List<TagInfoResponse> findAllTagList(){
+        return queryFactory.select(Projections.constructor(
+                        TagInfoResponse.class,
+                        tag.tagId,
+                        tag.tagName))
+                .from(tag)
+                .fetch();
+    }
 }

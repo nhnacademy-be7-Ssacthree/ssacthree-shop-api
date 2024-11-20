@@ -24,6 +24,7 @@ import com.nhnacademy.ssacthree_shop_api.memberset.pointsaverule.domain.PointSav
 import com.nhnacademy.ssacthree_shop_api.memberset.pointsaverule.exception.PointSaveRuleNotFoundException;
 import com.nhnacademy.ssacthree_shop_api.memberset.pointsaverule.repository.PointSaveRuleRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,6 +32,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 @Transactional
+@Slf4j
 public class MemberServiceImpl implements MemberService {
 
     private final MemberRepository memberRepository;
@@ -91,11 +93,6 @@ public class MemberServiceImpl implements MemberService {
         return memberCustomRepository.getMemberWithCustomer(
             memberLoginId);
     }
-
-//    @Override
-//    public void updateMember(String memberLoginId, MemberUpdateRequest memberUpdateRequest) {
-//
-//    }
 
     /**
      * 멤버 정보 업데이트 메소드

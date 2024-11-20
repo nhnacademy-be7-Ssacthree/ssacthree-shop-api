@@ -32,6 +32,11 @@ public class PublisherController {
         return new ResponseEntity<>(publishers, HttpStatus.OK);
     }
 
+    @GetMapping("/lists")
+    public ResponseEntity<List<PublisherGetResponse>> getAllPublisherList(){
+        return ResponseEntity.ok().body(publisherService.getAllPublisherList());
+    }
+
     @PutMapping
     ResponseEntity<MessageResponse> updatePublisher(
             @Valid @RequestBody PublisherUpdateRequest publisherUpdateRequest) {
