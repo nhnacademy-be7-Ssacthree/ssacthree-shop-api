@@ -1,6 +1,7 @@
 package com.nhnacademy.ssacthree_shop_api.couponset.couponrule.domain;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.*;
@@ -24,7 +25,7 @@ public class CouponRule {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="coupon_rule_id")
-    private long id;
+    private Long id;
 
     @NotNull
     private CouponType couponType;
@@ -39,7 +40,7 @@ public class CouponRule {
     @NotNull
     private int couponDiscountPrice;
 
-    @NotNull
+    @NotBlank
     @Size(max = 20)
     private String couponRuleName;
 

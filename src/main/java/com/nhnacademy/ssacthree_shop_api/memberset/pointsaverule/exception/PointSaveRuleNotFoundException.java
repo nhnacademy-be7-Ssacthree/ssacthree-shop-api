@@ -1,7 +1,10 @@
 package com.nhnacademy.ssacthree_shop_api.memberset.pointsaverule.exception;
 
-public class PointSaveRuleNotFoundException extends RuntimeException {
-  public PointSaveRuleNotFoundException(String message) {
-    super(message);
-  }
+import com.nhnacademy.ssacthree_shop_api.commons.exception.NotFoundException;
+
+public class PointSaveRuleNotFoundException extends NotFoundException {
+
+    public PointSaveRuleNotFoundException(String message) {
+        super(message);
+    }
 }

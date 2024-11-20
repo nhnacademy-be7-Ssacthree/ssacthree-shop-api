@@ -31,6 +31,8 @@ public class PointHistoryCustomRepositoryImpl implements PointHistoryCustomRepos
                     qPointHistory.pointChangeReason))
             .from(qPointHistory)
             .where(qPointHistory.member.customer.customerId.eq(customerId))
+            .offset(pageable.getOffset())
+            .limit(pageable.getPageSize())
             .fetch();
 
         return new PageImpl<>(pointHistoryGetResponseList, pageable,

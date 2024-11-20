@@ -11,7 +11,6 @@ import com.nhnacademy.ssacthree_shop_api.memberset.member.repository.MemberRepos
 import com.nhnacademy.ssacthree_shop_api.shoppingcart.domain.ShoppingCart;
 import com.nhnacademy.ssacthree_shop_api.shoppingcart.domain.ShoppingCartId;
 import com.nhnacademy.ssacthree_shop_api.shoppingcart.dto.ShoppingCartItemResponse;
-import com.nhnacademy.ssacthree_shop_api.shoppingcart.dto.ShoppingCartItemResponseWithCustomerId;
 import com.nhnacademy.ssacthree_shop_api.shoppingcart.dto.ShoppingCartRequest;
 import com.nhnacademy.ssacthree_shop_api.shoppingcart.repository.ShoppingCartRepository;
 import com.nhnacademy.ssacthree_shop_api.shoppingcart.service.ShoppingCartService;
@@ -39,7 +38,6 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
 
         List<ShoppingCart> shoppingCarts = shoppingCartRepository.findByCustomer_CustomerId(
             member.getId());
-
 
         return shoppingCarts.stream()
             .map(cart -> new ShoppingCartItemResponse(
@@ -79,16 +77,16 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
             boolean same = false;
             for (ShoppingCartRequest shoppingCartRequest : cartList) {
                 ShoppingCartId existShoppingCartId = shoppingCart.getShoppingCartId();
-                ShoppingCartId newShoppingCartId = new ShoppingCartId(customerId,shoppingCartRequest.getBookId());
-                if(existShoppingCartId.equals(newShoppingCartId)) {
+                ShoppingCartId newShoppingCartId = new ShoppingCartId(customerId,
+                    shoppingCartRequest.getBookId());
+                if (existShoppingCartId.equals(newShoppingCartId)) {
                     same = true;
                 }
             }
-            if(!same) {
+            if (!same) {
                 shoppingCartRepository.delete(shoppingCart);
             }
         }
-
 
         for (ShoppingCartRequest cartItem : cartList) {
             // 필요한 개수와 항목 정보 추출
@@ -102,14 +100,13 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
             ShoppingCart existingCart = shoppingCartRepository.findById(shoppingCartId)
                 .orElse(null);
 
-
             if (existingCart != null) {
                 // 존재할 경우 수량 업데이트
                 existingCart.addBookQuantity(quantity);
                 shoppingCartRepository.save(existingCart);
             } else {
                 // 존재하지 않을 경우 새로 생성
-                ShoppingCart newCart = new ShoppingCart(shoppingCartId,customer, book,
+                ShoppingCart newCart = new ShoppingCart(shoppingCartId, customer, book,
                     quantity);
                 shoppingCartRepository.save(newCart);
             }
@@ -123,7 +120,7 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
             .orElseThrow(() -> new MemberNotFoundException("member not found"));
         Long customerId = member.getCustomer().getCustomerId();
 
-        saveCart(cartList,customerId);
+        saveCart(cartList, customerId);
     }
 
 }

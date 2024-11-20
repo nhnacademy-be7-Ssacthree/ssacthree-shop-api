@@ -17,4 +17,8 @@ public class PublisherNameResponse {
         this.publisherId = publisher.getPublisherId();
         this.publisherName = publisher.getPublisherName();
     }
+
+    public PublisherNameResponse(String publisherName){
+        this.publisherName = publisherName;
+    }
 }

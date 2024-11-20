@@ -1,14 +1,15 @@
 package com.nhnacademy.ssacthree_shop_api.shoppingcart;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import com.nhnacademy.ssacthree_shop_api.bookset.book.domain.Book;
-import com.nhnacademy.ssacthree_shop_api.bookset.book.exception.BookNotFoundException;
 import com.nhnacademy.ssacthree_shop_api.bookset.book.repository.BookRepository;
 import com.nhnacademy.ssacthree_shop_api.customer.domain.Customer;
 import com.nhnacademy.ssacthree_shop_api.customer.repository.CustomerRepository;
-import com.nhnacademy.ssacthree_shop_api.memberset.member.domain.Member;
 import com.nhnacademy.ssacthree_shop_api.memberset.member.repository.MemberRepository;
 import com.nhnacademy.ssacthree_shop_api.shoppingcart.domain.ShoppingCart;
 import com.nhnacademy.ssacthree_shop_api.shoppingcart.domain.ShoppingCartId;
@@ -18,11 +19,9 @@ import com.nhnacademy.ssacthree_shop_api.shoppingcart.repository.ShoppingCartRep
 import com.nhnacademy.ssacthree_shop_api.shoppingcart.service.impl.ShoppingCartServiceImpl;
 import java.util.List;
 import java.util.Optional;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
