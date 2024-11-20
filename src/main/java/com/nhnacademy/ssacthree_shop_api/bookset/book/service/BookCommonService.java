@@ -22,7 +22,15 @@ public interface BookCommonService {
     // 도서 ISBN으로 도서 검색
     BookInfoResponse getBooksByBookIsbn(String isbn);
 
+    // 작가 아이디로 도서 찾기
     Page<BookInfoResponse> getBooksByAuthorId(Pageable pageable, Long authorId);
 
+    // 도서의 카테고리 찾기
     List<CategoryNameResponse> getCategoriesByBookId(Long bookId);
+
+    // 카테고리 아이디로 소속 도서 찾기
+    Page<BookInfoResponse> getBooksByCategoryId(Pageable pageable, Long categoryId);
+
+    // 태그 아이디로 소속 도서 찾기
+    Page<BookInfoResponse> getBooksByTagId(Pageable pageable, Long tagId);
 }
