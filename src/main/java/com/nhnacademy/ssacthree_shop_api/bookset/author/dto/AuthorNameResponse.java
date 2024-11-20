@@ -2,9 +2,11 @@ package com.nhnacademy.ssacthree_shop_api.bookset.author.dto;
 
 import com.nhnacademy.ssacthree_shop_api.bookset.author.domain.Author;
 import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+@Data
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor

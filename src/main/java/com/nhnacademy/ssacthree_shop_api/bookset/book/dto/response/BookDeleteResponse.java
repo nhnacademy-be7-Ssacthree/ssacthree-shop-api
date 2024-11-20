@@ -7,26 +7,26 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @AllArgsConstructor
 @Getter
 @NoArgsConstructor
-public class BookSearchResponse {
+public class BookDeleteResponse {
     private Long bookId;
     private String bookName;
     private String bookInfo;
     private BookStatus bookStatus;
+    private int stock;
 
     @Setter
     private List<AuthorNameResponse> authors;
 
-    public BookSearchResponse(Long bookId, String bookName, String bookInfo, BookStatus bookStatus) {
+    public BookDeleteResponse(Long bookId, String bookName, String bookInfo, BookStatus bookStatus,int stock) {
         this.bookId = bookId;
         this.bookName = bookName;
         this.bookInfo = bookInfo;
         this.bookStatus = BookStatus.ON_SALE;
+        this.stock = stock;
     }
-
 }

@@ -1,21 +1,26 @@
 package com.nhnacademy.ssacthree_shop_api.bookset.book.dto.mapper;
 
 import com.nhnacademy.ssacthree_shop_api.bookset.author.domain.Author;
+import com.nhnacademy.ssacthree_shop_api.bookset.author.dto.AuthorNameResponse;
 import com.nhnacademy.ssacthree_shop_api.bookset.author.repository.AuthorRepository;
 import com.nhnacademy.ssacthree_shop_api.bookset.book.domain.Book;
 import com.nhnacademy.ssacthree_shop_api.bookset.book.domain.BookStatus;
 import com.nhnacademy.ssacthree_shop_api.bookset.book.domain.converter.BookStatusConverter;
 import com.nhnacademy.ssacthree_shop_api.bookset.book.dto.request.BookSaveRequest;
+import com.nhnacademy.ssacthree_shop_api.bookset.book.dto.response.BookInfoResponse;
 import com.nhnacademy.ssacthree_shop_api.bookset.bookauthor.domain.BookAuthor;
 import com.nhnacademy.ssacthree_shop_api.bookset.bookauthor.repository.BookAuthorRepository;
 import com.nhnacademy.ssacthree_shop_api.bookset.bookcategory.domain.BookCategory;
 import com.nhnacademy.ssacthree_shop_api.bookset.booktag.domain.BookTag;
 import com.nhnacademy.ssacthree_shop_api.bookset.category.domain.Category;
+import com.nhnacademy.ssacthree_shop_api.bookset.category.dto.response.CategoryNameResponse;
 import com.nhnacademy.ssacthree_shop_api.bookset.category.repository.CategoryRepository;
 import com.nhnacademy.ssacthree_shop_api.bookset.publisher.domain.Publisher;
+import com.nhnacademy.ssacthree_shop_api.bookset.publisher.dto.PublisherNameResponse;
 import com.nhnacademy.ssacthree_shop_api.bookset.publisher.repository.PublisherRepository;
 
 import com.nhnacademy.ssacthree_shop_api.bookset.tag.domain.Tag;
+import com.nhnacademy.ssacthree_shop_api.bookset.tag.dto.response.TagInfoResponse;
 import com.nhnacademy.ssacthree_shop_api.bookset.tag.repository.TagRepository;
 import jakarta.ws.rs.NotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -76,5 +81,39 @@ public class BookMapper {
 
         return book;
     }
+
+    public BookInfoResponse bookToBookInfoResponse(Book book) {
+        // Book 엔티티의 기본 정보 설정
+        BookInfoResponse response = BookInfoResponse.builder()
+                .bookId(book.getBookId())
+                .bookName(book.getBookName())
+                .bookIndex(book.getBookIndex())
+                .bookInfo(book.getBookInfo())
+                .bookIsbn(book.getBookIsbn())
+                .publicationDate(book.getPublicationDate()) // LocalDateTime -> LocalDate 변환
+                .regularPrice(book.getRegularPrice())
+                .salePrice(book.getSalePrice())
+                .isPacked(book.getIsPacked())
+                .stock(book.getStock())
+                .bookThumbnailImageUrl(book.getBookThumbnailImageUrl())
+                .bookViewCount(book.getBookViewCount())
+                .bookDiscount(book.getBookDiscount())
+                .bookStatus(book.getBookStatus().toString())
+                .publisher(new PublisherNameResponse(book.getPublisher().getPublisherName()))
+                .categories(book.getBookCategories().stream()
+                        .map(bookCategory -> new CategoryNameResponse(bookCategory.getCategory().getCategoryName()))
+                        .toList()) // CategoryNameResponse 리스트로 변환
+                .authors(book.getBookAuthors().stream()
+                        .map(bookAuthor -> new AuthorNameResponse(bookAuthor.getAuthor().getAuthorName()))
+                        .toList()) // AuthorNameResponse 리스트로 변환
+                .tags(book.getBookTags().stream()
+                        .map(bookTag -> new TagInfoResponse(bookTag.getTag().getTagName()))
+                        .toList()) // TagInfoResponse 리스트로 변환
+                .build();
+
+        return response;
+    }
+
+
 
 }

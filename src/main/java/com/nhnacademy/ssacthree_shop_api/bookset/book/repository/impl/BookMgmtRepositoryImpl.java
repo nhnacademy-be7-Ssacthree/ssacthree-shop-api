@@ -55,7 +55,8 @@ public class BookMgmtRepositoryImpl implements BookMgmtRepository {
                 .select(Projections.constructor(BookSearchResponse.class,
                         book.bookId,
                         book.bookName,
-                        book.bookInfo
+                        book.bookInfo,
+                        book.bookStatus
                 ))
                 .from(book)
                 .offset(pageable.getOffset())
@@ -80,119 +81,6 @@ public class BookMgmtRepositoryImpl implements BookMgmtRepository {
 
         return new PageImpl<>(books, pageable, total);
     }
-
-
-    @Override
-    public Page<BookInfoResponse> findBooksByBookId(Long bookId, Pageable pageable) {
-        List<BookInfoResponse> books = queryFactory
-                .select(Projections.constructor(BookInfoResponse.class,
-                        book.bookId,
-                        book.bookName,
-                        book.bookIndex,
-                        book.bookInfo,
-                        book.bookIsbn,
-                        book.publicationDate,
-                        book.regularPrice,
-                        book.salePrice,
-                        book.isPacked,
-                        book.stock,
-                        book.bookThumbnailImageUrl,
-                        book.bookViewCount,
-                        book.bookDiscount,
-                        book.bookStatus.stringValue(),
-                        Projections.constructor(PublisherNameResponse.class,
-                                publisher.publisherId,
-                                publisher.publisherName)
-                ))
-                .from(book)
-                .join(bookAuthor).on(book.bookId.eq(bookAuthor.book.bookId))
-                .join(author).on(author.authorId.eq(bookAuthor.author.authorId))
-                .offset(pageable.getOffset())
-                .limit(pageable.getPageSize())
-                .fetch();
-
-        books.forEach(bookInfo -> {
-            List<AuthorNameResponse> authors = queryFactory
-                    .select(Projections.constructor(AuthorNameResponse.class,
-                            author.authorName))
-                    .from(author)
-                    .join(bookAuthor).on(author.authorId.eq(bookAuthor.author.authorId))
-                    .where(bookAuthor.book.bookId.eq(bookInfo.getBookId()))
-                    .fetch();
-            bookInfo.setAuthors(authors);
-
-            List<CategoryNameResponse> categories = queryFactory
-                    .select(Projections.constructor(CategoryNameResponse.class,
-                            category.categoryName,
-                            category.superCategory))
-                    .from(category)
-                    .join(bookCategory).on(category.categoryId.eq(bookCategory.category.categoryId))
-                    .where(bookCategory.book.bookId.eq(bookInfo.getBookId()))
-                    .fetch();
-            bookInfo.setCategories(categories);
-
-            List<TagInfoResponse> tags = queryFactory
-                    .select(Projections.constructor(TagInfoResponse.class,
-                            tag.tagName))
-                    .from(tag)
-                    .join(bookTag).on(tag.tagId.eq(bookTag.tag.tagId))
-                    .where(bookTag.book.bookId.eq(bookInfo.getBookId()))
-                    .fetch();
-            bookInfo.setTags(tags);
-        });
-
-        long total = queryFactory
-                .select(book.bookId)
-                .from(book)
-                .join(bookAuthor).on(book.bookId.eq(bookAuthor.book.bookId))
-                .join(author).on(author.authorId.eq(bookAuthor.author.authorId))
-                .fetchCount();
-
-        return new PageImpl<>(books, pageable, total);
-    }
-
-    @Override
-    public List<BookInfoResponse> findBookByBookIsbnForAdmin(String bookIsbn) {
-        return queryFactory.select(Projections.constructor(BookInfoResponse.class,
-                        book.bookId,
-                        book.bookName,
-                        book.bookIndex,
-                        book.bookInfo,
-                        book.bookIsbn,
-                        book.publicationDate,
-                        book.regularPrice,
-                        book.salePrice,
-                        book.isPacked,
-                        book.stock,
-                        book.bookThumbnailImageUrl,
-                        book.bookViewCount,
-                        book.bookDiscount,
-                        book.bookStatus.stringValue(),
-                        Projections.constructor(PublisherNameResponse.class,
-                                publisher.publisherId,
-                                publisher.publisherName),
-                        Projections.list(Projections.constructor(AuthorNameResponse.class, author.authorName)),
-                        Projections.list(Projections.constructor(CategoryNameResponse.class,
-                                category.categoryId,  // categoryId 추가
-                                category.categoryName,
-                                category.superCategory)),
-                        Projections.list(Projections.constructor(TagInfoResponse.class, tag.tagName))
-                ))
-                .from(book)
-                .leftJoin(book.publisher, publisher)
-                .leftJoin(book.bookAuthors, bookAuthor)
-                .leftJoin(bookAuthor.author, author)
-                .leftJoin(book.bookCategories, bookCategory)
-                .leftJoin(bookCategory.category, category)
-                .leftJoin(book.bookTags, bookTag)
-                .leftJoin(bookTag.tag, tag)
-                .where(book.bookIsbn.eq(bookIsbn))
-                .fetch();
-    }
-
-
-
-
 
     private OrderSpecifier<?>[] getOrderSpecifier(Pageable pageable) {
         Sort sort = pageable.getSort(); // pageable에서 Sort 객체 가져오기

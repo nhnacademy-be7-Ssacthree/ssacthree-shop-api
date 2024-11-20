@@ -54,7 +54,7 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
 
     @Override
     public ShoppingCartItemResponse getBookByBookId(Long bookId) {
-        Book book = bookRepository.findByBookId(bookId)
+        Book book = bookRepository.findBookByBookId(bookId)
             .orElseThrow(() -> new BookNotFoundException("book not found"));
 
         return new ShoppingCartItemResponse(book.getBookId(), book.getBookName(), 1,
@@ -94,7 +94,7 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
             // 필요한 개수와 항목 정보 추출
             int quantity = cartItem.getQuantity();
             Long bookId = cartItem.getBookId();
-            Book book = bookRepository.findByBookId(bookId)
+            Book book = bookRepository.findBookByBookId(bookId)
                 .orElseThrow(() -> new BookNotFoundException("book not found"));
             ShoppingCartId shoppingCartId = new ShoppingCartId(customerId, bookId);
 

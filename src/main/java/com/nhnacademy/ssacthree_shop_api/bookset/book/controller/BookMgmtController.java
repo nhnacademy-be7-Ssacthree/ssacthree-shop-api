@@ -1,6 +1,8 @@
 package com.nhnacademy.ssacthree_shop_api.bookset.book.controller;
 
+import com.nhnacademy.ssacthree_shop_api.bookset.book.dto.request.BookDeleteRequest;
 import com.nhnacademy.ssacthree_shop_api.bookset.book.dto.request.BookSaveRequest;
+import com.nhnacademy.ssacthree_shop_api.bookset.book.dto.request.BookUpdateRequest;
 import com.nhnacademy.ssacthree_shop_api.bookset.book.dto.response.BookBaseResponse;
 import com.nhnacademy.ssacthree_shop_api.bookset.book.dto.response.BookInfoResponse;
 import com.nhnacademy.ssacthree_shop_api.bookset.book.dto.response.BookSearchResponse;
@@ -43,36 +45,30 @@ public class BookMgmtController {
 
     @PostMapping
     public ResponseEntity<MessageResponse> createBook(@Valid @RequestBody BookSaveRequest bookSaveRequest) {
-//        return ResponseEntity.status(HttpStatus.CREATED).contentType(MediaType.APPLICATION_JSON)
-//                .body(bookMgmtService.saveBook(bookSaveRequest));
         bookMgmtService.saveBook(bookSaveRequest);
         MessageResponse messageResponse = new MessageResponse(BOOK_CREATE_SUCCESS_MESSAGE);
         return ResponseEntity.status(HttpStatus.CREATED).body(messageResponse);
     }
 
-    @PutMapping("/{book-id}")
-    public ResponseEntity<MessageResponse> updateBook(@PathVariable(name = "book-id") Long bookId, @Valid @RequestBody BookSaveRequest bookSaveRequest) {
-        bookMgmtService.updateBook(bookId, bookSaveRequest);
+    @PutMapping("/update")
+    public ResponseEntity<MessageResponse> updateBook(@Valid @RequestBody BookSaveRequest bookSaveRequest) {
+        bookMgmtService.updateBook(bookSaveRequest);
         MessageResponse messageResponse = new MessageResponse(BOOK_UPDATE_SUCCESS_MESSAGE);
         return ResponseEntity.status(HttpStatus.OK).body(messageResponse);
     }
 
-    @DeleteMapping("/{book-id}")
-    public ResponseEntity<MessageResponse> deleteBook(@PathVariable(name = "book-id") Long bookId, BookSaveRequest bookSaveRequest) {
-        bookMgmtService.deleteBook(bookId, bookSaveRequest);
+    @DeleteMapping("/delete/{book-id}")
+    public ResponseEntity<MessageResponse> deleteBook(@PathVariable(name = "book-id") Long bookId) {
+        bookMgmtService.deleteBook(bookId);
         MessageResponse messageResponse = new MessageResponse(BOOK_DELETE_SUCCESS_MESSAGE);
         return ResponseEntity.status(HttpStatus.OK).body(messageResponse);
     }
 
+
+    //도서 수정 폼 불러오기
     @GetMapping("/{book-id}")
-    public ResponseEntity<Page<BookInfoResponse>> getBookByBookId(@PathVariable(name = "book-id") Long bookId,
-                                                                    @RequestParam(defaultValue = "0") int page,
-                                                                    @RequestParam(defaultValue = "10") int size,
-                                                                    @RequestParam(defaultValue = "bookName") String[] sortBy){
-
-
-        Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy));
-        Page<BookInfoResponse> books = bookMgmtService.getBookById(bookId, pageable);
+    public ResponseEntity<BookInfoResponse> getBookByBookId(@PathVariable(name = "book-id") Long bookId){
+        BookInfoResponse books = bookMgmtService.getBookById(bookId);
         return new ResponseEntity<>(books, HttpStatus.OK);
     }
 

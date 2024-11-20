@@ -6,12 +6,9 @@ import com.nhnacademy.ssacthree_shop_api.bookset.book.dto.response.BookSearchRes
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-import java.util.List;
 
 public interface BookMgmtRepository {
     Page<BookSearchResponse> findAllBooks(Pageable pageable);
 
-    Page<BookInfoResponse> findBooksByBookId(Long bookId, Pageable pageable);
 
-    List<BookInfoResponse> findBookByBookIsbnForAdmin(String bookIsbn);
 }

@@ -1,4 +1,4 @@
-package com.nhnacademy.ssacthree_shop_api.bookset.book.dto.response;
+package com.nhnacademy.ssacthree_shop_api.bookset.book.dto.request;
 
 import com.nhnacademy.ssacthree_shop_api.bookset.author.dto.AuthorNameResponse;
 import com.nhnacademy.ssacthree_shop_api.bookset.book.domain.BookStatus;
@@ -7,13 +7,12 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @AllArgsConstructor
 @Getter
 @NoArgsConstructor
-public class BookSearchResponse {
+public class BookDeleteRequest {
     private Long bookId;
     private String bookName;
     private String bookInfo;
@@ -22,7 +21,7 @@ public class BookSearchResponse {
     @Setter
     private List<AuthorNameResponse> authors;
 
-    public BookSearchResponse(Long bookId, String bookName, String bookInfo, BookStatus bookStatus) {
+    public BookDeleteRequest(Long bookId, String bookName, String bookInfo) {
         this.bookId = bookId;
         this.bookName = bookName;
         this.bookInfo = bookInfo;

@@ -8,7 +8,6 @@ import com.nhnacademy.ssacthree_shop_api.commons.dto.MessageResponse;
 import com.nhnacademy.ssacthree_shop_api.commons.paging.PageRequestBuilder;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.apache.coyote.Response;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -34,6 +33,11 @@ public class AuthorController {
         Pageable pageable = PageRequestBuilder.createPageable(page, size, sort);
         Page<AuthorGetResponse> authors = authorService.getAllAuthors(pageable);
         return new ResponseEntity<>(authors, HttpStatus.OK);
+    }
+
+    @GetMapping("/lists")
+    public ResponseEntity<List<AuthorGetResponse>> getAllAuthorList(){
+        return ResponseEntity.ok().body(authorService.getAllAuthorList());
     }
 
     @GetMapping("/{authorId}")
