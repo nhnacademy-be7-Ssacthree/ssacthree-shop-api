@@ -5,10 +5,12 @@ import com.nhnacademy.ssacthree_shop_api.customer.domain.Customer;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
+@Getter
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
