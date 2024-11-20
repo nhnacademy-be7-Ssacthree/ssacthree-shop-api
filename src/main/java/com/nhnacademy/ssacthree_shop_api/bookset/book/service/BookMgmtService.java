@@ -3,10 +3,7 @@ package com.nhnacademy.ssacthree_shop_api.bookset.book.service;
 import com.nhnacademy.ssacthree_shop_api.bookset.book.dto.request.BookDeleteRequest;
 import com.nhnacademy.ssacthree_shop_api.bookset.book.dto.request.BookSaveRequest;
 import com.nhnacademy.ssacthree_shop_api.bookset.book.dto.request.BookUpdateRequest;
-import com.nhnacademy.ssacthree_shop_api.bookset.book.dto.response.BookBaseResponse;
-import com.nhnacademy.ssacthree_shop_api.bookset.book.dto.response.BookDeleteResponse;
-import com.nhnacademy.ssacthree_shop_api.bookset.book.dto.response.BookInfoResponse;
-import com.nhnacademy.ssacthree_shop_api.bookset.book.dto.response.BookSearchResponse;
+import com.nhnacademy.ssacthree_shop_api.bookset.book.dto.response.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -20,7 +17,7 @@ public interface BookMgmtService {
     BookInfoResponse saveBook(BookSaveRequest bookSaveRequest);
 
     // 도서 수정
-    BookInfoResponse updateBook(BookSaveRequest bookSaveRequest);
+    BookUpdateResponse updateBook(BookSaveRequest bookSaveRequest);
 
     // 도서 soft 삭제
     BookDeleteResponse deleteBook(Long bookId);

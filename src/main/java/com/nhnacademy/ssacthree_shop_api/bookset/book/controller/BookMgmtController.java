@@ -57,13 +57,12 @@ public class BookMgmtController {
         return ResponseEntity.status(HttpStatus.OK).body(messageResponse);
     }
 
-    @DeleteMapping("/delete/{book-id}")
+    @PutMapping("/delete/{book-id}")
     public ResponseEntity<MessageResponse> deleteBook(@PathVariable(name = "book-id") Long bookId) {
         bookMgmtService.deleteBook(bookId);
         MessageResponse messageResponse = new MessageResponse(BOOK_DELETE_SUCCESS_MESSAGE);
         return ResponseEntity.status(HttpStatus.OK).body(messageResponse);
     }
-
 
     //도서 수정 폼 불러오기
     @GetMapping("/{book-id}")
@@ -71,7 +70,4 @@ public class BookMgmtController {
         BookInfoResponse books = bookMgmtService.getBookById(bookId);
         return new ResponseEntity<>(books, HttpStatus.OK);
     }
-
-
-
 }

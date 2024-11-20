@@ -17,16 +17,16 @@ public class BookSearchResponse {
     private Long bookId;
     private String bookName;
     private String bookInfo;
-    private BookStatus bookStatus;
+    private String bookStatus;
 
     @Setter
     private List<AuthorNameResponse> authors;
 
-    public BookSearchResponse(Long bookId, String bookName, String bookInfo, BookStatus bookStatus) {
+    public BookSearchResponse(Long bookId, String bookName, String bookInfo, String bookStatus) {
         this.bookId = bookId;
         this.bookName = bookName;
         this.bookInfo = bookInfo;
-        this.bookStatus = BookStatus.ON_SALE;
+        this.bookStatus = String.valueOf(bookStatus);
     }
 
 }

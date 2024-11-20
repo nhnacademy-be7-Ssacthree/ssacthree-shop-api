@@ -2,6 +2,7 @@ package com.nhnacademy.ssacthree_shop_api.bookset.book.repository.impl;
 
 import com.nhnacademy.ssacthree_shop_api.bookset.author.domain.QAuthor;
 import com.nhnacademy.ssacthree_shop_api.bookset.author.dto.AuthorNameResponse;
+import com.nhnacademy.ssacthree_shop_api.bookset.book.domain.BookStatus;
 import com.nhnacademy.ssacthree_shop_api.bookset.book.domain.QBook;
 import com.nhnacademy.ssacthree_shop_api.bookset.book.dto.response.BookBaseResponse;
 import com.nhnacademy.ssacthree_shop_api.bookset.book.dto.response.BookInfoResponse;
@@ -22,6 +23,7 @@ import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.PathBuilder;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -33,6 +35,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+@Slf4j
 @Repository
 @RequiredArgsConstructor
 public class BookMgmtRepositoryImpl implements BookMgmtRepository {
@@ -51,19 +54,24 @@ public class BookMgmtRepositoryImpl implements BookMgmtRepository {
 
     @Override
     public Page<BookSearchResponse> findAllBooks(Pageable pageable) {
+        // Modify the query to filter out books with status "삭제 도서"
         List<BookSearchResponse> books = queryFactory
                 .select(Projections.constructor(BookSearchResponse.class,
                         book.bookId,
                         book.bookName,
                         book.bookInfo,
-                        book.bookStatus
+                        book.bookStatus.stringValue() // Get the status as a string
                 ))
                 .from(book)
+                .where(book.bookStatus.ne(BookStatus.DELETE_BOOK)) // Filter out books with status "삭제 도서"
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .orderBy(getOrderSpecifier(pageable))
                 .fetch();
 
+        books.forEach(book -> log.info("bookStatus 확인용: {}", book.getBookStatus())); // 확인용
+
+        // Fetch authors for each book
         books.forEach(b -> {
             List<AuthorNameResponse> authors = queryFactory
                     .select(Projections.constructor(AuthorNameResponse.class, author.authorName))
@@ -74,13 +82,51 @@ public class BookMgmtRepositoryImpl implements BookMgmtRepository {
             b.setAuthors(authors);
         });
 
+        // Fetch the total count of books, excluding the "삭제 도서"
         long total = queryFactory
                 .select(book.bookId)
                 .from(book)
+                .where(book.bookStatus.ne(BookStatus.DELETE_BOOK)) // Filter out books with status "삭제 도서"
                 .fetchCount();
 
         return new PageImpl<>(books, pageable, total);
     }
+
+//    @Override
+//    public Page<BookSearchResponse> findAllBooks(Pageable pageable) {
+//        List<BookSearchResponse> books = queryFactory
+//                .select(Projections.constructor(BookSearchResponse.class,
+//                        book.bookId,
+//                        book.bookName,
+//                        book.bookInfo,
+//                        book.bookStatus.stringValue()
+//                ))
+//                .from(book)
+//                .offset(pageable.getOffset())
+//                .limit(pageable.getPageSize())
+//                .orderBy(getOrderSpecifier(pageable))
+//                .fetch();
+//
+//        books.forEach(book -> log.info("bookStatus 확인용: {}", book.getBookStatus())); // 확인용
+//
+//
+//        books.forEach(b -> {
+//            List<AuthorNameResponse> authors = queryFactory
+//                    .select(Projections.constructor(AuthorNameResponse.class, author.authorName))
+//                    .from(bookAuthor)
+//                    .join(author).on(author.authorId.eq(bookAuthor.author.authorId))
+//                    .where(bookAuthor.book.bookId.eq(b.getBookId()))
+//                    .fetch();
+//            b.setAuthors(authors);
+//        });
+//
+//        long total = queryFactory
+//                .select(book.bookId)
+//                .from(book)
+//                .fetchCount();
+//
+//        return new PageImpl<>(books, pageable, total);
+//    }
 
     private OrderSpecifier<?>[] getOrderSpecifier(Pageable pageable) {
         Sort sort = pageable.getSort(); // pageable에서 Sort 객체 가져오기
