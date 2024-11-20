@@ -7,13 +7,15 @@ import com.nhnacademy.ssacthree_shop_api.bookset.author.repository.AuthorReposit
 import com.nhnacademy.ssacthree_shop_api.bookset.book.domain.Book;
 import com.nhnacademy.ssacthree_shop_api.bookset.book.domain.BookStatus;
 import com.nhnacademy.ssacthree_shop_api.bookset.book.dto.mapper.BookMapper;
-import com.nhnacademy.ssacthree_shop_api.bookset.book.dto.request.BookDeleteRequest;
 import com.nhnacademy.ssacthree_shop_api.bookset.book.dto.request.BookSaveRequest;
-import com.nhnacademy.ssacthree_shop_api.bookset.book.dto.request.BookUpdateRequest;
 import com.nhnacademy.ssacthree_shop_api.bookset.book.dto.response.BookDeleteResponse;
 import com.nhnacademy.ssacthree_shop_api.bookset.book.dto.response.BookInfoResponse;
 import com.nhnacademy.ssacthree_shop_api.bookset.book.dto.response.BookSearchResponse;
-import com.nhnacademy.ssacthree_shop_api.bookset.book.exception.*;
+import com.nhnacademy.ssacthree_shop_api.bookset.book.exception.AuthorNotSetException;
+import com.nhnacademy.ssacthree_shop_api.bookset.book.exception.BookAlreadyExistsException;
+import com.nhnacademy.ssacthree_shop_api.bookset.book.exception.BookNotFoundException;
+import com.nhnacademy.ssacthree_shop_api.bookset.book.exception.CategoryLimitExceededException;
+import com.nhnacademy.ssacthree_shop_api.bookset.book.exception.CategoryNotSetException;
 import com.nhnacademy.ssacthree_shop_api.bookset.book.repository.BookRepository;
 import com.nhnacademy.ssacthree_shop_api.bookset.book.service.BookMgmtService;
 import com.nhnacademy.ssacthree_shop_api.bookset.bookauthor.domain.BookAuthor;
@@ -31,17 +33,16 @@ import com.nhnacademy.ssacthree_shop_api.bookset.tag.domain.Tag;
 import com.nhnacademy.ssacthree_shop_api.bookset.tag.exception.TagNotFoundException;
 import com.nhnacademy.ssacthree_shop_api.bookset.tag.repository.TagRepository;
 import jakarta.ws.rs.NotFoundException;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -50,7 +51,7 @@ import java.util.stream.Collectors;
 public class BookMgmtServiceImpl implements BookMgmtService {
 
     private static final String BOOK_ID_NOT_FOUND_MESSAGE = "해당 책 아이디를 찾을 수 없습니다.";
-    private  static final String CATEGORY_NOT_FOUND_MESSAGE  = "해당 카테고리가 존재하지 않습니다.";
+    private static final String CATEGORY_NOT_FOUND_MESSAGE = "해당 카테고리가 존재하지 않습니다.";
     private static final String TAG_NOT_FOUND_MESSAGE = "해당 태그가 존재하지 않습니다.";
     private static final String AUTHOR_NOT_FOUND_MESSAGE = "해당 작가가 존재하지 않습니다.";
     private static final String BOOK_ISBN_NOT_FOUND_MESSAGE = "해당 ISBN인 책이 존채하지 않습니다.";
@@ -70,12 +71,13 @@ public class BookMgmtServiceImpl implements BookMgmtService {
 
     @Override
     @Transactional(readOnly = true)
-    public Page<BookSearchResponse> getAllBooks(Pageable pageable){
+    public Page<BookSearchResponse> getAllBooks(Pageable pageable) {
         return bookRepository.findAllBooks(pageable);
     }
 
     /**
      * 새로운 도서를 저장합니다.
+     *
      * @param bookSaveRequest 저장할 도서 정보
      * @return 저장된 도서 정보
      */
@@ -83,11 +85,12 @@ public class BookMgmtServiceImpl implements BookMgmtService {
     public BookInfoResponse saveBook(BookSaveRequest bookSaveRequest) {
         Book book = bookMapper.bookSaveRequestToBook(bookSaveRequest);
 
-         if(bookRepository.findBookByBookIsbn(book.getBookIsbn()).isPresent()){
+        if (bookRepository.findBookByBookIsbn(book.getBookIsbn()).isPresent()) {
             throw new BookAlreadyExistsException(book.getBookIsbn());
         }
 
-        Publisher publisher = publisherRepository.findById(bookSaveRequest.getPublisherId()).orElseThrow( () -> new NotFoundException("해당 출판사가 존재하지 않습니다."));
+        Publisher publisher = publisherRepository.findById(bookSaveRequest.getPublisherId())
+            .orElseThrow(() -> new NotFoundException("해당 출판사가 존재하지 않습니다."));
         book.setPublisher(publisher);
 
         // 카테고리 설정 개수가 올바른지 체크
@@ -101,7 +104,7 @@ public class BookMgmtServiceImpl implements BookMgmtService {
             book.clearCategories();
             for (Long categoryId : bookSaveRequest.getCategoryIdList()) {
                 Category category = categoryRepository.findById(categoryId)
-                        .orElseThrow(() -> new CategoryNotFoundException(CATEGORY_NOT_FOUND_MESSAGE));
+                    .orElseThrow(() -> new CategoryNotFoundException(CATEGORY_NOT_FOUND_MESSAGE));
                 book.addCategory(new BookCategory(book, category));
             }
         }
@@ -111,7 +114,7 @@ public class BookMgmtServiceImpl implements BookMgmtService {
             book.clearTags();
             for (Long tagId : bookSaveRequest.getTagIdList()) {
                 Tag tag = tagRepository.findById(tagId)
-                        .orElseThrow(() -> new TagNotFoundException(TAG_NOT_FOUND_MESSAGE));
+                    .orElseThrow(() -> new TagNotFoundException(TAG_NOT_FOUND_MESSAGE));
                 book.addTag(new BookTag(book, tag));
             }
         }
@@ -121,7 +124,7 @@ public class BookMgmtServiceImpl implements BookMgmtService {
             book.clearAuthors();
             for (Long authorId : bookSaveRequest.getAuthorIdList()) {
                 Author author = authorRepository.findById(authorId)
-                        .orElseThrow(() -> new AuthorNotFoundException(AUTHOR_NOT_FOUND_MESSAGE));
+                    .orElseThrow(() -> new AuthorNotFoundException(AUTHOR_NOT_FOUND_MESSAGE));
                 book.addAuthor(new BookAuthor(book, author));
             }
         }
@@ -134,13 +137,11 @@ public class BookMgmtServiceImpl implements BookMgmtService {
     public BookInfoResponse updateBook(BookSaveRequest bookSaveRequest) {
         // bookId로 책을 찾는다
         Book book = bookRepository.findBookByBookIsbn(bookSaveRequest.getBookIsbn())
-                .orElseThrow(() -> new BookNotFoundException(BOOK_ISBN_NOT_FOUND_MESSAGE));
-
-
+            .orElseThrow(() -> new BookNotFoundException(BOOK_ISBN_NOT_FOUND_MESSAGE));
 
         // 출판사 설정
         Publisher publisher = publisherRepository.findById(bookSaveRequest.getPublisherId())
-                .orElseThrow(() -> new NotFoundException(PUBLISHER_NOT_FOUND_MESSAGE));
+            .orElseThrow(() -> new NotFoundException(PUBLISHER_NOT_FOUND_MESSAGE));
         book.setPublisher(publisher);
 
         // 카테고리, 태그, 작가 수정 로직
@@ -155,22 +156,24 @@ public class BookMgmtServiceImpl implements BookMgmtService {
 
     /**
      * 카테고리 설정 개수가 0개이거나 10개를 초과했을 경우 exception
+     *
      * @param bookSaveRequest 도서 저장 정보
      */
     public void validateCategoryCountLimit(BookSaveRequest bookSaveRequest) {
-        if(bookSaveRequest.getCategoryIdList().isEmpty()){
+        if (bookSaveRequest.getCategoryIdList().isEmpty()) {
             throw new CategoryNotSetException();
-        }else if(bookSaveRequest.getCategoryIdList().size() > 10){
+        } else if (bookSaveRequest.getCategoryIdList().size() > 10) {
             throw new CategoryLimitExceededException();
         }
     }
 
     /**
      * 카테고리 설정 개수가 0개이거나 10개를 초과했을 경우 exception
+     *
      * @param bookSaveRequest 도서 저장 정보
      */
     public void validateAuthorCountLimit(BookSaveRequest bookSaveRequest) {
-        if(bookSaveRequest.getAuthorIdList().isEmpty()){
+        if (bookSaveRequest.getAuthorIdList().isEmpty()) {
             throw new AuthorNotSetException();
         }
     }
@@ -178,8 +181,8 @@ public class BookMgmtServiceImpl implements BookMgmtService {
 
     @Override
     public BookInfoResponse getBookById(Long bookId) {
-        Book book = bookRepository.findBookByBookId(bookId)
-                .orElseThrow( () -> new BookNotFoundException(BOOK_ID_NOT_FOUND_MESSAGE));
+        Book book = bookRepository.findByBookId(bookId)
+            .orElseThrow(() -> new BookNotFoundException(BOOK_ID_NOT_FOUND_MESSAGE));
 
         return bookMapper.bookToBookInfoResponse(book);
     }
@@ -187,7 +190,7 @@ public class BookMgmtServiceImpl implements BookMgmtService {
     @Override
     public BookDeleteResponse deleteBook(Long bookId) {
         Book book = bookRepository.findById(bookId)
-                .orElseThrow(() -> new BookNotFoundException(BOOK_ID_NOT_FOUND_MESSAGE));
+            .orElseThrow(() -> new BookNotFoundException(BOOK_ID_NOT_FOUND_MESSAGE));
 
         book.setBookStatus(BookStatus.DELETE_BOOK);
         book.setStock(UNIT_ZERO);
@@ -195,42 +198,41 @@ public class BookMgmtServiceImpl implements BookMgmtService {
 
         // Book의 Author 정보 조회
         List<AuthorNameResponse> authors = book.getBookAuthors().stream()
-                .map(bookAuthor -> new AuthorNameResponse(bookAuthor.getAuthor().getAuthorName()))
-                .toList();
+            .map(bookAuthor -> new AuthorNameResponse(bookAuthor.getAuthor().getAuthorName()))
+            .toList();
 
         // 응답 반환
         BookDeleteResponse response = new BookDeleteResponse(
-                book.getBookId(),
-                book.getBookName(),
-                book.getBookInfo(),
-                book.getBookStatus(),
-                book.getStock()
+            book.getBookId(),
+            book.getBookName(),
+            book.getBookInfo(),
+            book.getBookStatus(),
+            book.getStock()
         );
         response.setAuthors(authors);
         return response;
     }
 
 
-
-
-    private boolean hasCategoryChanges(Set<BookCategory> existingCategories, List<Long> newCategoryIds) {
+    private boolean hasCategoryChanges(Set<BookCategory> existingCategories,
+        List<Long> newCategoryIds) {
         Set<Long> existingCategoryIds = existingCategories.stream()
-                .map(cat -> cat.getCategory().getCategoryId())
-                .collect(Collectors.toSet());
+            .map(cat -> cat.getCategory().getCategoryId())
+            .collect(Collectors.toSet());
         return !existingCategoryIds.equals(new HashSet<>(newCategoryIds));
     }
 
     private boolean hasTagChanges(Set<BookTag> existingTags, List<Long> newTagIds) {
         Set<Long> existingTagIds = existingTags.stream()
-                .map(tag -> tag.getTag().getTagId())
-                .collect(Collectors.toSet());
+            .map(tag -> tag.getTag().getTagId())
+            .collect(Collectors.toSet());
         return !existingTagIds.equals(new HashSet<>(newTagIds));
     }
 
     private boolean hasAuthorChanges(Set<BookAuthor> existingAuthors, List<Long> newAuthorIds) {
         Set<Long> existingAuthorIds = existingAuthors.stream()
-                .map(author -> author.getAuthor().getAuthorId())
-                .collect(Collectors.toSet());
+            .map(author -> author.getAuthor().getAuthorId())
+            .collect(Collectors.toSet());
         return !existingAuthorIds.equals(new HashSet<>(newAuthorIds));
     }
 
@@ -240,7 +242,7 @@ public class BookMgmtServiceImpl implements BookMgmtService {
             book.clearCategories();
             for (Long categoryId : bookSaveRequest.getCategoryIdList()) {
                 Category category = categoryRepository.findById(categoryId)
-                        .orElseThrow(() -> new CategoryNotFoundException("카테고리가 존재하지 않습니다."));
+                    .orElseThrow(() -> new CategoryNotFoundException("카테고리가 존재하지 않습니다."));
                 book.addCategory(new BookCategory(book, category));
             }
         }
@@ -250,7 +252,7 @@ public class BookMgmtServiceImpl implements BookMgmtService {
             book.clearTags();
             for (Long tagId : bookSaveRequest.getTagIdList()) {
                 Tag tag = tagRepository.findById(tagId)
-                        .orElseThrow(() -> new TagNotFoundException("태그가 존재하지 않습니다."));
+                    .orElseThrow(() -> new TagNotFoundException("태그가 존재하지 않습니다."));
                 book.addTag(new BookTag(book, tag));
             }
         }
@@ -260,7 +262,7 @@ public class BookMgmtServiceImpl implements BookMgmtService {
             book.clearAuthors();
             for (Long authorId : bookSaveRequest.getAuthorIdList()) {
                 Author author = authorRepository.findById(authorId)
-                        .orElseThrow(() -> new AuthorNotFoundException("작가가 존재하지 않습니다."));
+                    .orElseThrow(() -> new AuthorNotFoundException("작가가 존재하지 않습니다."));
                 book.addAuthor(new BookAuthor(book, author));
             }
         }
