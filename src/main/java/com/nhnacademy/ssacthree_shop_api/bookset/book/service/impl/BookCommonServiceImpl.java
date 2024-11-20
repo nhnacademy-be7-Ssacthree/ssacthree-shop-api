@@ -118,9 +118,49 @@ public class BookCommonServiceImpl implements BookCommonService {
         return addAssociatedDataToBookInfoResponse(bookRepository.findByBookIsbn(isbn));
     }
 
+    /**
+     * 작가 아이디로 작가의 도서를 조회합니다.
+     * @param pageable 페이징 처리
+     * @param authorId 작가 아이디
+     * @return 도서 정보 페이지
+     */
     @Override
     public Page<BookInfoResponse> getBooksByAuthorId(Pageable pageable, Long authorId) {
         Page<BookBaseResponse> booksPage =  bookRepository.findBooksByAuthorId(authorId, pageable);
+
+        List<BookInfoResponse> bookInfoResponses = booksPage.getContent().stream()
+                .map(this::addAssociatedDataToBookInfoResponse)
+                .collect(Collectors.toList());
+
+        return new PageImpl<>(bookInfoResponses, pageable, booksPage.getTotalElements());
+    }
+
+    /**
+     * 카테고리 아이디로 카테고리의 소속 도서를 조회합니다.
+     * @param pageable 페이징 처리
+     * @param categoryId 카테고리 아이디
+     * @return 도서 정보 페이지
+     */
+    @Override
+    public Page<BookInfoResponse> getBooksByCategoryId(Pageable pageable, Long categoryId) {
+        Page<BookBaseResponse> booksPage =  bookRepository.findBooksByCategoryId(categoryId, pageable);
+
+        List<BookInfoResponse> bookInfoResponses = booksPage.getContent().stream()
+                .map(this::addAssociatedDataToBookInfoResponse)
+                .collect(Collectors.toList());
+
+        return new PageImpl<>(bookInfoResponses, pageable, booksPage.getTotalElements());
+    }
+
+    /**
+     * 태그 아이디로 소속 도서를 조회합니다.
+     * @param pageable 페이징 처리
+     * @param tagId 태그 아이디
+     * @return 도서 정보 페이지
+     */
+    @Override
+    public Page<BookInfoResponse> getBooksByTagId(Pageable pageable, Long tagId) {
+        Page<BookBaseResponse> booksPage =  bookRepository.findBooksByTagId(tagId, pageable);
 
         List<BookInfoResponse> bookInfoResponses = booksPage.getContent().stream()
                 .map(this::addAssociatedDataToBookInfoResponse)

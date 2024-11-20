@@ -47,7 +47,7 @@ GET http://localhost:8083/api/shop/books
 Content-Type: application/json
 
 ### 작가 아이디로 도서 검색
-GET http://localhost:8083/api/shop/books/author/365
+GET http://localhost:8083/api/shop/books/authors/365
 Content-Type: application/json
 
 ### 도서 아이디로 도서 검색
@@ -61,3 +61,7 @@ Accept: application/json
 ###
 GET http://localhost:8083/api/shop/books?page=0&size=10&sort=bookName;
 Accept: application/json
+
+###
+GET http://localhost:8083/api/shop/books/categories/57
+Content-Type: application/json

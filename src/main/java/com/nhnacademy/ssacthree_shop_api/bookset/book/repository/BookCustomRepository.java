@@ -52,6 +52,7 @@ public interface BookCustomRepository {
     // 책의 조회수 증가 ..?
 
     // 카테고리 책 검색(해당 카테고리에 속해있는 책 검색, 하위 카테고리까지 검색해야함)
+    Page<BookBaseResponse> findBooksByCategoryId(Long categoryId, Pageable pageable);
 
     // 작가 아이디로 책 검색
     Page<BookBaseResponse> findBooksByAuthorId(Long authorId, Pageable pageable);
@@ -61,6 +62,7 @@ public interface BookCustomRepository {
     // 책의 카테고리 루트 검색
 
     // 태그로 책 검색
+    Page<BookBaseResponse> findBooksByTagId(Long tagId, Pageable pageable);
 
     // 책으로 작가 이름 검색
     List<String> findAuthorNamesByBookId(Long bookId);

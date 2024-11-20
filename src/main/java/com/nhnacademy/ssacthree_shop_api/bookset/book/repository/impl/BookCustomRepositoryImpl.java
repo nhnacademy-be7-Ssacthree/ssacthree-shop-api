@@ -14,6 +14,7 @@ import com.nhnacademy.ssacthree_shop_api.bookset.booktag.domain.QBookTag;
 import com.nhnacademy.ssacthree_shop_api.bookset.booktag.dto.BookTagDto;
 import com.nhnacademy.ssacthree_shop_api.bookset.category.domain.QCategory;
 import com.nhnacademy.ssacthree_shop_api.bookset.category.dto.response.CategoryNameResponse;
+import com.nhnacademy.ssacthree_shop_api.bookset.category.repository.CategoryRepository;
 import com.nhnacademy.ssacthree_shop_api.bookset.publisher.domain.QPublisher;
 import com.nhnacademy.ssacthree_shop_api.bookset.publisher.dto.PublisherNameResponse;
 import com.nhnacademy.ssacthree_shop_api.bookset.tag.domain.QTag;
@@ -29,8 +30,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
+import com.nhnacademy.ssacthree_shop_api.bookset.category.domain.Category;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Repository
 @RequiredArgsConstructor
@@ -45,6 +48,8 @@ public class BookCustomRepositoryImpl implements BookCustomRepository {
     private static final QCategory category = QCategory.category;
     private static final QTag tag = QTag.tag;
     private static final QAuthor author = QAuthor.author;
+
+    private final CategoryRepository categoryRepository;
 
     /**
      * 도서 상태가 판매중이거나 재고 없음인지 판별합니다.
@@ -65,10 +70,10 @@ public class BookCustomRepositoryImpl implements BookCustomRepository {
 
     /**
      * 공통 메소드 처리
-     * @param pageable
-     * @param condition
-     * @param joinConditions
-     * @return
+     * @param pageable 페이징 처리
+     * @param condition where 조건절
+     * @param joinConditions 조인 리스트
+     * @return 도서 기본 정보 페이지
      */
     private Page<BookBaseResponse> findBooksByCondition(
             Pageable pageable,
@@ -192,6 +197,52 @@ public class BookCustomRepositoryImpl implements BookCustomRepository {
                 query -> query.leftJoin(book.bookAuthors, bookAuthor).leftJoin(bookAuthor.author, author)
         );
         Predicate condition = author.authorId.eq(authorId).and(isOnSaleOrNoStock());
+        return findBooksByCondition(pageable, condition, joinConditions);
+    }
+
+    /**
+     * 태그 아이디로 도서 조회
+     * @param tagId 태그 아이디
+     * @param pageable 페이징 처리
+     * @return Page<BookBaseResponse>
+     */
+    @Override
+    public Page<BookBaseResponse> findBooksByTagId(Long tagId, Pageable pageable) {
+        List<JoinClause> joinConditions = List.of(
+                query -> query.leftJoin(book.bookTags, bookTag).leftJoin(bookTag.tag, tag)
+        );
+        Predicate condition = tag.tagId.eq(tagId).and(isOnSaleOrNoStock());
+        return findBooksByCondition(pageable, condition, joinConditions);
+    }
+
+    /**
+     * 카테고리 아이디로 도서 조회
+     * @param categoryId 카테고리 아이디
+     * @param pageable 페이징 처리
+     * @return Page<BookBaseResponse>
+     */
+    @Override
+    public Page<BookBaseResponse> findBooksByCategoryId(Long categoryId, Pageable pageable) {
+//        List<JoinClause> joinConditions = List.of(
+//                query -> query.leftJoin(book.bookCategories, bookCategory).leftJoin(bookCategory.category, category)
+//        );
+//        Predicate condition = category.categoryId.eq(categoryId).and(isOnSaleOrNoStock());
+//        return findBooksByCondition(pageable, condition, joinConditions);
+        // 현재 카테고리와 모든 하위 카테고리 ID 조회
+        List<Long> allCategoryIds = categoryRepository.findAllDescendants(categoryId).stream()
+                .map(Category::getCategoryId) // 하위 카테고리의 ID 리스트 추출
+                .collect(Collectors.toList());
+        allCategoryIds.add(categoryId); // 현재 카테고리 ID도 포함
+
+        // 동적 조인 조건 추가
+        List<JoinClause> joinConditions = List.of(
+                query -> query.leftJoin(book.bookCategories, bookCategory).leftJoin(bookCategory.category, category)
+        );
+
+        // 다중 ID 조건 생성
+        Predicate condition = category.categoryId.in(allCategoryIds).and(isOnSaleOrNoStock());
+
+        // 조건과 조인으로 결과 조회
         return findBooksByCondition(pageable, condition, joinConditions);
     }
 
