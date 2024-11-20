@@ -58,6 +58,7 @@ public class BookCustomRepositoryImpl implements BookCustomRepository {
     private BooleanExpression isOnSaleOrNoStock() {
         return book.bookStatus.eq(BookStatus.ON_SALE)
                 .or(book.bookStatus.eq(BookStatus.NO_STOCK));
+
     }
 
     /**
