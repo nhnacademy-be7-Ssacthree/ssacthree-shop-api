@@ -249,6 +249,7 @@ public class ElasticService {
    */
   private void logElasticsearchQuery(Map<String, Object> query) {
     try {
+      log.info("쿼리 로그를 출력합니다.");
       // ObjectMapper를 사용하여 JSON 문자열로 변환
       ObjectMapper objectMapper = new ObjectMapper();
       String queryJson = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(query);
