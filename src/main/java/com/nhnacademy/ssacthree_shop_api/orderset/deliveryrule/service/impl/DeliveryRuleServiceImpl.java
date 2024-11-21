@@ -8,6 +8,8 @@ import com.nhnacademy.ssacthree_shop_api.orderset.deliveryrule.dto.DeliveryRuleU
 import com.nhnacademy.ssacthree_shop_api.orderset.deliveryrule.exception.DeliveryRuleNotFoundException;
 import com.nhnacademy.ssacthree_shop_api.orderset.deliveryrule.repository.DeliveryRuleRepository;
 import com.nhnacademy.ssacthree_shop_api.orderset.deliveryrule.service.DeliveryRuleService;
+import com.nhnacademy.ssacthree_shop_api.orderset.packaging.domain.Packaging;
+import com.nhnacademy.ssacthree_shop_api.orderset.packaging.dto.PackagingGetResponse;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
@@ -16,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -91,5 +94,18 @@ public class DeliveryRuleServiceImpl implements DeliveryRuleService {
                 .orderBy(deliveryRule.deliveryRuleIsSelected.desc())
                 .orderBy(deliveryRule.deliveryRuleCreatedAt.asc())
                 .fetch();
+    }
+
+    @Override
+    public DeliveryRuleGetResponse getCurrentDeliveryRule() {
+        DeliveryRule deliveryRule = deliveryRuleRepository.findByDeliveryRuleIsSelectedTrue();
+        DeliveryRuleGetResponse response = new DeliveryRuleGetResponse(
+                deliveryRule.getDeliveryRuleId(),
+                deliveryRule.getDeliveryRuleName(),
+                deliveryRule.getDeliveryFee(),
+                deliveryRule.getDeliveryDiscountCost(),
+                true,
+                deliveryRule.getDeliveryRuleCreatedAt());
+        return response;
     }
 }
