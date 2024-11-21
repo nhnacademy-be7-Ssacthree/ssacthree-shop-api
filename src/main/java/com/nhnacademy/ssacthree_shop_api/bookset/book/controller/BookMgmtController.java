@@ -57,7 +57,7 @@ public class BookMgmtController {
         return ResponseEntity.status(HttpStatus.OK).body(messageResponse);
     }
 
-    @PutMapping("/{book-id}")
+    @DeleteMapping("/{book-id}")
     public ResponseEntity<MessageResponse> deleteBook(@PathVariable(name = "book-id") Long bookId) {
         bookMgmtService.deleteBook(bookId);
         MessageResponse messageResponse = new MessageResponse(BOOK_DELETE_SUCCESS_MESSAGE);
