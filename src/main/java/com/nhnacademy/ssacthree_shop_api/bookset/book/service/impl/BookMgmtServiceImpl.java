@@ -44,6 +44,7 @@ import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -76,9 +77,14 @@ public class BookMgmtServiceImpl implements BookMgmtService {
     @Override
     @Transactional(readOnly = true)
     public Page<BookSearchResponse> getAllBooks(Pageable pageable) {
-        return bookRepository.findAllBooks(pageable);
-    }
+        Page<BookSearchResponse> booksPage = bookRepository.findAllBooks(pageable);
 
+        List<BookSearchResponse> updatedBooks = booksPage.getContent().stream()
+            .map(this::addAuthorsToBook)
+            .toList();
+
+        return new PageImpl<>(updatedBooks, pageable, booksPage.getTotalElements());
+    }
     /**
      * 새로운 도서를 저장합니다.
      *
@@ -316,4 +322,10 @@ public class BookMgmtServiceImpl implements BookMgmtService {
         return !existingAuthorIds.equals(new HashSet<>(newAuthorIds));
     }
 
+    private BookSearchResponse addAuthorsToBook(BookSearchResponse book) {
+        List<AuthorNameResponse> authors = bookRepository.findAuthorsByBookId(book.getBookId());
+
+        book.setAuthors(authors);
+        return book;
+    }
 }

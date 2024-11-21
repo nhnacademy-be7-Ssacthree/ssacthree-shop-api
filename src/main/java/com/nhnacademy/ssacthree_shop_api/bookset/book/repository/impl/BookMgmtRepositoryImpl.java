@@ -92,42 +92,6 @@ public class BookMgmtRepositoryImpl implements BookMgmtRepository {
         return new PageImpl<>(books, pageable, total);
     }
 
-//    @Override
-//    public Page<BookSearchResponse> findAllBooks(Pageable pageable) {
-//        List<BookSearchResponse> books = queryFactory
-//                .select(Projections.constructor(BookSearchResponse.class,
-//                        book.bookId,
-//                        book.bookName,
-//                        book.bookInfo,
-//                        book.bookStatus.stringValue()
-//                ))
-//                .from(book)
-//                .offset(pageable.getOffset())
-//                .limit(pageable.getPageSize())
-//                .orderBy(getOrderSpecifier(pageable))
-//                .fetch();
-//
-//        books.forEach(book -> log.info("bookStatus 확인용: {}", book.getBookStatus())); // 확인용
-//
-//
-//        books.forEach(b -> {
-//            List<AuthorNameResponse> authors = queryFactory
-//                    .select(Projections.constructor(AuthorNameResponse.class, author.authorName))
-//                    .from(bookAuthor)
-//                    .join(author).on(author.authorId.eq(bookAuthor.author.authorId))
-//                    .where(bookAuthor.book.bookId.eq(b.getBookId()))
-//                    .fetch();
-//            b.setAuthors(authors);
-//        });
-//
-//        long total = queryFactory
-//                .select(book.bookId)
-//                .from(book)
-//                .fetchCount();
-//
-//        return new PageImpl<>(books, pageable, total);
-//    }
-
     private OrderSpecifier<?>[] getOrderSpecifier(Pageable pageable) {
         Sort sort = pageable.getSort(); // pageable에서 Sort 객체 가져오기
 
@@ -142,14 +106,14 @@ public class BookMgmtRepositoryImpl implements BookMgmtRepository {
     }
 
     private OrderSpecifier<?> getOrderSpecifierForField(Sort.Order order, PathBuilder<Object> pathBuilder) {
-        // 필드명에 맞게 정렬 설정
         if (order.getProperty().equals("bookId")) {
             return order.isDescending() ? pathBuilder.getNumber("bookId", Long.class).desc() : pathBuilder.getNumber("bookId", Long.class).asc();
         } else if (order.getProperty().equals("bookName")) {
             return order.isDescending() ? pathBuilder.getString("bookName").desc() : pathBuilder.getString("bookName").asc();
-        } else {
-            // 다른 필드에 대해서도 필요한 만큼 추가
-            return null; // 기본값 처리
+        } else if (order.getProperty().equals("bookIsbn")) {
+            return order.isDescending() ? pathBuilder.getNumber("bookIsbn", Integer.class).desc() : pathBuilder.getNumber("bookIsbn", Integer.class).asc();
+        }else{
+            return null; //기본 값 반환
         }
     }
 
