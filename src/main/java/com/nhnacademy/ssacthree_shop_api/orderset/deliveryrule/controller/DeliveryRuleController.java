@@ -1,6 +1,7 @@
 package com.nhnacademy.ssacthree_shop_api.orderset.deliveryrule.controller;
 
 import com.nhnacademy.ssacthree_shop_api.commons.dto.MessageResponse;
+import com.nhnacademy.ssacthree_shop_api.orderset.deliveryrule.domain.DeliveryRule;
 import com.nhnacademy.ssacthree_shop_api.orderset.deliveryrule.dto.DeliveryRuleCreateRequest;
 import com.nhnacademy.ssacthree_shop_api.orderset.deliveryrule.dto.DeliveryRuleGetResponse;
 import com.nhnacademy.ssacthree_shop_api.orderset.deliveryrule.dto.DeliveryRuleUpdateRequest;
@@ -43,5 +44,10 @@ public class DeliveryRuleController {
         MessageResponse messageResponse = new MessageResponse("수정 성공");
 
         return ResponseEntity.status(HttpStatus.OK).body(messageResponse);
+    }
+
+    @GetMapping("/current")
+    ResponseEntity<DeliveryRuleGetResponse> getCurrentDeliveryRule() {
+        return ResponseEntity.ok().body(deliveryRuleService.getCurrentDeliveryRule());
     }
 }
