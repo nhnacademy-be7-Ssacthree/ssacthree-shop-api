@@ -16,4 +16,6 @@ public interface DeliveryRuleService {
     DeliveryRule updateDeliveryRule(DeliveryRuleUpdateRequest deliveryRuleUpdateRequest);
 
     List<DeliveryRuleGetResponse> getAllDeliveryRules();
+
+    DeliveryRuleGetResponse getCurrentDeliveryRule();
 }
