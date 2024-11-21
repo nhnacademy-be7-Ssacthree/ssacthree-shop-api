@@ -13,8 +13,11 @@ import com.nhnacademy.ssacthree_shop_api.orderset.orderdetail.domain.domain.Orde
 import com.nhnacademy.ssacthree_shop_api.orderset.orderdetail.domain.repo.OrderDetailRepository;
 import com.nhnacademy.ssacthree_shop_api.review.domain.Review;
 import com.nhnacademy.ssacthree_shop_api.review.domain.ReviewId;
+import com.nhnacademy.ssacthree_shop_api.review.dto.MemberReviewResponse;
 import com.nhnacademy.ssacthree_shop_api.review.dto.ReviewRequestWithUrl;
+import com.nhnacademy.ssacthree_shop_api.review.dto.BookReviewResponse;
 import com.nhnacademy.ssacthree_shop_api.review.dto.ReviewResponse;
+import com.nhnacademy.ssacthree_shop_api.review.exception.ReviewNotFoundException;
 import com.nhnacademy.ssacthree_shop_api.review.repository.ReviewRepository;
 import com.nhnacademy.ssacthree_shop_api.review.service.ReviewService;
 import java.util.ArrayList;
@@ -39,19 +42,19 @@ public class ReviewServiceImpl implements ReviewService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<ReviewResponse> getReviewsByBookId(Long bookId) {
+    public List<BookReviewResponse> getReviewsByBookId(Long bookId) {
         Book book = bookRepository.findByBookId(bookId).orElseThrow(() -> new BookNotFoundException("해당 책을 찾을 수 없습니다."));
         List<Review> reviews = reviewRepository.findAllByBook(book);
-        List<ReviewResponse> reviewResponses = new ArrayList<>();
+        List<BookReviewResponse> bookReviewRespons = new ArrayList<>();
 
         for (Review review : reviews) {
             Member member = memberRepository.findById(review.getCustomer().getCustomerId()).orElseThrow(
                 () -> new MemberNotFoundException("해당 회원을 찾을 수 없습니다."));
-            ReviewResponse reviewResponse = new ReviewResponse(member.getMemberLoginId(),review.getReviewRate(),review.getReviewTitle(),review.getReviewContent(),review.getReviewCreatedAt(),review.getReviewImageUrl());
-            reviewResponses.add(reviewResponse);
+            BookReviewResponse bookReviewResponse = new BookReviewResponse(member.getMemberLoginId(),review.getReviewRate(),review.getReviewTitle(),review.getReviewContent(),review.getReviewCreatedAt(),review.getReviewImageUrl());
+            bookReviewRespons.add(bookReviewResponse);
         }
 
-        return reviewResponses;
+        return bookReviewRespons;
     }
 
     @Override //리뷰 작성 저장
@@ -86,5 +89,27 @@ public class ReviewServiceImpl implements ReviewService {
         }
 
         return null;
+    }
+
+    @Override
+    public List<MemberReviewResponse> getReviewsByMemberId(String header) {
+        Member member = memberRepository.findByMemberLoginId(header).orElseThrow(() -> new MemberNotFoundException("member not found"));
+
+        List<Review> reviews = reviewRepository.findAllByCustomer(member.getCustomer());
+        List<MemberReviewResponse> reviewResponses = new ArrayList<>();
+
+        for (Review review : reviews) {
+            reviewResponses.add(new MemberReviewResponse(review.getReviewId().getOrderId(),review.getReviewId().getBookId(),review.getReviewRate(),review.getReviewTitle(),review.getReviewContent(),review.getReviewImageUrl()));
+        }
+
+        return reviewResponses;
+    }
+
+    @Override
+    public ReviewResponse getReview(String header, Long orderId, Long bookId) {
+        ReviewId reviewId = new ReviewId(orderId,bookId);
+        Review review = reviewRepository.findByReviewId(reviewId).orElseThrow(() -> new ReviewNotFoundException("review not found"));
+
+        return new ReviewResponse(review.getReviewRate(),review.getReviewTitle(),review.getReviewContent(),review.getReviewImageUrl());
     }
 }
