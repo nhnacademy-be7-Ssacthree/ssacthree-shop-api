@@ -2,6 +2,7 @@ package com.nhnacademy.ssacthree_shop_api.bookset.book.repository.impl;
 
 import com.nhnacademy.ssacthree_shop_api.bookset.author.domain.QAuthor;
 import com.nhnacademy.ssacthree_shop_api.bookset.author.dto.AuthorNameResponse;
+import com.nhnacademy.ssacthree_shop_api.bookset.book.domain.BookStatus;
 import com.nhnacademy.ssacthree_shop_api.bookset.book.domain.QBook;
 import com.nhnacademy.ssacthree_shop_api.bookset.book.dto.response.BookBaseResponse;
 import com.nhnacademy.ssacthree_shop_api.bookset.book.dto.response.BookInfoResponse;
@@ -22,6 +23,7 @@ import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.PathBuilder;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -33,6 +35,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+@Slf4j
 @Repository
 @RequiredArgsConstructor
 public class BookMgmtRepositoryImpl implements BookMgmtRepository {
@@ -51,19 +54,24 @@ public class BookMgmtRepositoryImpl implements BookMgmtRepository {
 
     @Override
     public Page<BookSearchResponse> findAllBooks(Pageable pageable) {
+        // Modify the query to filter out books with status "삭제 도서"
         List<BookSearchResponse> books = queryFactory
                 .select(Projections.constructor(BookSearchResponse.class,
                         book.bookId,
                         book.bookName,
                         book.bookInfo,
-                        book.bookStatus
+                        book.bookStatus.stringValue() // Get the status as a string
                 ))
                 .from(book)
+                .where(book.bookStatus.ne(BookStatus.DELETE_BOOK)) // Filter out books with status "삭제 도서"
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .orderBy(getOrderSpecifier(pageable))
                 .fetch();
 
+        books.forEach(book -> log.info("bookStatus 확인용: {}", book.getBookStatus())); // 확인용
+
+        // Fetch authors for each book
         books.forEach(b -> {
             List<AuthorNameResponse> authors = queryFactory
                     .select(Projections.constructor(AuthorNameResponse.class, author.authorName))
@@ -74,9 +82,11 @@ public class BookMgmtRepositoryImpl implements BookMgmtRepository {
             b.setAuthors(authors);
         });
 
+        // Fetch the total count of books, excluding the "삭제 도서"
         long total = queryFactory
                 .select(book.bookId)
                 .from(book)
+                .where(book.bookStatus.ne(BookStatus.DELETE_BOOK)) // Filter out books with status "삭제 도서"
                 .fetchCount();
 
         return new PageImpl<>(books, pageable, total);
@@ -96,14 +106,14 @@ public class BookMgmtRepositoryImpl implements BookMgmtRepository {
     }
 
     private OrderSpecifier<?> getOrderSpecifierForField(Sort.Order order, PathBuilder<Object> pathBuilder) {
-        // 필드명에 맞게 정렬 설정
         if (order.getProperty().equals("bookId")) {
             return order.isDescending() ? pathBuilder.getNumber("bookId", Long.class).desc() : pathBuilder.getNumber("bookId", Long.class).asc();
         } else if (order.getProperty().equals("bookName")) {
             return order.isDescending() ? pathBuilder.getString("bookName").desc() : pathBuilder.getString("bookName").asc();
-        } else {
-            // 다른 필드에 대해서도 필요한 만큼 추가
-            return null; // 기본값 처리
+        } else if (order.getProperty().equals("bookIsbn")) {
+            return order.isDescending() ? pathBuilder.getNumber("bookIsbn", Integer.class).desc() : pathBuilder.getNumber("bookIsbn", Integer.class).asc();
+        }else{
+            return null; //기본 값 반환
         }
     }
 

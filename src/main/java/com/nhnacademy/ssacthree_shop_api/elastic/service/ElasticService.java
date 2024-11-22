@@ -141,13 +141,21 @@ public class ElasticService {
         "multi_match", Map.of(
             "query", keyword,
             "fields", List.of(
-                "bookName^100",
-                "bookInfo^30",
-                "tags^50",
-                "category^3",
-                "bookName.jaso^80",
-                "bookName.icu^50"
+                "bookName.nori^5", // 형태소 분석 기반 검색
+                "bookName^4",              // 기본 검색 필드 (책 제목 - 가장 높은 가중치)
+                "bookName.edge_ngram^3",   // 오타 및 부분 검색 지원
+                "bookName.shingle^3",      // 단어 묶음 기반 검색
+                "bookName.ascii^1",        // 비ASCII 문자 변환 검색
+                "bookInfo^3",              // 책 정보
+                "bookInfo.nori^2",         // 형태소 분석 기반 부가 검색
+                "authorNames^2",           // 저자 이름
+                "authorNames.jaso^1",      // 저자 이름 자소 기반 검색
+                "publisherNames^1",        // 출판사 이름
+                "publisherNames.jaso^1",   // 출판사 이름 자소 검색
+                "category^2",              // 카테고리
+                "category.nori^1"          // 카테고리 형태소 분석 검색
             )
+
         )
     );
   }
@@ -179,12 +187,12 @@ public class ElasticService {
     //controller filters에 에서 category, tag 로 넣어줌
     if (filters.containsKey("category") && filters.get("category") != null && !filters.get("category").isEmpty()) {
       // 카테고리가 입력된 경우, 카테고리 필터만 추가
-      return Map.of("term", Map.of("category", filters.get("category")));
+      return Map.of("term", Map.of("category.keyword", filters.get("category"))); // keyword로 정확히 일치할 때만 검색이 됩니다.
     }
 
     if (filters.containsKey("tag") && filters.get("tag") != null && !filters.get("tag").isEmpty()) {
       // 태그가 입력된 경우, 태그 필터만 추가
-      return Map.of("term", Map.of("tag", filters.get("tag")));
+      return Map.of("term", Map.of("tag.keyword", filters.get("tag")));
     }
 
     // 필터가 없는 경우 빈 Map 반환
