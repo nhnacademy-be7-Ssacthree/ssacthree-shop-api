@@ -141,19 +141,19 @@ public class ElasticService {
         "multi_match", Map.of(
             "query", keyword,
             "fields", List.of(
-                "bookName.nori^5", // 형태소 분석 기반 검색
-                "bookName^4",              // 기본 검색 필드 (책 제목 - 가장 높은 가중치)
-                "bookName.edge_ngram^3",   // 오타 및 부분 검색 지원
-                "bookName.shingle^3",      // 단어 묶음 기반 검색
-                "bookName.ascii^1",        // 비ASCII 문자 변환 검색
-                "bookInfo^3",              // 책 정보
-                "bookInfo.nori^2",         // 형태소 분석 기반 부가 검색
-                "authorNames^2",           // 저자 이름
-                "authorNames.jaso^1",      // 저자 이름 자소 기반 검색
-                "publisherNames^1",        // 출판사 이름
-                "publisherNames.jaso^1",   // 출판사 이름 자소 검색
-                "category^2",              // 카테고리
-                "category.nori^1"          // 카테고리 형태소 분석 검색
+                "bookName.nori^100", // 형태소 분석 기반 검색
+                "bookName^50",              // 기본 검색 필드 (책 제목 - 가장 높은 가중치)
+                "bookName.edge_ngram^40",   // 오타 및 부분 검색 지원
+                "bookName.shingle^30",      // 단어 묶음 기반 검색
+                "bookName.ascii^10",        // 비ASCII 문자 변환 검색
+                "bookInfo^20",              // 책 정보
+                "bookInfo.nori^30",         // 형태소 분석 기반 부가 검색
+                "authorNames^40",           // 저자 이름
+                "authorNames.jaso^10",      // 저자 이름 자소 기반 검색
+                "publisherNames^8",        // 출판사 이름
+                "publisherNames.jaso^8",   // 출판사 이름 자소 검색
+                "category^8",              // 카테고리
+                "category.nori^15"          // 카테고리 형태소 분석 검색
             )
 
         )
