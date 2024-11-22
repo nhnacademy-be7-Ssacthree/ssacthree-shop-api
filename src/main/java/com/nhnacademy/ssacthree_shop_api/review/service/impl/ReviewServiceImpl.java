@@ -98,8 +98,10 @@ public class ReviewServiceImpl implements ReviewService {
         List<Review> reviews = reviewRepository.findAllByCustomer(member.getCustomer());
         List<MemberReviewResponse> reviewResponses = new ArrayList<>();
 
+
         for (Review review : reviews) {
-            reviewResponses.add(new MemberReviewResponse(review.getReviewId().getOrderId(),review.getReviewId().getBookId(),review.getReviewRate(),review.getReviewTitle(),review.getReviewContent(),review.getReviewImageUrl()));
+            Book book = review.getBook();
+            reviewResponses.add(new MemberReviewResponse(review.getReviewId().getOrderId(),review.getReviewId().getBookId(),book.getBookThumbnailImageUrl(),book.getBookName(),review.getReviewRate(),review.getReviewTitle(),review.getReviewContent(),review.getReviewImageUrl()));
         }
 
         return reviewResponses;
