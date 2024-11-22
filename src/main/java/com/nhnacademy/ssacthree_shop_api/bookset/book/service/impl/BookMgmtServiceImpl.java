@@ -11,6 +11,7 @@ import com.nhnacademy.ssacthree_shop_api.bookset.book.dto.request.BookSaveReques
 import com.nhnacademy.ssacthree_shop_api.bookset.book.dto.response.BookDeleteResponse;
 import com.nhnacademy.ssacthree_shop_api.bookset.book.dto.response.BookInfoResponse;
 import com.nhnacademy.ssacthree_shop_api.bookset.book.dto.response.BookSearchResponse;
+import com.nhnacademy.ssacthree_shop_api.bookset.book.dto.response.BookUpdateResponse;
 import com.nhnacademy.ssacthree_shop_api.bookset.book.exception.AuthorNotSetException;
 import com.nhnacademy.ssacthree_shop_api.bookset.book.exception.BookAlreadyExistsException;
 import com.nhnacademy.ssacthree_shop_api.bookset.book.exception.BookNotFoundException;
@@ -25,11 +26,14 @@ import com.nhnacademy.ssacthree_shop_api.bookset.bookcategory.repository.BookCat
 import com.nhnacademy.ssacthree_shop_api.bookset.booktag.domain.BookTag;
 import com.nhnacademy.ssacthree_shop_api.bookset.booktag.repository.BookTagRepository;
 import com.nhnacademy.ssacthree_shop_api.bookset.category.domain.Category;
+import com.nhnacademy.ssacthree_shop_api.bookset.category.dto.response.CategoryNameResponse;
 import com.nhnacademy.ssacthree_shop_api.bookset.category.exception.CategoryNotFoundException;
 import com.nhnacademy.ssacthree_shop_api.bookset.category.repository.CategoryRepository;
 import com.nhnacademy.ssacthree_shop_api.bookset.publisher.domain.Publisher;
+import com.nhnacademy.ssacthree_shop_api.bookset.publisher.dto.PublisherNameResponse;
 import com.nhnacademy.ssacthree_shop_api.bookset.publisher.repository.PublisherRepository;
 import com.nhnacademy.ssacthree_shop_api.bookset.tag.domain.Tag;
+import com.nhnacademy.ssacthree_shop_api.bookset.tag.dto.response.TagInfoResponse;
 import com.nhnacademy.ssacthree_shop_api.bookset.tag.exception.TagNotFoundException;
 import com.nhnacademy.ssacthree_shop_api.bookset.tag.repository.TagRepository;
 import jakarta.ws.rs.NotFoundException;
@@ -40,6 +44,7 @@ import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -72,9 +77,14 @@ public class BookMgmtServiceImpl implements BookMgmtService {
     @Override
     @Transactional(readOnly = true)
     public Page<BookSearchResponse> getAllBooks(Pageable pageable) {
-        return bookRepository.findAllBooks(pageable);
-    }
+        Page<BookSearchResponse> booksPage = bookRepository.findAllBooks(pageable);
 
+        List<BookSearchResponse> updatedBooks = booksPage.getContent().stream()
+            .map(this::addAuthorsToBook)
+            .toList();
+
+        return new PageImpl<>(updatedBooks, pageable, booksPage.getTotalElements());
+    }
     /**
      * 새로운 도서를 저장합니다.
      *
@@ -90,7 +100,7 @@ public class BookMgmtServiceImpl implements BookMgmtService {
         }
 
         Publisher publisher = publisherRepository.findById(bookSaveRequest.getPublisherId())
-            .orElseThrow(() -> new NotFoundException("해당 출판사가 존재하지 않습니다."));
+            .orElseThrow(() -> new NotFoundException(PUBLISHER_NOT_FOUND_MESSAGE));
         book.setPublisher(publisher);
 
         // 카테고리 설정 개수가 올바른지 체크
@@ -134,24 +144,101 @@ public class BookMgmtServiceImpl implements BookMgmtService {
     }
 
     @Override
-    public BookInfoResponse updateBook(BookSaveRequest bookSaveRequest) {
-        // bookId로 책을 찾는다
+    public BookUpdateResponse updateBook(BookSaveRequest bookSaveRequest) {
+        // ISBN으로 책을 찾는다
         Book book = bookRepository.findBookByBookIsbn(bookSaveRequest.getBookIsbn())
-            .orElseThrow(() -> new BookNotFoundException(BOOK_ISBN_NOT_FOUND_MESSAGE));
+                .orElseThrow(() -> new BookNotFoundException(BOOK_ISBN_NOT_FOUND_MESSAGE));
+
+        // bookSaveRequest와 비교하여 값이 다를 경우 book 엔티티를 업데이트
+        if (!book.getBookName().equals(bookSaveRequest.getBookName())) {
+            book.setBookName(bookSaveRequest.getBookName());
+        }
+        if (!book.getBookIndex().equals(bookSaveRequest.getBookIndex())) {
+            book.setBookIndex(bookSaveRequest.getBookIndex());
+        }
+        if (!book.getBookInfo().equals(bookSaveRequest.getBookInfo())) {
+            book.setBookInfo(bookSaveRequest.getBookInfo());
+        }
+        if (book.getRegularPrice() != bookSaveRequest.getRegularPrice()) {
+            book.setRegularPrice(bookSaveRequest.getRegularPrice());
+        }
+        if (book.getSalePrice() != bookSaveRequest.getSalePrice()) {
+            book.setSalePrice(bookSaveRequest.getSalePrice());
+        }
+        if (book.getIsPacked() != bookSaveRequest.getIsPacked()) {
+            book.setIsPacked(bookSaveRequest.getIsPacked());
+        }
+        if (book.getStock() != bookSaveRequest.getStock()) {
+            book.setStock(bookSaveRequest.getStock());
+        }
+        if (book.getBookViewCount() != bookSaveRequest.getBookViewCount()) {
+            book.setBookViewCount(bookSaveRequest.getBookViewCount());
+        }
+        if (book.getBookDiscount() != bookSaveRequest.getBookDiscount()) {
+            book.setBookDiscount(bookSaveRequest.getBookDiscount());
+        }
+        if (!book.getBookThumbnailImageUrl().equals(bookSaveRequest.getBookThumbnailImageUrl())) {
+            book.setBookThumbnailImageUrl(bookSaveRequest.getBookThumbnailImageUrl());
+        }
+        if (bookSaveRequest.getBookStatus() != null && !bookSaveRequest.getBookStatus().isEmpty()) {
+            try {
+                BookStatus newStatus = BookStatus.valueOf(bookSaveRequest.getBookStatus()); // 문자열을 Enum으로 변환
+                if (book.getBookStatus() == null || !book.getBookStatus().equals(newStatus)) {
+                    book.setBookStatus(newStatus);  // 새로운 상태로 업데이트
+                }
+            } catch (IllegalArgumentException e) {
+                // 유효하지 않은 상태 값 처리
+                throw new IllegalArgumentException("유효하지 않은 상태 값입니다: " + bookSaveRequest.getBookStatus());
+            }
+        } else {
+            // 상태 값이 null이거나 빈 문자열일 경우 처리
+            throw new IllegalArgumentException("상태 값이 제공되지 않았습니다.");
+        }
+
+        log.info("bookStatus 확인용: {} ", book.getBookStatus());
 
         // 출판사 설정
         Publisher publisher = publisherRepository.findById(bookSaveRequest.getPublisherId())
-            .orElseThrow(() -> new NotFoundException(PUBLISHER_NOT_FOUND_MESSAGE));
-        book.setPublisher(publisher);
+                .orElseThrow(() -> new NotFoundException(PUBLISHER_NOT_FOUND_MESSAGE));
+        if (!book.getPublisher().equals(publisher)) {
+            book.setPublisher(publisher);
+        }
 
-        // 카테고리, 태그, 작가 수정 로직
-        updateCategoriesAndTags(book, bookSaveRequest);
+        // 카테고리 업데이트
+        if (hasCategoryChanges(book.getBookCategories(), bookSaveRequest.getCategoryIdList())) {
+            book.clearCategories();
+            for (Long categoryId : bookSaveRequest.getCategoryIdList()) {
+                Category category = categoryRepository.findById(categoryId)
+                        .orElseThrow(() -> new CategoryNotFoundException("카테고리가 존재하지 않습니다."));
+                book.addCategory(new BookCategory(book, category));
+            }
+        }
 
-        // 책 정보 업데이트
+        // 태그 업데이트
+        if (hasTagChanges(book.getBookTags(), bookSaveRequest.getTagIdList())) {
+            book.clearTags();
+            for (Long tagId : bookSaveRequest.getTagIdList()) {
+                Tag tag = tagRepository.findById(tagId)
+                        .orElseThrow(() -> new TagNotFoundException("태그가 존재하지 않습니다."));
+                book.addTag(new BookTag(book, tag));
+            }
+        }
+
+        // 작가 업데이트
+        if (hasAuthorChanges(book.getBookAuthors(), bookSaveRequest.getAuthorIdList())) {
+            book.clearAuthors();
+            for (Long authorId : bookSaveRequest.getAuthorIdList()) {
+                Author author = authorRepository.findById(authorId)
+                        .orElseThrow(() -> new AuthorNotFoundException("작가가 존재하지 않습니다."));
+                book.addAuthor(new BookAuthor(book, author));
+            }
+        }
+
+        // 변경된 책을 저장
         bookRepository.save(book);
 
-        // 수정된 책 정보를 반환
-        return new BookInfoResponse(book);
+        // BookUpdateResponse로 응답 반환
+        return new BookUpdateResponse(book);
     }
 
     /**
@@ -214,8 +301,7 @@ public class BookMgmtServiceImpl implements BookMgmtService {
     }
 
 
-    private boolean hasCategoryChanges(Set<BookCategory> existingCategories,
-        List<Long> newCategoryIds) {
+    private boolean hasCategoryChanges(Set<BookCategory> existingCategories, List<Long> newCategoryIds) {
         Set<Long> existingCategoryIds = existingCategories.stream()
             .map(cat -> cat.getCategory().getCategoryId())
             .collect(Collectors.toSet());
@@ -236,35 +322,10 @@ public class BookMgmtServiceImpl implements BookMgmtService {
         return !existingAuthorIds.equals(new HashSet<>(newAuthorIds));
     }
 
-    private void updateCategoriesAndTags(Book book, BookSaveRequest bookSaveRequest) {
-        // 카테고리 수정
-        if (hasCategoryChanges(book.getBookCategories(), bookSaveRequest.getCategoryIdList())) {
-            book.clearCategories();
-            for (Long categoryId : bookSaveRequest.getCategoryIdList()) {
-                Category category = categoryRepository.findById(categoryId)
-                    .orElseThrow(() -> new CategoryNotFoundException("카테고리가 존재하지 않습니다."));
-                book.addCategory(new BookCategory(book, category));
-            }
-        }
+    private BookSearchResponse addAuthorsToBook(BookSearchResponse book) {
+        List<AuthorNameResponse> authors = bookRepository.findAuthorsByBookId(book.getBookId());
 
-        // 태그 수정
-        if (hasTagChanges(book.getBookTags(), bookSaveRequest.getTagIdList())) {
-            book.clearTags();
-            for (Long tagId : bookSaveRequest.getTagIdList()) {
-                Tag tag = tagRepository.findById(tagId)
-                    .orElseThrow(() -> new TagNotFoundException("태그가 존재하지 않습니다."));
-                book.addTag(new BookTag(book, tag));
-            }
-        }
-
-        // 작가 수정
-        if (hasAuthorChanges(book.getBookAuthors(), bookSaveRequest.getAuthorIdList())) {
-            book.clearAuthors();
-            for (Long authorId : bookSaveRequest.getAuthorIdList()) {
-                Author author = authorRepository.findById(authorId)
-                    .orElseThrow(() -> new AuthorNotFoundException("작가가 존재하지 않습니다."));
-                book.addAuthor(new BookAuthor(book, author));
-            }
-        }
+        book.setAuthors(authors);
+        return book;
     }
 }

@@ -30,5 +30,4 @@ public class BookBaseResponse {
 
     // FK
     private PublisherNameResponse publisher;
-
 }
