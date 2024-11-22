@@ -136,24 +136,24 @@ public class ElasticService {
   }
 
   // multi_match 쿼리 작성
-  private Map<String, Object> createKeywordSearchCondition(String keyword) {
+  public Map<String, Object> createKeywordSearchCondition(String keyword) {
     return Map.of(
         "multi_match", Map.of(
             "query", keyword,
             "fields", List.of(
-                "bookName.nori^5", // 형태소 분석 기반 검색
-                "bookName^4",              // 기본 검색 필드 (책 제목 - 가장 높은 가중치)
-                "bookName.edge_ngram^3",   // 오타 및 부분 검색 지원
-                "bookName.shingle^3",      // 단어 묶음 기반 검색
-                "bookName.ascii^1",        // 비ASCII 문자 변환 검색
-                "bookInfo^3",              // 책 정보
-                "bookInfo.nori^2",         // 형태소 분석 기반 부가 검색
-                "authorNames^2",           // 저자 이름
-                "authorNames.jaso^1",      // 저자 이름 자소 기반 검색
-                "publisherNames^1",        // 출판사 이름
-                "publisherNames.jaso^1",   // 출판사 이름 자소 검색
-                "category^2",              // 카테고리
-                "category.nori^1"          // 카테고리 형태소 분석 검색
+                "bookName.nori^100", // 형태소 분석 기반 검색
+                "bookName^50",              // 기본 검색 필드 (책 제목 - 가장 높은 가중치)
+                "bookName.edge_ngram^40",   // 오타 및 부분 검색 지원
+                "bookName.shingle^30",      // 단어 묶음 기반 검색
+                "bookName.ascii^10",        // 비ASCII 문자 변환 검색
+                "bookInfo^20",              // 책 정보
+                "bookInfo.nori^30",         // 형태소 분석 기반 부가 검색
+                "authorNames^40",           // 저자 이름
+                "authorNames.jaso^10",      // 저자 이름 자소 기반 검색
+                "publisherNames^8",        // 출판사 이름
+                "publisherNames.jaso^8",   // 출판사 이름 자소 검색
+                "category^8",              // 카테고리
+                "category.nori^15"          // 카테고리 형태소 분석 검색
             )
 
         )
@@ -167,7 +167,7 @@ public class ElasticService {
    * @param sort 사용자가 요청한 정렬 방식
    * @return 정렬 조건 리스트
    */
-  private List<Map<String, Object>> getSortCriteria(String sort) {
+  public List<Map<String, Object>> getSortCriteria(String sort) {
     return switch (sort) {
       case "newest" -> List.of(Map.of(PUBLICATION_DATE, Map.of(ORDER, DESC))); // 최신순
       case "priceLow" -> List.of(Map.of(SALE_PRICE, Map.of(ORDER, ASC))); // 낮은 가격순
@@ -183,7 +183,7 @@ public class ElasticService {
    * @param filters 사용자가 요청한 필터 조건 (카테고리, 태그 등)
    * @return 필터 조건 맵 객체
    */
-  private Map<String, Object> getFilterConditions(Map<String, String> filters) {
+  public Map<String, Object> getFilterConditions(Map<String, String> filters) {
     //controller filters에 에서 category, tag 로 넣어줌
     if (filters.containsKey("category") && filters.get("category") != null && !filters.get("category").isEmpty()) {
       // 카테고리가 입력된 경우, 카테고리 필터만 추가
@@ -212,7 +212,7 @@ public class ElasticService {
    * @return 변환된 BookDocument 리스트
    */
   @SuppressWarnings("unchecked")
-  private List<BookDocument> parseSearchResults(Map<String, Object> response) {
+  public List<BookDocument> parseSearchResults(Map<String, Object> response) {
     List<BookDocument> books = new ArrayList<>(); // 결과 저장용 리스트
 
     // Elasticsearch 응답에서 "hits" 필드 추출
@@ -243,7 +243,7 @@ public class ElasticService {
    * @param source Elasticsearch 문서의 "_source" 데이터
    * @return BookDocument 객체
    */
-  private BookDocument mapToBookDocument(Map<String, Object> source) {
+  public BookDocument mapToBookDocument(Map<String, Object> source) {
     BookDocument book = new BookDocument();
 
     // 개별 필드 매핑 (안전하게 추출)
@@ -313,7 +313,7 @@ public class ElasticService {
    *
    * @param query Elasticsearch 쿼리 맵 객체
    */
-  private void logElasticsearchQuery(Map<String, Object> query) {
+  public void logElasticsearchQuery(Map<String, Object> query) {
     try {
       // ObjectMapper를 사용하여 JSON 문자열로 변환
       ObjectMapper objectMapper = new ObjectMapper();
