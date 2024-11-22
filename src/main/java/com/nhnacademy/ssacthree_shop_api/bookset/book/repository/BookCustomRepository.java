@@ -2,19 +2,15 @@ package com.nhnacademy.ssacthree_shop_api.bookset.book.repository;
 
 import com.nhnacademy.ssacthree_shop_api.bookset.author.domain.Author;
 import com.nhnacademy.ssacthree_shop_api.bookset.author.dto.AuthorNameResponse;
-import com.nhnacademy.ssacthree_shop_api.bookset.book.domain.Book;
 import com.nhnacademy.ssacthree_shop_api.bookset.book.dto.response.BookBaseResponse;
-import com.nhnacademy.ssacthree_shop_api.bookset.book.dto.response.BookInfoResponse;
 import com.nhnacademy.ssacthree_shop_api.bookset.bookauthor.dto.BookAuthorDto;
 import com.nhnacademy.ssacthree_shop_api.bookset.bookcategory.dto.BookCategoryDto;
 import com.nhnacademy.ssacthree_shop_api.bookset.booktag.dto.BookTagDto;
-import com.nhnacademy.ssacthree_shop_api.bookset.category.domain.Category;
 import com.nhnacademy.ssacthree_shop_api.bookset.category.dto.response.CategoryNameResponse;
-import com.nhnacademy.ssacthree_shop_api.bookset.tag.domain.Tag;
 import com.nhnacademy.ssacthree_shop_api.bookset.tag.dto.response.TagInfoResponse;
+import com.nhnacademy.ssacthree_shop_api.memberset.member.domain.Member;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
 
@@ -47,19 +43,11 @@ public interface BookCustomRepository {
 
     List<BookAuthorDto> findAuthorsByBookIds(List<Long> bookIds);
 
-    // 조건에 따른 도서 순서(최저 가격 순, 최고 가격 순, 좋아요 순, 판매 수량 순, 조회수 순)
-
-    // 책의 조회수 증가 ..?
-
     // 카테고리 책 검색(해당 카테고리에 속해있는 책 검색, 하위 카테고리까지 검색해야함)
     Page<BookBaseResponse> findBooksByCategoryId(Long categoryId, Pageable pageable);
 
     // 작가 아이디로 책 검색
     Page<BookBaseResponse> findBooksByAuthorId(Long authorId, Pageable pageable);
-
-    // 작가 이름으로 책 검색
-
-    // 책의 카테고리 루트 검색
 
     // 태그로 책 검색
     Page<BookBaseResponse> findBooksByTagId(Long tagId, Pageable pageable);
@@ -79,4 +67,9 @@ public interface BookCustomRepository {
     // 도서 아이디로 도서 검색
     BookBaseResponse findBookById(Long bookId);
 
+    // 회원의 좋아요 도서 목록 검색
+    Page<BookBaseResponse> findBookLikesByCustomerId(Long customerId, Pageable pageable);
+
+    // 도서의 좋아요 수
+    Long findBookLikeByBookId(Long bookId);
 }

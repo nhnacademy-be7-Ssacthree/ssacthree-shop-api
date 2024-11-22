@@ -26,4 +26,10 @@ public class BookLike {
     @JoinColumn(name = "customer_id")
     private Member member;
 
+    public BookLike(Book book, Member member) {
+        this.book = book;
+        this.member = member;
+        this.bookLikeId = new BookLikeId(book.getBookId(), member.getCustomer().getCustomerId());
+    }
+
 }

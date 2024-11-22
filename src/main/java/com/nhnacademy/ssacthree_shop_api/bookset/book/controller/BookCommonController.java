@@ -2,6 +2,8 @@ package com.nhnacademy.ssacthree_shop_api.bookset.book.controller;
 
 import com.nhnacademy.ssacthree_shop_api.bookset.book.dto.response.BookInfoResponse;
 import com.nhnacademy.ssacthree_shop_api.bookset.book.service.BookCommonService;
+import com.nhnacademy.ssacthree_shop_api.bookset.booklike.dto.request.BookLikeRequest;
+import com.nhnacademy.ssacthree_shop_api.bookset.booklike.dto.response.BookLikeResponse;
 import com.nhnacademy.ssacthree_shop_api.bookset.category.dto.response.CategoryNameResponse;
 import com.nhnacademy.ssacthree_shop_api.commons.paging.PageRequestBuilder;
 import lombok.RequiredArgsConstructor;
@@ -11,6 +13,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -75,7 +78,6 @@ public class BookCommonController {
      * @param authorId 작가 아이디
      * @return 작가의 도서 페이지
      */
-    //todo:@RequestParam 써서 해봐야겠다.
     @GetMapping("/authors/{author-id}")
     public ResponseEntity<Page<BookInfoResponse>> getBookByAuthorId(@RequestParam(defaultValue = "0") int page,
                                                                     @RequestParam(defaultValue = "10") int size,
@@ -86,6 +88,14 @@ public class BookCommonController {
         return new ResponseEntity<>(books, HttpStatus.OK);
     }
 
+    /**
+     * 카테고리 아이디로 소속 도서를 조회합니다.
+     * @param page 현재 요청하려는 페이지 번호
+     * @param size 한 페이지에 표시할 데이터의 개수
+     * @param sort 정렬 조건 (여러개의 정렬 조건을 설정 가능하도록 배열 형태로)
+     * @param categoryId 카테고리 아이디
+     * @return 카테고리의 도서 페이지
+     */
     @GetMapping("/categories/{category-id}")
     public ResponseEntity<Page<BookInfoResponse>> getBooksByCategoryId(@RequestParam(defaultValue = "0") int page,
                                                                        @RequestParam(defaultValue = "10") int size,
@@ -96,6 +106,14 @@ public class BookCommonController {
         return new ResponseEntity<>(books, HttpStatus.OK);
     }
 
+    /**
+     * 태그 아이디로 소속 도서를 조회합니다.
+     * @param page 현재 요청하려는 페이지 번호
+     * @param size 한 페이지에 표시할 데이터의 개수
+     * @param sort 정렬 조건 (여러개의 정렬 조건을 설정 가능하도록 배열 형태로)
+     * @param tagId 태그 아이디
+     * @return 태그의 도서 페이지
+     */
     @GetMapping("/tags/{tag-id}")
     public ResponseEntity<Page<BookInfoResponse>> getBooksByTagId(@RequestParam(defaultValue = "0") int page,
                                                                        @RequestParam(defaultValue = "10") int size,
@@ -106,9 +124,56 @@ public class BookCommonController {
         return new ResponseEntity<>(books, HttpStatus.OK);
     }
 
+    /**
+     * 도서의 소속 카테고리를 보여줍니다.
+     * @param bookId 도서 아이디
+     * @return 도서의 카테고리 리스트를 보여줍니다.
+     */
     @GetMapping("/{book-id}/categories")
     public ResponseEntity<List<CategoryNameResponse>> getCategoriesByBookId(@PathVariable(name = "book-id") Long bookId) {
         List<CategoryNameResponse> categories = bookCommonService.getCategoriesByBookId(bookId);
         return new ResponseEntity<>(categories, HttpStatus.OK);
+    }
+
+    /**
+     * 회원의 좋아요 도서 목록을 조회합니다
+     * @param page 현재 요청하려는 페이지 번호
+     * @param size 한 페이지에 표시할 데이터의 개수
+     * @param sort 정렬 조건 (여러개의 정렬 조건을 설정 가능하도록 배열 형태로)
+     * @param memberId 멤버 아이디
+     * @return 도서 정보 페이지
+     */
+    @GetMapping("/likes")
+    public ResponseEntity<Page<BookInfoResponse>> getBooksByMemberId(@RequestParam(defaultValue = "0") int page,
+                                                                     @RequestParam(defaultValue = "10") int size,
+                                                                     @RequestParam(defaultValue = "bookName:asc") String[] sort,
+                                                                     @RequestParam(name="member-id") Long memberId){
+        Pageable pageable = PageRequestBuilder.createPageable(page, size, sort);
+        Page<BookInfoResponse> books = bookCommonService.getBooksByMemberId(pageable, memberId);
+        return new ResponseEntity<>(books, HttpStatus.OK);
+    }
+
+    /**
+     * 좋아요를 등록합니다
+     * @param request 좋아요 요청
+     * @return 좋아요 정보
+     */
+    @PostMapping("/likes")
+    public ResponseEntity<BookLikeResponse> createBookLikeByMemberId(@RequestBody BookLikeRequest request) {
+        return ResponseEntity.status(HttpStatus.CREATED).contentType(MediaType.APPLICATION_JSON)
+                .body(bookCommonService.saveBookLike(request));
+    }
+
+    /**
+     * 좋아요를 삭제합니다.
+     * @param bookId 도서 아이디
+     * @param memberId 멤버 아이디
+     * @return 삭제 성공 여부
+     */
+    @DeleteMapping("/likes/{book-id}/{member-id}")
+    public ResponseEntity<Boolean> deleteBookLikeByMemberId(@PathVariable(name="book-id") Long bookId,
+                                                         @PathVariable(name="member-id") Long memberId) {
+        boolean result = bookCommonService.deleteBookLike(bookId, memberId);
+        return new ResponseEntity<>(result, HttpStatus.OK);
     }
 }

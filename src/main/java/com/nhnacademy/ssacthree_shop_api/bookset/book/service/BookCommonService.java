@@ -2,6 +2,8 @@ package com.nhnacademy.ssacthree_shop_api.bookset.book.service;
 
 import com.nhnacademy.ssacthree_shop_api.bookset.author.dto.AuthorNameResponse;
 import com.nhnacademy.ssacthree_shop_api.bookset.book.dto.response.BookInfoResponse;
+import com.nhnacademy.ssacthree_shop_api.bookset.booklike.dto.request.BookLikeRequest;
+import com.nhnacademy.ssacthree_shop_api.bookset.booklike.dto.response.BookLikeResponse;
 import com.nhnacademy.ssacthree_shop_api.bookset.category.dto.response.CategoryNameResponse;
 import com.nhnacademy.ssacthree_shop_api.bookset.tag.dto.response.TagInfoResponse;
 import org.springframework.data.domain.Page;
@@ -33,4 +35,14 @@ public interface BookCommonService {
 
     // 태그 아이디로 소속 도서 찾기
     Page<BookInfoResponse> getBooksByTagId(Pageable pageable, Long tagId);
+
+    // 회원의 좋아요 도서 목록 검색
+    Page<BookInfoResponse> getBooksByMemberId(Pageable pageable, Long customerId);
+
+    // 좋아요 생성
+    BookLikeResponse saveBookLike(BookLikeRequest bookLikeRequest);
+
+    // 좋아요 삭제
+    Boolean deleteBookLike(Long bookId, Long customerId);
+
 }

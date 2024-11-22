@@ -10,6 +10,7 @@ import com.nhnacademy.ssacthree_shop_api.bookset.bookauthor.domain.QBookAuthor;
 import com.nhnacademy.ssacthree_shop_api.bookset.bookauthor.dto.BookAuthorDto;
 import com.nhnacademy.ssacthree_shop_api.bookset.bookcategory.domain.QBookCategory;
 import com.nhnacademy.ssacthree_shop_api.bookset.bookcategory.dto.BookCategoryDto;
+import com.nhnacademy.ssacthree_shop_api.bookset.booklike.domain.QBookLike;
 import com.nhnacademy.ssacthree_shop_api.bookset.booktag.domain.QBookTag;
 import com.nhnacademy.ssacthree_shop_api.bookset.booktag.dto.BookTagDto;
 import com.nhnacademy.ssacthree_shop_api.bookset.category.domain.QCategory;
@@ -20,6 +21,8 @@ import com.nhnacademy.ssacthree_shop_api.bookset.publisher.dto.PublisherNameResp
 import com.nhnacademy.ssacthree_shop_api.bookset.tag.domain.QTag;
 import com.nhnacademy.ssacthree_shop_api.bookset.tag.dto.response.TagInfoResponse;
 import com.nhnacademy.ssacthree_shop_api.commons.util.QueryDslSortUtil;
+import com.nhnacademy.ssacthree_shop_api.memberset.member.domain.Member;
+import com.nhnacademy.ssacthree_shop_api.memberset.member.domain.QMember;
 import com.querydsl.core.types.*;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.PathBuilder;
@@ -48,6 +51,8 @@ public class BookCustomRepositoryImpl implements BookCustomRepository {
     private static final QCategory category = QCategory.category;
     private static final QTag tag = QTag.tag;
     private static final QAuthor author = QAuthor.author;
+    private static final QBookLike bookLike = QBookLike.bookLike;
+    private static final QMember member = QMember.member;
 
     private final CategoryRepository categoryRepository;
 
@@ -224,11 +229,6 @@ public class BookCustomRepositoryImpl implements BookCustomRepository {
      */
     @Override
     public Page<BookBaseResponse> findBooksByCategoryId(Long categoryId, Pageable pageable) {
-//        List<JoinClause> joinConditions = List.of(
-//                query -> query.leftJoin(book.bookCategories, bookCategory).leftJoin(bookCategory.category, category)
-//        );
-//        Predicate condition = category.categoryId.eq(categoryId).and(isOnSaleOrNoStock());
-//        return findBooksByCondition(pageable, condition, joinConditions);
         // 현재 카테고리와 모든 하위 카테고리 ID 조회
         List<Long> allCategoryIds = categoryRepository.findAllDescendants(categoryId).stream()
                 .map(Category::getCategoryId) // 하위 카테고리의 ID 리스트 추출
@@ -245,6 +245,32 @@ public class BookCustomRepositoryImpl implements BookCustomRepository {
 
         // 조건과 조인으로 결과 조회
         return findBooksByCondition(pageable, condition, joinConditions);
+    }
+
+    /**
+     * 회원의 좋아요 도서 목록 검색
+     * @param customerId 회원 아이디
+     * @param pageable 페이징 처리
+     * @return 도서 기본 정보
+     */
+    @Override
+    public Page<BookBaseResponse> findBookLikesByCustomerId(Long customerId, Pageable pageable) {
+        List<JoinClause> joinConditions = List.of(
+                query -> query.leftJoin(book, bookLike.book).leftJoin(bookLike.member, member)
+        );
+        Predicate condition = member.id.eq(customerId).and(isOnSaleOrNoStock());
+        return findBooksByCondition(pageable, condition, joinConditions);
+    }
+
+    /**
+     * 특정 책의 좋아요 수
+     * @param bookId 도서 아이디
+     * @return 좋아요 수
+     */
+    @Override
+    public Long findBookLikeByBookId(Long bookId) {
+        return queryFactory.select(bookLike.count()).from(bookLike)
+                .where(bookLike.book.bookId.eq(bookId)).fetchOne();
     }
 
     /**
@@ -291,7 +317,7 @@ public class BookCustomRepositoryImpl implements BookCustomRepository {
      */
     @Override
     public BookBaseResponse findBookById(Long bookId) {
-        addViewCount(book, bookId);
+        addViewCount(book, bookId); // 조회수 증가
         return queryFactory.select(Projections.constructor(BookBaseResponse.class,
                         book.bookId,
                         book.bookName,

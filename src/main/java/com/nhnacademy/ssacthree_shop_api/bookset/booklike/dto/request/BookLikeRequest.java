@@ -1,13 +1,11 @@
-package com.nhnacademy.ssacthree_shop_api.bookset.booklike.dto;
+package com.nhnacademy.ssacthree_shop_api.bookset.booklike.dto.request;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
-@AllArgsConstructor
 @NoArgsConstructor
-public class BookLikeDto {
+public class BookLikeRequest {
     private Long bookId;
     private Long customerId;
 }

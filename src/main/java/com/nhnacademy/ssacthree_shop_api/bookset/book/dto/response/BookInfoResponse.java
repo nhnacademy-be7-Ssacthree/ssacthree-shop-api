@@ -32,7 +32,7 @@ public class BookInfoResponse {
     private int bookViewCount;
     private int bookDiscount; // 할인율
 
-    private String bookStatus; // 배송 상태
+    private String bookStatus; // 도서 상태
 
     // FK
     @Setter
