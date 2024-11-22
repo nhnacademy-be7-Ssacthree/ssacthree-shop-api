@@ -4,6 +4,8 @@ import com.nhnacademy.ssacthree_shop_api.bookset.author.dto.AuthorNameResponse;
 import com.nhnacademy.ssacthree_shop_api.bookset.book.domain.Book;
 import com.nhnacademy.ssacthree_shop_api.bookset.book.dto.response.BookBaseResponse;
 import com.nhnacademy.ssacthree_shop_api.bookset.book.dto.response.BookInfoResponse;
+import com.nhnacademy.ssacthree_shop_api.bookset.book.dto.response.BookListBaseResponse;
+import com.nhnacademy.ssacthree_shop_api.bookset.book.dto.response.BookListResponse;
 import com.nhnacademy.ssacthree_shop_api.bookset.book.exception.BookNotFoundException;
 import com.nhnacademy.ssacthree_shop_api.bookset.book.repository.BookRepository;
 import com.nhnacademy.ssacthree_shop_api.bookset.book.service.BookCommonService;
@@ -62,6 +64,29 @@ public class BookCommonServiceImpl implements BookCommonService {
         return bookInfoResponse;
     }
 
+    private Page<BookListResponse> addAssociatedDataToBookListResponsePage(Page<BookListBaseResponse> booksPage) {
+        if (booksPage == null) {
+            throw new NotFoundException("해당 도서를 찾을 수 없습니다");
+        }
+
+        List<BookListResponse> bookListResponse = booksPage.getContent().stream()
+                .map(baseResponse -> {
+                    BookListResponse response = new BookListResponse(baseResponse);
+
+                    response.setCategories(bookRepository.findCategoriesByBookId(baseResponse.getBookId()));
+                    response.setTags(bookRepository.findTagsByBookId(baseResponse.getBookId()));
+                    response.setAuthors(bookRepository.findAuthorsByBookId(baseResponse.getBookId()));
+                    response.setLikeCount(bookRepository.findBookLikeByBookId(baseResponse.getBookId()));
+                    response.setReviewCount(bookRepository.findReviewCountByBookId(baseResponse.getBookId()));
+                    response.setReviewRateAverage(bookRepository.findReviewRateAverageByBookId(baseResponse.getBookId()));
+
+                    return response;
+                })
+                .collect(Collectors.toList());
+
+        return new PageImpl<>(bookListResponse, booksPage.getPageable(), booksPage.getTotalElements());
+    }
+
     /**
      * 판매 중, 재고 없음 상태 책 모두 조회
      * @param pageable 페이징 처리
@@ -69,14 +94,8 @@ public class BookCommonServiceImpl implements BookCommonService {
      */
     @Override
     @Transactional(readOnly = true)
-    public Page<BookInfoResponse> getAllAvailableBooks(Pageable pageable) {
-        Page<BookBaseResponse> booksPage = bookRepository.findAllAvailableBooks(pageable);
-
-        List<BookInfoResponse> bookInfoResponses = booksPage.getContent().stream()
-                .map(this::addAssociatedDataToBookInfoResponse)
-                .collect(Collectors.toList());
-
-        return new PageImpl<>(bookInfoResponses, pageable, booksPage.getTotalElements());
+    public Page<BookListResponse> getAllAvailableBooks(Pageable pageable) {
+        return addAssociatedDataToBookListResponsePage(bookRepository.findAllAvailableBooks(pageable));
     }
 
     /**
@@ -97,14 +116,8 @@ public class BookCommonServiceImpl implements BookCommonService {
      */
     @Override
     @Transactional(readOnly = true)
-    public Page<BookInfoResponse> getBooksByBookName(Pageable pageable, String bookName) {
-        Page<BookBaseResponse> booksPage =  bookRepository.findBooksByBookName(pageable, bookName);
-
-        List<BookInfoResponse> bookInfoResponses = booksPage.getContent().stream()
-                .map(this::addAssociatedDataToBookInfoResponse)
-                .collect(Collectors.toList());
-
-        return new PageImpl<>(bookInfoResponses, pageable, booksPage.getTotalElements());
+    public Page<BookListResponse> getBooksByBookName(Pageable pageable, String bookName) {
+        return addAssociatedDataToBookListResponsePage(bookRepository.findBooksByBookName(pageable, bookName));
     }
 
     /**
@@ -125,14 +138,8 @@ public class BookCommonServiceImpl implements BookCommonService {
      * @return 도서 정보 페이지
      */
     @Override
-    public Page<BookInfoResponse> getBooksByAuthorId(Pageable pageable, Long authorId) {
-        Page<BookBaseResponse> booksPage =  bookRepository.findBooksByAuthorId(authorId, pageable);
-
-        List<BookInfoResponse> bookInfoResponses = booksPage.getContent().stream()
-                .map(this::addAssociatedDataToBookInfoResponse)
-                .collect(Collectors.toList());
-
-        return new PageImpl<>(bookInfoResponses, pageable, booksPage.getTotalElements());
+    public Page<BookListResponse> getBooksByAuthorId(Pageable pageable, Long authorId) {
+        return addAssociatedDataToBookListResponsePage(bookRepository.findBooksByAuthorId(authorId, pageable));
     }
 
     /**
@@ -142,14 +149,8 @@ public class BookCommonServiceImpl implements BookCommonService {
      * @return 도서 정보 페이지
      */
     @Override
-    public Page<BookInfoResponse> getBooksByCategoryId(Pageable pageable, Long categoryId) {
-        Page<BookBaseResponse> booksPage =  bookRepository.findBooksByCategoryId(categoryId, pageable);
-
-        List<BookInfoResponse> bookInfoResponses = booksPage.getContent().stream()
-                .map(this::addAssociatedDataToBookInfoResponse)
-                .collect(Collectors.toList());
-
-        return new PageImpl<>(bookInfoResponses, pageable, booksPage.getTotalElements());
+    public Page<BookListResponse> getBooksByCategoryId(Pageable pageable, Long categoryId) {
+        return addAssociatedDataToBookListResponsePage(bookRepository.findBooksByCategoryId(categoryId, pageable));
     }
 
     /**
@@ -159,14 +160,8 @@ public class BookCommonServiceImpl implements BookCommonService {
      * @return 도서 정보 페이지
      */
     @Override
-    public Page<BookInfoResponse> getBooksByTagId(Pageable pageable, Long tagId) {
-        Page<BookBaseResponse> booksPage =  bookRepository.findBooksByTagId(tagId, pageable);
-
-        List<BookInfoResponse> bookInfoResponses = booksPage.getContent().stream()
-                .map(this::addAssociatedDataToBookInfoResponse)
-                .collect(Collectors.toList());
-
-        return new PageImpl<>(bookInfoResponses, pageable, booksPage.getTotalElements());
+    public Page<BookListResponse> getBooksByTagId(Pageable pageable, Long tagId) {
+        return addAssociatedDataToBookListResponsePage(bookRepository.findBooksByTagId(tagId, pageable));
     }
 
     /**
@@ -176,14 +171,19 @@ public class BookCommonServiceImpl implements BookCommonService {
      * @return 도서 정보 페이지
      */
     @Override
-    public Page<BookInfoResponse> getBooksByMemberId(Pageable pageable, Long customerId) {
-        Page<BookBaseResponse> booksPage = bookRepository.findBookLikesByCustomerId(customerId, pageable);
+    public Page<BookListResponse> getBooksByMemberId(Pageable pageable, Long customerId) {
+        return addAssociatedDataToBookListResponsePage(bookRepository.findBookLikesByCustomerId(customerId, pageable));
+    }
 
-        List<BookInfoResponse> bookInfoResponses = booksPage.getContent().stream()
-                .map(this::addAssociatedDataToBookInfoResponse)
-                .collect(Collectors.toList());
-
-        return new PageImpl<>(bookInfoResponses, pageable, booksPage.getTotalElements());
+    /**
+     * 회원의 좋아요 도서 아이디 리스트를 가져옵니다
+     * @param customerId 회원 아이디
+     * @return 좋아요한 도서 아이디 리스트
+     */
+    @Override
+    public List<Long> getLikedBooksIdForCurrentUser(Long customerId) {
+        List<Long> bookIdList = bookRepository.findLikedBookIdByCustomerId(customerId);
+        return bookIdList!= null ? bookIdList : List.of();
     }
 
     /**
@@ -201,9 +201,9 @@ public class BookCommonServiceImpl implements BookCommonService {
     }
 
     @Override
-    public BookLikeResponse saveBookLike(BookLikeRequest bookLikeRequest) {
+    public BookLikeResponse saveBookLike(BookLikeRequest bookLikeRequest, Long customerId) {
         Book book = bookRepository.findById(bookLikeRequest.getBookId()).orElseThrow(() -> new BookNotFoundException("해당 도서를 찾을 수 없습니다."));
-        Member member = memberRepository.findById(bookLikeRequest.getCustomerId()).orElseThrow(() -> new NotFoundException("해당 회원이 존재하지않습니다."));
+        Member member = memberRepository.findById(customerId).orElseThrow(() -> new NotFoundException("해당 회원이 존재하지않습니다."));
 
         BookLike bookLike = new BookLike(book, member);
 

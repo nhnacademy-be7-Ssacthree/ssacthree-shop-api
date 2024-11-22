@@ -9,18 +9,15 @@ import lombok.Setter;
 @NoArgsConstructor
 public class BookLikeResponse {
     private Long bookId;
-    private Long customerId;
     @Setter
     private Long likeCount;
 
     public BookLikeResponse(BookLikeRequest bookLikeRequest) {
         this.bookId = bookLikeRequest.getBookId();
-        this.customerId = bookLikeRequest.getCustomerId();
     }
 
     public BookLikeResponse(BookLikeRequest bookLikeRequest, Long likeCount) {
         this.bookId = bookLikeRequest.getBookId();
-        this.customerId = bookLikeRequest.getCustomerId();
         this.likeCount = likeCount;
     }
 }
