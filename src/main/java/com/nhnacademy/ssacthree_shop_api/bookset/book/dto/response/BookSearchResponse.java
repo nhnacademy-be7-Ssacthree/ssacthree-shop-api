@@ -26,7 +26,7 @@ public class BookSearchResponse {
         this.bookId = bookId;
         this.bookName = bookName;
         this.bookInfo = bookInfo;
-        this.bookStatus = String.valueOf(bookStatus);
+        this.bookStatus = bookStatus;
     }
 
 }

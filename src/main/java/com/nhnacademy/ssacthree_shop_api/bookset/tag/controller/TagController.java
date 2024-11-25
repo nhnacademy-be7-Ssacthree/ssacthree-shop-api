@@ -1,6 +1,7 @@
 package com.nhnacademy.ssacthree_shop_api.bookset.tag.controller;
 
 import com.nhnacademy.ssacthree_shop_api.bookset.tag.dto.request.TagCreateRequest;
+import com.nhnacademy.ssacthree_shop_api.bookset.tag.dto.request.TagUpdateRequest;
 import com.nhnacademy.ssacthree_shop_api.bookset.tag.dto.response.TagInfoResponse;
 import com.nhnacademy.ssacthree_shop_api.bookset.tag.service.TagService;
 import com.nhnacademy.ssacthree_shop_api.commons.dto.MessageResponse;
@@ -19,6 +20,8 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/shop/admin/tags")
 @RequiredArgsConstructor
 public class TagController {
+    private static final String TAG_UPDATE_SUCCESS_MESSAGE = "태그 정보 수정 성공";
+    private static final String TAG_DELETE_SUCCESS_MESSAGE = "태그 정보 삭제 성공";
 
     private final TagService tagService;
 
@@ -40,6 +43,21 @@ public class TagController {
     @GetMapping("/lists")
     public ResponseEntity<List<TagInfoResponse>> getAllTagList() {
         return ResponseEntity.ok().body(tagService.getAllTagList());
+    }
+
+    @PutMapping
+    public ResponseEntity<MessageResponse> updateTag(@RequestBody TagUpdateRequest tagUpdateRequest){
+        tagService.updateTag(tagUpdateRequest);
+        MessageResponse response = new MessageResponse(TAG_UPDATE_SUCCESS_MESSAGE);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @DeleteMapping("/{tag-id}")
+    public ResponseEntity<MessageResponse> deleteTag(@PathVariable(name = "tag-id") Long tagId) {
+        tagService.deleteTag(tagId);
+        MessageResponse response = new MessageResponse(TAG_DELETE_SUCCESS_MESSAGE);
+
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
 }

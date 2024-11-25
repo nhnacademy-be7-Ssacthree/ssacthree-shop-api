@@ -2,6 +2,7 @@ package com.nhnacademy.ssacthree_shop_api.bookset.tag.service;
 
 
 import com.nhnacademy.ssacthree_shop_api.bookset.tag.dto.request.TagCreateRequest;
+import com.nhnacademy.ssacthree_shop_api.bookset.tag.dto.request.TagUpdateRequest;
 import com.nhnacademy.ssacthree_shop_api.bookset.tag.dto.response.TagInfoResponse;
 import com.nhnacademy.ssacthree_shop_api.commons.dto.MessageResponse;
 import org.springframework.data.domain.Page;
@@ -16,4 +17,9 @@ public interface TagService {
     Page<TagInfoResponse> getAllTags(Pageable pageable);
 
     List<TagInfoResponse> getAllTagList();
+
+    TagInfoResponse updateTag(TagUpdateRequest tagUpdateRequest);
+
+    void deleteTag(Long tagId);
+
 }
