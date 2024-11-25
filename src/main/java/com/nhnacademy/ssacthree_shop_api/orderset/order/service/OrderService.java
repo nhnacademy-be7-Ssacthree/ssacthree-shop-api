@@ -1,4 +1,8 @@
 package com.nhnacademy.ssacthree_shop_api.orderset.order.service;
 
-public class OrderService {
+import com.nhnacademy.ssacthree_shop_api.orderset.order.dto.OrderResponse;
+import com.nhnacademy.ssacthree_shop_api.orderset.order.dto.OrderSaveRequest;
+
+public interface OrderService {
+    OrderResponse saveOrder(OrderSaveRequest orderSaveRequest);
 }
