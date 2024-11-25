@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.Optional;
 
 import com.nhnacademy.ssacthree_shop_api.bookset.publisher.domain.Publisher;
-import com.nhnacademy.ssacthree_shop_api.bookset.publisher.dto.PublisherGetResponse;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface PublisherRepository extends JpaRepository<Publisher, Long>, PublisherCustomRepository {

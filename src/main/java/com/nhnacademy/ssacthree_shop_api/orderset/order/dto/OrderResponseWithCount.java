@@ -11,6 +11,6 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class OrderResponseWithCount {
-  private List<OrderResponse> orders; // 주문 데이터 리스트
+  private List<OrderListResponse> orders; // 주문 데이터 리스트
   private long totalOrders;           // 전체 주문 수
 }

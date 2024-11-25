@@ -1,6 +1,7 @@
 package com.nhnacademy.ssacthree_shop_api.orderset.order.repository.impl;
 
 import com.nhnacademy.ssacthree_shop_api.orderset.order.domain.QOrder;
+import com.nhnacademy.ssacthree_shop_api.orderset.order.dto.OrderListResponse;
 import com.nhnacademy.ssacthree_shop_api.orderset.order.dto.OrderResponse;
 import com.nhnacademy.ssacthree_shop_api.orderset.order.repository.OrderRepositoryCustom;
 import com.nhnacademy.ssacthree_shop_api.orderset.orderstatus.domain.QOrderStatus;
@@ -24,7 +25,7 @@ public class OrderRepositoryImpl implements OrderRepositoryCustom {
   private final JPAQueryFactory queryFactory;
 
   @Override
-  public Page<OrderResponse> findOrdersByCustomerAndDate(
+  public Page<OrderListResponse> findOrdersByCustomerAndDate(
           Long customerId,
           LocalDateTime startDate,
           LocalDateTime endDate,
@@ -49,8 +50,8 @@ public class OrderRepositoryImpl implements OrderRepositoryCustom {
         )
         .fetch();
 
-    List<OrderResponse> results = rawResults.stream()
-        .map(tuple -> new OrderResponse(
+    List<OrderListResponse> results = rawResults.stream()
+        .map(tuple -> new OrderListResponse(
             tuple.get(order.id),
             Objects.requireNonNull(tuple.get(order.ordered_date)).toLocalDate(), // LocalDateTime → LocalDate 변환
             tuple.get(order.total_price),

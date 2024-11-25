@@ -1,8 +1,9 @@
-package com.nhnacademy.ssacthree_shop_api.orderset.orderdetail.domain.repo;
+package com.nhnacademy.ssacthree_shop_api.orderset.orderdetail.repo;
 
 import com.nhnacademy.ssacthree_shop_api.bookset.book.domain.Book;
 import com.nhnacademy.ssacthree_shop_api.orderset.order.domain.Order;
-import com.nhnacademy.ssacthree_shop_api.orderset.orderdetail.domain.domain.OrderDetail;
+import com.nhnacademy.ssacthree_shop_api.orderset.orderdetail.domain.OrderDetail;
+
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 

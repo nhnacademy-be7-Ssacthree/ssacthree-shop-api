@@ -14,4 +14,6 @@ public class OrderDetailSaveRequest {
     private Long couponId;
     private Integer quantity;
     private Integer bookPriceAtOrder;
+    // 임시 추가
+    private Long packagingId;
 }

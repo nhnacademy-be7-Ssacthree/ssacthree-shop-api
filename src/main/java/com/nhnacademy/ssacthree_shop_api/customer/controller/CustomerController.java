@@ -49,13 +49,13 @@ public class CustomerController {
         return ResponseEntity.ok().body(messageResponse);
     }
 
-    @PutMapping("/{cusotmerId}")
+    @PutMapping("/{customerId}")
     public ResponseEntity<MessageResponse> updateCustomer(
         @PathVariable("customerId") Long customerId,
         @RequestBody CustomerUpdateRequest customerUpdateRequest) {
 
         customerService.updateCustomer(customerId, customerUpdateRequest);
-        MessageResponse MessageResponse =new MessageResponse(customerId+ "가 수정 되었습니다.");
+        MessageResponse MessageResponse = new MessageResponse(customerId + "가 수정 되었습니다.");
         return ResponseEntity.ok().body(MessageResponse);
     }
 

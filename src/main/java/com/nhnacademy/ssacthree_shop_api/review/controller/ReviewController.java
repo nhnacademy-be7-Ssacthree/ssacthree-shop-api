@@ -37,9 +37,8 @@ public class ReviewController {
         @RequestParam("book-id") Long bookId,
         @RequestParam("order-id") Long orderId,
         @RequestBody ReviewRequestWithUrl reviewRequest) {
-        ResponseEntity<Void> responseEntity = reviewService.postReviewBook(header,bookId,orderId,reviewRequest);
 
-        return responseEntity;
+        return reviewService.postReviewBook(header,bookId,orderId,reviewRequest);
     }
 
     @GetMapping("/members/reviews/{book-id}")

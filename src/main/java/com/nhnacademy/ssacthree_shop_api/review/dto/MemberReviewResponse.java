@@ -12,6 +12,8 @@ public class MemberReviewResponse {
 
     private Long orderId;
     private Long bookId;
+    private String bookImageUrl;
+    private String bookTitle;
     private int reviewRate;
     private String reviewTitle;
     private String reviewContent;
