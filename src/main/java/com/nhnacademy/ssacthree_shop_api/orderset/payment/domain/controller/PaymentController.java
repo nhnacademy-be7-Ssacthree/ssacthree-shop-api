@@ -6,6 +6,7 @@ import com.nhnacademy.ssacthree_shop_api.orderset.payment.domain.service.Payment
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -17,7 +18,7 @@ public class PaymentController {
     private final PaymentService paymentService;
 
     @PostMapping
-    ResponseEntity<MessageResponse> savePayment(PaymentRequest paymentRequest) {
+    ResponseEntity<MessageResponse> savePayment(@RequestBody PaymentRequest paymentRequest) {
         paymentService.savePayment(paymentRequest);
         return ResponseEntity.ok().body(new MessageResponse("결제 성공"));
     }

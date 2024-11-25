@@ -4,7 +4,6 @@ import com.nhnacademy.ssacthree_shop_api.customer.domain.Customer;
 import com.nhnacademy.ssacthree_shop_api.customer.repository.CustomerRepository;
 import com.nhnacademy.ssacthree_shop_api.orderset.deliveryrule.domain.DeliveryRule;
 import com.nhnacademy.ssacthree_shop_api.orderset.deliveryrule.repository.DeliveryRuleRepository;
-import com.nhnacademy.ssacthree_shop_api.orderset.deliveryrule.service.DeliveryRuleService;
 import com.nhnacademy.ssacthree_shop_api.orderset.order.domain.Order;
 import com.nhnacademy.ssacthree_shop_api.orderset.order.dto.OrderResponse;
 import com.nhnacademy.ssacthree_shop_api.orderset.order.dto.OrderSaveRequest;
@@ -14,10 +13,7 @@ import com.nhnacademy.ssacthree_shop_api.orderset.orderdetail.domain.domain.Orde
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -26,8 +22,6 @@ public class OrderServiceImpl implements OrderService {
     private final OrderRepository orderRepository;
     private final CustomerRepository customerRepository;
     private final DeliveryRuleRepository deliveryRuleRepository;
-
-
 
     @Override
     @Transactional //하나라도 안되면 롤백필요ㅣ.
@@ -76,7 +70,7 @@ public class OrderServiceImpl implements OrderService {
 
         // TODO : 재고 차감
 
-        return null;
+        return new OrderResponse(order.getId());
 
     }
 }
