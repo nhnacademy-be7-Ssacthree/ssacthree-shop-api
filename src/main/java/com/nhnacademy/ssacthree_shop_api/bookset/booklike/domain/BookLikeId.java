@@ -9,6 +9,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor(access =  AccessLevel.PROTECTED)
 public class BookLikeId {
-    private long bookId;
-    private long customerId;
+    private Long bookId;
+    private Long customerId;
 }
