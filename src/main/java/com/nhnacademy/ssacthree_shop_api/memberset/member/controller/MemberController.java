@@ -78,7 +78,7 @@ public class MemberController {
      * @param memberId 회원 로그인 아이디
      * @return 도서 정보 페이지
      */
-    @GetMapping("/likes")
+    @GetMapping("/my-page/likes")
     public ResponseEntity<Page<BookListResponse>> getBooksByMemberId(@RequestParam(defaultValue = "0") int page,
                                                                      @RequestParam(defaultValue = "10") int size,
                                                                      @RequestParam(defaultValue = "bookName:asc") String[] sort,

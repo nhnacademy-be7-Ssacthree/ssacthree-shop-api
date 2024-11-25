@@ -253,12 +253,52 @@ public class BookCustomRepositoryImpl implements BookCustomRepository {
      */
     @Override
     public Page<BookListBaseResponse> findBookLikesByCustomerId(Long customerId, Pageable pageable) {
-        List<JoinClause> joinConditions = List.of(
-                query -> query.leftJoin(book, bookLike.book).leftJoin(bookLike.member, member)
-        );
-        Predicate condition = member.id.eq(customerId).and(isOnSaleOrNoStock());
-        return findBooksByCondition(pageable, condition, joinConditions);
+
+        JPAQuery<BookListBaseResponse> query = queryFactory
+                .select(Projections.constructor(BookListBaseResponse.class,
+                        book.bookId,
+                        book.bookName,
+                        book.publicationDate,
+                        book.regularPrice,
+                        book.salePrice,
+                        book.bookThumbnailImageUrl,
+                        book.bookViewCount,
+                        book.bookDiscount,
+                        book.bookStatus.stringValue(),
+                        Projections.constructor(PublisherNameResponse.class,
+                                publisher.publisherId,
+                                publisher.publisherName)
+                ))
+                .from(bookLike)
+                .leftJoin(bookLike.book, book)
+                .leftJoin(bookLike.member, member)
+                .leftJoin(book.publisher, publisher)
+                .where(member.id.eq(customerId)
+                        .and(isOnSaleOrNoStock()))
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize());
+
+        // 정렬 추가
+        PathBuilder pathBuilder = new PathBuilder<>(QBook.book.getType(), QBook.book.getMetadata());
+        QueryDslSortUtil.applyOrderBy(query, pageable.getSort(), pathBuilder);
+
+        // 데이터 조회
+        List<BookListBaseResponse> books = query.fetch();
+
+        Long totalCount = queryFactory
+                .select(bookLike.count())
+                .from(bookLike)
+                .leftJoin(bookLike.book, book)
+                .leftJoin(bookLike.member, member)
+                .where(member.id.eq(customerId)
+                        .and(isOnSaleOrNoStock()))
+                .fetchOne();
+
+        totalCount = totalCount != null ? totalCount : 0L; // Null 방지
+
+        return new PageImpl<>(books, pageable, totalCount);
     }
+
 
     /**
      * 회원의 좋아요 도서 아이디 리스트
