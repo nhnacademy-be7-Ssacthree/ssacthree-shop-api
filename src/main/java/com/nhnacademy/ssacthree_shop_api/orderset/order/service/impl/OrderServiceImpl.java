@@ -11,6 +11,10 @@ import com.nhnacademy.ssacthree_shop_api.orderset.order.dto.OrderSaveRequest;
 import com.nhnacademy.ssacthree_shop_api.orderset.order.repository.OrderRepository;
 import com.nhnacademy.ssacthree_shop_api.orderset.order.service.OrderService;
 import com.nhnacademy.ssacthree_shop_api.orderset.orderdetail.service.OrderDetailService;
+import com.nhnacademy.ssacthree_shop_api.orderset.orderstatus.domain.OrderStatus;
+import com.nhnacademy.ssacthree_shop_api.orderset.orderstatus.domain.repository.OrderStatusRepository;
+import com.nhnacademy.ssacthree_shop_api.orderset.ordertostatusmapping.OrderToStatusMapping;
+import com.nhnacademy.ssacthree_shop_api.orderset.ordertostatusmapping.repository.OrderToStatusMappingRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,6 +29,8 @@ public class OrderServiceImpl implements OrderService {
     private final CustomerRepository customerRepository;
     private final DeliveryRuleRepository deliveryRuleRepository;
     private final OrderDetailService orderDetailService;
+    private final OrderStatusRepository orderStatusRepository;
+    private final OrderToStatusMappingRepository orderToStatusMappingRepository;
 
     @Override
     @Transactional //하나라도 안되면 롤백필요ㅣ.
@@ -62,13 +68,23 @@ public class OrderServiceImpl implements OrderService {
 
         // TODO : 주문 상세 생성 - 리스트 돌면서 하나씩 생성 .. 응답값 생각하기
         orderDetailService.saveOrderDetails(order, orderSaveRequest.getOrderDetailList());
+        OrderStatus orderStatus= orderStatusRepository.findById(1L)
+                .orElseThrow(() -> new RuntimeException("상태를 찾을 수 없습니다."));
 
-
-        // TODO : 주문 상태 생성
+        // TODO : 주문 상태 생성 - 결제 완료 대기
+        // 일단 주문 + 결제 완료되어야 대기로 됨.
+        OrderToStatusMapping orderToStatusMapping = new OrderToStatusMapping(
+                order,
+                orderStatus,
+                LocalDateTime.now()
+        );
+        orderToStatusMappingRepository.save(orderToStatusMapping);
 
         // TODO : 포장 테이블 생성
+        // 현재는 포장을 받아올 수 없어서 저장 불가함 ...
 
         // TODO : 포인트 내역 생성
+
 
         // TODO : 포인트, 쿠폰 차감
 
