@@ -6,6 +6,11 @@ import com.nhnacademy.ssacthree_shop_api.bookset.book.repository.BookRepository;
 import com.nhnacademy.ssacthree_shop_api.memberset.member.domain.Member;
 import com.nhnacademy.ssacthree_shop_api.memberset.member.exception.MemberNotFoundException;
 import com.nhnacademy.ssacthree_shop_api.memberset.member.repository.MemberRepository;
+import com.nhnacademy.ssacthree_shop_api.memberset.pointhistory.domain.PointHistory;
+import com.nhnacademy.ssacthree_shop_api.memberset.pointhistory.repository.PointHistoryRepository;
+import com.nhnacademy.ssacthree_shop_api.memberset.pointsaverule.domain.PointSaveRule;
+import com.nhnacademy.ssacthree_shop_api.memberset.pointsaverule.exception.PointSaveRuleNotFoundException;
+import com.nhnacademy.ssacthree_shop_api.memberset.pointsaverule.repository.PointSaveRuleRepository;
 import com.nhnacademy.ssacthree_shop_api.orderset.order.domain.Order;
 import com.nhnacademy.ssacthree_shop_api.orderset.order.exception.NotFoundOrderException;
 import com.nhnacademy.ssacthree_shop_api.orderset.order.repository.OrderRepository;
@@ -20,8 +25,10 @@ import com.nhnacademy.ssacthree_shop_api.review.dto.ReviewResponse;
 import com.nhnacademy.ssacthree_shop_api.review.exception.ReviewNotFoundException;
 import com.nhnacademy.ssacthree_shop_api.review.repository.ReviewRepository;
 import com.nhnacademy.ssacthree_shop_api.review.service.ReviewService;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -39,6 +46,8 @@ public class ReviewServiceImpl implements ReviewService {
     private final MemberRepository memberRepository;
     private final OrderRepository orderRepository;
     private final OrderDetailRepository orderDetailRepository;
+    private final PointHistoryRepository pointHistoryRepository;
+    private final PointSaveRuleRepository pointSaveRuleRepository;
 
     @Override
     @Transactional(readOnly = true)
@@ -67,7 +76,25 @@ public class ReviewServiceImpl implements ReviewService {
 
         ReviewId reviewId = new ReviewId(orderId,bookId);
 
-        Review review = new Review(reviewId,order,book,member.getCustomer(),reviewRequest.getReviewRate(),reviewRequest.getReviewTitle(),reviewRequest.getReviewContent(),reviewRequest.getReviewImageUrl()); //일단 사진 저장 보류
+        Review review = new Review(reviewId,order,book,member.getCustomer(),reviewRequest.getReviewRate(),reviewRequest.getReviewTitle(),reviewRequest.getReviewContent(),reviewRequest.getReviewImageUrl());
+
+
+        if(reviewRepository.findByReviewId(reviewId).isEmpty()) {
+            PointHistory pointHistory = null;
+            int memberPoint = 0;
+            if(Objects.equals(reviewRequest.getReviewImageUrl(), "")){ //사진이 없는 경우
+                PointSaveRule pointSaveRule = pointSaveRuleRepository.findPointSaveRuleByPointSaveRuleName("리뷰작성사진없음").orElseThrow(() -> new PointSaveRuleNotFoundException("point save rule not found"));
+                pointHistory = new PointHistory(pointSaveRule,member,pointSaveRule.getPointSaveAmount(),"리뷰작성");
+                memberPoint = member.getMemberPoint() + pointSaveRule.getPointSaveAmount();
+            }else { // 사진이 있는 경우
+                PointSaveRule pointSaveRule = pointSaveRuleRepository.findPointSaveRuleByPointSaveRuleName("리뷰작성사진있음").orElseThrow(() -> new PointSaveRuleNotFoundException("point save rule not found"));
+                pointHistory = new PointHistory(pointSaveRule,member,pointSaveRule.getPointSaveAmount(),"리뷰작성");
+                memberPoint = member.getMemberPoint() + pointSaveRule.getPointSaveAmount();
+            }
+            member.setMemberPoint(memberPoint);
+            pointHistoryRepository.save(pointHistory);
+        }
+
 
         reviewRepository.save(review);
 

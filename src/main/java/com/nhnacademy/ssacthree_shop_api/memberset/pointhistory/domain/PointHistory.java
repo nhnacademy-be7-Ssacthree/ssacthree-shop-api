@@ -12,6 +12,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import java.awt.Point;
 import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -30,6 +31,13 @@ public class PointHistory {
     public PointHistory(PointSaveRule pointSaveRule, Member member) {
         this.member = member;
         this.pointSaveRule = pointSaveRule;
+    }
+
+    public PointHistory(PointSaveRule pointSaveRule, Member member, int pointAmount, String pointChangeReason) {
+        this.pointSaveRule = pointSaveRule;
+        this.member = member;
+        this.pointAmount = pointAmount;
+        this.pointChangeReason = pointChangeReason;
     }
 
 
