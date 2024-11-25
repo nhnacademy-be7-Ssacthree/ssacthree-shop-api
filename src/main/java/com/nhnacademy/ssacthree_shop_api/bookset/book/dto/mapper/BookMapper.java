@@ -99,7 +99,9 @@ public class BookMapper {
                 .bookViewCount(book.getBookViewCount())
                 .bookDiscount(book.getBookDiscount())
                 .bookStatus(book.getBookStatus().toString())
-                .publisher(new PublisherNameResponse(book.getPublisher().getPublisherName()))
+                .publisher(book.getPublisher() != null
+                    ? new PublisherNameResponse(book.getPublisher().getPublisherId(), book.getPublisher().getPublisherName())
+                    : null)
                 .categories(book.getBookCategories().stream()
                         .map(bookCategory -> new CategoryNameResponse(bookCategory.getCategory().getCategoryName()))
                         .toList()) // CategoryNameResponse 리스트로 변환
@@ -113,7 +115,5 @@ public class BookMapper {
 
         return response;
     }
-
-
 
 }

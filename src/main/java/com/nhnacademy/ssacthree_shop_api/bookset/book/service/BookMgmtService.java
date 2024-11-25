@@ -1,6 +1,5 @@
 package com.nhnacademy.ssacthree_shop_api.bookset.book.service;
 
-import com.nhnacademy.ssacthree_shop_api.bookset.book.dto.request.BookDeleteRequest;
 import com.nhnacademy.ssacthree_shop_api.bookset.book.dto.request.BookSaveRequest;
 import com.nhnacademy.ssacthree_shop_api.bookset.book.dto.request.BookUpdateRequest;
 import com.nhnacademy.ssacthree_shop_api.bookset.book.dto.response.*;
@@ -17,7 +16,7 @@ public interface BookMgmtService {
     BookInfoResponse saveBook(BookSaveRequest bookSaveRequest);
 
     // 도서 수정
-    BookUpdateResponse updateBook(BookSaveRequest bookSaveRequest);
+    BookUpdateResponse updateBook(BookUpdateRequest bookUpdateRequest);
 
     // 도서 soft 삭제
     BookDeleteResponse deleteBook(Long bookId);
