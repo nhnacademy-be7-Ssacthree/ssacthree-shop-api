@@ -2,6 +2,7 @@ package com.nhnacademy.ssacthree_shop_api.memberset.member.domain;
 
 import com.nhnacademy.ssacthree_shop_api.customer.domain.Customer;
 import com.nhnacademy.ssacthree_shop_api.memberset.membergrade.domain.MemberGrade;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -75,5 +76,8 @@ public class Member {
     @Setter
     private int memberPoint = 0;
 
+    @Setter
+    @Column(name = "payco_id_number")
+    private String paycoIdNumber = null;
 
 }

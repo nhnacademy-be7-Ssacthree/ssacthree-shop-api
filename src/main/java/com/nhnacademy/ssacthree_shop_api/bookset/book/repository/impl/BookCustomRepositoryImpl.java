@@ -5,11 +5,13 @@ import com.nhnacademy.ssacthree_shop_api.bookset.author.dto.AuthorNameResponse;
 import com.nhnacademy.ssacthree_shop_api.bookset.book.domain.BookStatus;
 import com.nhnacademy.ssacthree_shop_api.bookset.book.domain.QBook;
 import com.nhnacademy.ssacthree_shop_api.bookset.book.dto.response.BookBaseResponse;
+import com.nhnacademy.ssacthree_shop_api.bookset.book.dto.response.BookListBaseResponse;
 import com.nhnacademy.ssacthree_shop_api.bookset.book.repository.BookCustomRepository;
 import com.nhnacademy.ssacthree_shop_api.bookset.bookauthor.domain.QBookAuthor;
 import com.nhnacademy.ssacthree_shop_api.bookset.bookauthor.dto.BookAuthorDto;
 import com.nhnacademy.ssacthree_shop_api.bookset.bookcategory.domain.QBookCategory;
 import com.nhnacademy.ssacthree_shop_api.bookset.bookcategory.dto.BookCategoryDto;
+import com.nhnacademy.ssacthree_shop_api.bookset.booklike.domain.QBookLike;
 import com.nhnacademy.ssacthree_shop_api.bookset.booktag.domain.QBookTag;
 import com.nhnacademy.ssacthree_shop_api.bookset.booktag.dto.BookTagDto;
 import com.nhnacademy.ssacthree_shop_api.bookset.category.domain.QCategory;
@@ -20,6 +22,9 @@ import com.nhnacademy.ssacthree_shop_api.bookset.publisher.dto.PublisherNameResp
 import com.nhnacademy.ssacthree_shop_api.bookset.tag.domain.QTag;
 import com.nhnacademy.ssacthree_shop_api.bookset.tag.dto.response.TagInfoResponse;
 import com.nhnacademy.ssacthree_shop_api.commons.util.QueryDslSortUtil;
+import com.nhnacademy.ssacthree_shop_api.memberset.member.domain.Member;
+import com.nhnacademy.ssacthree_shop_api.memberset.member.domain.QMember;
+import com.nhnacademy.ssacthree_shop_api.review.domain.QReview;
 import com.querydsl.core.types.*;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.PathBuilder;
@@ -48,6 +53,9 @@ public class BookCustomRepositoryImpl implements BookCustomRepository {
     private static final QCategory category = QCategory.category;
     private static final QTag tag = QTag.tag;
     private static final QAuthor author = QAuthor.author;
+    private static final QBookLike bookLike = QBookLike.bookLike;
+    private static final QMember member = QMember.member;
+    private static final QReview review = QReview.review;
 
     private final CategoryRepository categoryRepository;
 
@@ -58,6 +66,7 @@ public class BookCustomRepositoryImpl implements BookCustomRepository {
     private BooleanExpression isOnSaleOrNoStock() {
         return book.bookStatus.eq(BookStatus.ON_SALE)
                 .or(book.bookStatus.eq(BookStatus.NO_STOCK));
+
     }
 
     /**
@@ -75,23 +84,18 @@ public class BookCustomRepositoryImpl implements BookCustomRepository {
      * @param joinConditions 조인 리스트
      * @return 도서 기본 정보 페이지
      */
-    private Page<BookBaseResponse> findBooksByCondition(
+    private Page<BookListBaseResponse> findBooksByCondition(
             Pageable pageable,
             Predicate condition,
             List<JoinClause> joinConditions
     ) {
-        JPAQuery<BookBaseResponse> query = queryFactory
-                .select(Projections.constructor(BookBaseResponse.class,
+        JPAQuery<BookListBaseResponse> query = queryFactory
+                .select(Projections.constructor(BookListBaseResponse.class,
                         book.bookId,
                         book.bookName,
-                        book.bookIndex,
-                        book.bookInfo,
-                        book.bookIsbn,
                         book.publicationDate,
                         book.regularPrice,
                         book.salePrice,
-                        book.isPacked,
-                        book.stock,
                         book.bookThumbnailImageUrl,
                         book.bookViewCount,
                         book.bookDiscount,
@@ -113,7 +117,7 @@ public class BookCustomRepositoryImpl implements BookCustomRepository {
         QueryDslSortUtil.applyOrderBy(query, pageable.getSort(), pathBuilder);
 
         // 페이징 처리 및 결과 조회
-        List<BookBaseResponse> books = query
+        List<BookListBaseResponse> books = query
                 .where(condition)
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
@@ -147,7 +151,7 @@ public class BookCustomRepositoryImpl implements BookCustomRepository {
      * @return Page<BookBaseResponse>
      */
     @Override
-    public Page<BookBaseResponse> findBooksByBookName(Pageable pageable, String bookName) {
+    public Page<BookListBaseResponse> findBooksByBookName(Pageable pageable, String bookName) {
         Predicate condition = isOnSaleOrNoStock().and(book.bookName.containsIgnoreCase(bookName));
         return findBooksByCondition(pageable, condition, List.of());
     }
@@ -158,7 +162,7 @@ public class BookCustomRepositoryImpl implements BookCustomRepository {
      * @return Page<BookInfoResponse>
      */
     @Override
-    public Page<BookBaseResponse> findAllAvailableBooks(Pageable pageable) {
+    public Page<BookListBaseResponse> findAllAvailableBooks(Pageable pageable) {
         Predicate condition = isOnSaleOrNoStock();
         return findBooksByCondition(pageable, condition, List.of());
     }
@@ -169,7 +173,7 @@ public class BookCustomRepositoryImpl implements BookCustomRepository {
      * @return Page<BookBaseResponse>
      */
     @Override
-    public Page<BookBaseResponse> findAllBooksByStatusNoStock(Pageable pageable) {
+    public Page<BookListBaseResponse> findAllBooksByStatusNoStock(Pageable pageable) {
         Predicate condition = book.bookStatus.eq(BookStatus.NO_STOCK);
         return findBooksByCondition(pageable, condition, List.of());
     }
@@ -180,7 +184,7 @@ public class BookCustomRepositoryImpl implements BookCustomRepository {
      * @return Page<BookBaseResponse>
      */
     @Override
-    public Page<BookBaseResponse> findStatusDiscontinued(Pageable pageable) {
+    public Page<BookListBaseResponse> findStatusDiscontinued(Pageable pageable) {
         Predicate condition = book.bookStatus.eq(BookStatus.DISCONTINUED);
         return findBooksByCondition(pageable, condition, List.of());
     }
@@ -192,7 +196,7 @@ public class BookCustomRepositoryImpl implements BookCustomRepository {
      * @return Page<BookBaseResponse>
      */
     @Override
-    public Page<BookBaseResponse> findBooksByAuthorId(Long authorId, Pageable pageable) {
+    public Page<BookListBaseResponse> findBooksByAuthorId(Long authorId, Pageable pageable) {
         List<JoinClause> joinConditions = List.of(
                 query -> query.leftJoin(book.bookAuthors, bookAuthor).leftJoin(bookAuthor.author, author)
         );
@@ -207,7 +211,7 @@ public class BookCustomRepositoryImpl implements BookCustomRepository {
      * @return Page<BookBaseResponse>
      */
     @Override
-    public Page<BookBaseResponse> findBooksByTagId(Long tagId, Pageable pageable) {
+    public Page<BookListBaseResponse> findBooksByTagId(Long tagId, Pageable pageable) {
         List<JoinClause> joinConditions = List.of(
                 query -> query.leftJoin(book.bookTags, bookTag).leftJoin(bookTag.tag, tag)
         );
@@ -222,12 +226,7 @@ public class BookCustomRepositoryImpl implements BookCustomRepository {
      * @return Page<BookBaseResponse>
      */
     @Override
-    public Page<BookBaseResponse> findBooksByCategoryId(Long categoryId, Pageable pageable) {
-//        List<JoinClause> joinConditions = List.of(
-//                query -> query.leftJoin(book.bookCategories, bookCategory).leftJoin(bookCategory.category, category)
-//        );
-//        Predicate condition = category.categoryId.eq(categoryId).and(isOnSaleOrNoStock());
-//        return findBooksByCondition(pageable, condition, joinConditions);
+    public Page<BookListBaseResponse> findBooksByCategoryId(Long categoryId, Pageable pageable) {
         // 현재 카테고리와 모든 하위 카테고리 ID 조회
         List<Long> allCategoryIds = categoryRepository.findAllDescendants(categoryId).stream()
                 .map(Category::getCategoryId) // 하위 카테고리의 ID 리스트 추출
@@ -244,6 +243,109 @@ public class BookCustomRepositoryImpl implements BookCustomRepository {
 
         // 조건과 조인으로 결과 조회
         return findBooksByCondition(pageable, condition, joinConditions);
+    }
+
+    /**
+     * 회원의 좋아요 도서 정보 목록 검색
+     * @param customerId 회원 아이디
+     * @param pageable 페이징 처리
+     * @return 도서 기본 정보
+     */
+    @Override
+    public Page<BookListBaseResponse> findBookLikesByCustomerId(Long customerId, Pageable pageable) {
+
+        JPAQuery<BookListBaseResponse> query = queryFactory
+                .select(Projections.constructor(BookListBaseResponse.class,
+                        book.bookId,
+                        book.bookName,
+                        book.publicationDate,
+                        book.regularPrice,
+                        book.salePrice,
+                        book.bookThumbnailImageUrl,
+                        book.bookViewCount,
+                        book.bookDiscount,
+                        book.bookStatus.stringValue(),
+                        Projections.constructor(PublisherNameResponse.class,
+                                publisher.publisherId,
+                                publisher.publisherName)
+                ))
+                .from(bookLike)
+                .leftJoin(bookLike.book, book)
+                .leftJoin(bookLike.member, member)
+                .leftJoin(book.publisher, publisher)
+                .where(member.id.eq(customerId)
+                        .and(isOnSaleOrNoStock()))
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize());
+
+        // 정렬 추가
+        PathBuilder pathBuilder = new PathBuilder<>(QBook.book.getType(), QBook.book.getMetadata());
+        QueryDslSortUtil.applyOrderBy(query, pageable.getSort(), pathBuilder);
+
+        // 데이터 조회
+        List<BookListBaseResponse> books = query.fetch();
+
+        Long totalCount = queryFactory
+                .select(bookLike.count())
+                .from(bookLike)
+                .leftJoin(bookLike.book, book)
+                .leftJoin(bookLike.member, member)
+                .where(member.id.eq(customerId)
+                        .and(isOnSaleOrNoStock()))
+                .fetchOne();
+
+        totalCount = totalCount != null ? totalCount : 0L; // Null 방지
+
+        return new PageImpl<>(books, pageable, totalCount);
+    }
+
+
+    /**
+     * 회원의 좋아요 도서 아이디 리스트
+     * @param customerId 회원 아이디
+     * @return 도서 아이디
+     */
+    @Override
+    public List<Long> findLikedBookIdByCustomerId(Long customerId) {
+        return queryFactory.select(bookLike.book.bookId)
+                .from(bookLike).where(bookLike.member.id.eq(customerId)).fetch();
+    }
+
+    /**
+     * 특정 책의 좋아요 수
+     * @param bookId 도서 아이디
+     * @return 좋아요 수
+     */
+    @Override
+    public Long findBookLikeByBookId(Long bookId) {
+        return queryFactory.select(bookLike.count()).from(bookLike)
+                .where(bookLike.book.bookId.eq(bookId)).fetchOne();
+    }
+
+    /**
+     * 특정 책의 리뷰 수
+     * @param bookId 도서 아이디
+     * @return 특정 책의 리뷰 수
+     */
+    @Override
+    public Long findReviewCountByBookId(Long bookId) {
+        return queryFactory.select(review.count()).from(review)
+                .where(review.book.bookId.eq(bookId)).fetchOne();
+    }
+
+    /**
+     * 특정 책의 리뷰 별점 평균
+     * @param bookId 도서 아이디
+     * @return 특정 책의 리뷰 별점 평균
+     */
+    @Override
+    public Double findReviewRateAverageByBookId(Long bookId) {
+        Double average = queryFactory.select(review.reviewRate.avg())
+                .from(review)
+                .where(review.book.bookId.eq(bookId))
+                .fetchOne();
+
+        return average != null ? average : 0.0; // 리뷰가 없으면 0.0 반환
     }
 
     /**
@@ -290,7 +392,7 @@ public class BookCustomRepositoryImpl implements BookCustomRepository {
      */
     @Override
     public BookBaseResponse findBookById(Long bookId) {
-        addViewCount(book, bookId);
+        addViewCount(book, bookId); // 조회수 증가
         return queryFactory.select(Projections.constructor(BookBaseResponse.class,
                         book.bookId,
                         book.bookName,
