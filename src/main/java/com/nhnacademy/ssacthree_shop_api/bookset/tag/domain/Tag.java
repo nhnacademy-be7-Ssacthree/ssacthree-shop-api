@@ -6,6 +6,7 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Getter
@@ -23,8 +24,7 @@ public class Tag {
     private Long tagId;
 
     @NotNull
+    @Setter
     @Column(name = "tag_name")
     private String tagName;
-
-
 }
