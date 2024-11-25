@@ -2,18 +2,27 @@ package com.nhnacademy.ssacthree_shop_api.orderset.order.service.impl;
 
 import com.nhnacademy.ssacthree_shop_api.orderset.order.domain.Order;
 import com.nhnacademy.ssacthree_shop_api.orderset.order.dto.OrderResponse;
+import com.nhnacademy.ssacthree_shop_api.orderset.order.dto.OrderResponseWithCount;
 import com.nhnacademy.ssacthree_shop_api.orderset.order.dto.OrderSaveRequest;
 import com.nhnacademy.ssacthree_shop_api.orderset.order.repository.OrderRepository;
+import com.nhnacademy.ssacthree_shop_api.orderset.order.repository.OrderRepositoryCustom;
 import com.nhnacademy.ssacthree_shop_api.orderset.order.service.OrderService;
+import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class OrderServiceImpl implements OrderService {
 
     private final OrderRepository orderRepository;
+    private final OrderRepositoryCustom orderRepositoryCustom;
 
     @Override
     @Transactional //하나라도 안되면 롤백필요ㅣ.
@@ -39,5 +48,27 @@ public class OrderServiceImpl implements OrderService {
 
         return null;
 
+    }
+
+
+
+
+    @Override
+    public OrderResponseWithCount getOrdersByCustomerAndDate(Long customerId, int page, int size, LocalDateTime startDate, LocalDateTime endDate) {
+        Pageable pageable = PageRequest.of(page, size);
+
+        // 주문 조회 (상태 포함)
+        Page<OrderResponse> orderPage = orderRepositoryCustom.findOrdersByCustomerAndDate(customerId, startDate, endDate, pageable);
+
+
+        orderPage.getContent().forEach(order ->
+            log.info("Order ID: {}, Order Date: {}, Total Price: {}, Order Status: {}",
+                order.getOrderId(),
+                order.getOrderDate(),
+                order.getTotalPrice(),
+                order.getOrderStatus()));
+
+        // 상태를 포함한 주문 리스트를 생성하여 반환
+        return new OrderResponseWithCount(orderPage.getContent(), orderPage.getTotalElements());
     }
 }

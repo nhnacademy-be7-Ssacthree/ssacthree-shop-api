@@ -4,11 +4,13 @@ import com.nhnacademy.ssacthree_shop_api.orderset.ordertostatusmapping.OrderStat
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
+@Getter
 @Table(name = "order_status")
 public class OrderStatus {
 
@@ -20,5 +22,5 @@ public class OrderStatus {
     @NotNull
     @Enumerated(EnumType.STRING) // Enum 값을 문자열로 저장
     @Column(name = "order_status_name")
-    private OrderStatusEnum orderStatusEnum = OrderStatusEnum.PEENDING;
+    private OrderStatusEnum orderStatusEnum = OrderStatusEnum.PENDING;
 }

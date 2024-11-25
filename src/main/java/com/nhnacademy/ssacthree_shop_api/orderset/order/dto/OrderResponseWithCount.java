@@ -1,6 +1,6 @@
 package com.nhnacademy.ssacthree_shop_api.orderset.order.dto;
 
-import java.time.LocalDate;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -10,11 +10,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class OrderResponse {
-  private Long orderId;
-  private LocalDate orderDate;
-  private int totalPrice;
-
-  @Getter
-  private String orderStatus;
+public class OrderResponseWithCount {
+  private List<OrderResponse> orders; // 주문 데이터 리스트
+  private long totalOrders;           // 전체 주문 수
 }
