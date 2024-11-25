@@ -7,13 +7,10 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
-public class OrderDetailSaveRequest {
-
+public class OrderDetailDto {
     private Long bookId;
     private Long orderId;
     private Long couponId;
     private Integer quantity;
     private Integer bookPriceAtOrder;
-    // 임시 추가
-    private Long packagingId;
 }

@@ -34,9 +34,19 @@ public class OrderSaveRequest {
     // 포인트 사용
     private Integer pointToUse;
 
+    // 총금액
+    private Integer totalPrice;
+
     // 적립 포인트
 
-    // 순수 금액
+    // 배송 정책 id
+    private Long deliveryRuleId;
+
+    // 주문 id
+    private String orderNumber;
+
+    // 쿠폰아이디? -> 일단 막아두고 도서에서 쓰게 함.
+    // private Long couponId;
 
 
 

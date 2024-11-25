@@ -4,7 +4,6 @@ import com.nhnacademy.ssacthree_shop_api.orderset.order.dto.OrderResponse;
 import com.nhnacademy.ssacthree_shop_api.orderset.order.dto.OrderSaveRequest;
 import com.nhnacademy.ssacthree_shop_api.orderset.order.service.OrderService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -19,8 +18,8 @@ public class OrderController {
     private final OrderService orderService;
 
     @PostMapping
-    ResponseEntity<OrderResponse> saveOrder(@RequestBody OrderSaveRequest orderSaveRequest) {
-        OrderResponse orderResponse = orderService.saveOrder(orderSaveRequest);
+    ResponseEntity<OrderResponse> createOrder(@RequestBody OrderSaveRequest orderSaveRequest) {
+        OrderResponse orderResponse = orderService.createOrder(orderSaveRequest);
         return ResponseEntity.ok().body(orderResponse);
     }
 
