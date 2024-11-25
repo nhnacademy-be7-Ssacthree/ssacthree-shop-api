@@ -5,15 +5,17 @@ import com.nhnacademy.ssacthree_shop_api.customer.repository.CustomerRepository;
 import com.nhnacademy.ssacthree_shop_api.orderset.deliveryrule.domain.DeliveryRule;
 import com.nhnacademy.ssacthree_shop_api.orderset.deliveryrule.repository.DeliveryRuleRepository;
 import com.nhnacademy.ssacthree_shop_api.orderset.order.domain.Order;
+import com.nhnacademy.ssacthree_shop_api.orderset.order.dto.OrderDetailSaveRequest;
 import com.nhnacademy.ssacthree_shop_api.orderset.order.dto.OrderResponse;
 import com.nhnacademy.ssacthree_shop_api.orderset.order.dto.OrderSaveRequest;
 import com.nhnacademy.ssacthree_shop_api.orderset.order.repository.OrderRepository;
 import com.nhnacademy.ssacthree_shop_api.orderset.order.service.OrderService;
-import com.nhnacademy.ssacthree_shop_api.orderset.orderdetail.domain.domain.OrderDetail;
+import com.nhnacademy.ssacthree_shop_api.orderset.orderdetail.service.OrderDetailService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -22,6 +24,7 @@ public class OrderServiceImpl implements OrderService {
     private final OrderRepository orderRepository;
     private final CustomerRepository customerRepository;
     private final DeliveryRuleRepository deliveryRuleRepository;
+    private final OrderDetailService orderDetailService;
 
     @Override
     @Transactional //하나라도 안되면 롤백필요ㅣ.
@@ -38,7 +41,7 @@ public class OrderServiceImpl implements OrderService {
         DeliveryRule deliveryRule = deliveryRuleRepository.findById(orderSaveRequest.getDeliveryRuleId())
                 .orElseThrow(() -> new IllegalArgumentException("배송 정책 정보를 찾을 수 없습니다. ID: " + orderSaveRequest.getDeliveryRuleId()));
 
-        // TODO : 주문 정보 생성
+        // TODO 1 : 주문 정보 생성
         Order order = new Order(
                 null,
                 customer,
@@ -57,8 +60,9 @@ public class OrderServiceImpl implements OrderService {
                 );
         orderRepository.save(order); // 주문후 줘야하는 정보.. 상세 ; orderKey랑 결제 key랑 결제 금액
 
-        // TODO : 주문 상세 생성
-        OrderDetail orderDetail = new OrderDetail();
+        // TODO : 주문 상세 생성 - 리스트 돌면서 하나씩 생성 .. 응답값 생각하기
+        orderDetailService.saveOrderDetails(order, orderSaveRequest.getOrderDetailList());
+
 
         // TODO : 주문 상태 생성
 

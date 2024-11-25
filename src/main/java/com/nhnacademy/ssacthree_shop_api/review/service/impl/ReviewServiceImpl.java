@@ -9,8 +9,8 @@ import com.nhnacademy.ssacthree_shop_api.memberset.member.repository.MemberRepos
 import com.nhnacademy.ssacthree_shop_api.orderset.order.domain.Order;
 import com.nhnacademy.ssacthree_shop_api.orderset.order.exception.NotFoundOrderException;
 import com.nhnacademy.ssacthree_shop_api.orderset.order.repository.OrderRepository;
-import com.nhnacademy.ssacthree_shop_api.orderset.orderdetail.domain.domain.OrderDetail;
-import com.nhnacademy.ssacthree_shop_api.orderset.orderdetail.domain.repo.OrderDetailRepository;
+import com.nhnacademy.ssacthree_shop_api.orderset.orderdetail.domain.OrderDetail;
+import com.nhnacademy.ssacthree_shop_api.orderset.orderdetail.repo.OrderDetailRepository;
 import com.nhnacademy.ssacthree_shop_api.review.domain.Review;
 import com.nhnacademy.ssacthree_shop_api.review.domain.ReviewId;
 import com.nhnacademy.ssacthree_shop_api.review.dto.MemberReviewResponse;

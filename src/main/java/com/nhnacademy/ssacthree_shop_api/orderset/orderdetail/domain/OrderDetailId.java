@@ -1,4 +1,4 @@
-package com.nhnacademy.ssacthree_shop_api.orderset.orderdetail.domain.domain;
+package com.nhnacademy.ssacthree_shop_api.orderset.orderdetail.domain;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
