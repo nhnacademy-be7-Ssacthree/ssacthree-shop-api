@@ -12,8 +12,9 @@ public class BookLikeResponse {
     @Setter
     private Long likeCount;
 
-    public BookLikeResponse(BookLikeRequest bookLikeRequest) {
-        this.bookId = bookLikeRequest.getBookId();
+    public BookLikeResponse(Long bookId, Long likeCount) {
+        this.bookId = bookId;
+        this.likeCount = likeCount;
     }
 
     public BookLikeResponse(BookLikeRequest bookLikeRequest, Long likeCount) {

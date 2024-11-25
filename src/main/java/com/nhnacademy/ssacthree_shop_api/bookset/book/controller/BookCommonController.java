@@ -135,58 +135,5 @@ public class BookCommonController {
         return new ResponseEntity<>(categories, HttpStatus.OK);
     }
 
-    /**
-     * 회원의 좋아요 도서 목록을 조회합니다
-     * @param page 현재 요청하려는 페이지 번호
-     * @param size 한 페이지에 표시할 데이터의 개수
-     * @param sort 정렬 조건 (여러개의 정렬 조건을 설정 가능하도록 배열 형태로)
-     * @param memberId 회원 로그인 아이디
-     * @return 도서 정보 페이지
-     */
-    @GetMapping("/likes")
-    public ResponseEntity<Page<BookListResponse>> getBooksByMemberId(@RequestParam(defaultValue = "0") int page,
-                                                                     @RequestParam(defaultValue = "10") int size,
-                                                                     @RequestParam(defaultValue = "bookName:asc") String[] sort,
-                                                                     @RequestHeader(name = "X-USER-ID") String memberId){
-        Pageable pageable = PageRequestBuilder.createPageable(page, size, sort);
-        Page<BookListResponse> books = bookCommonService.getBooksByMemberId(pageable, memberService.getCustomerIdByMemberLoginId(memberId));
-        return new ResponseEntity<>(books, HttpStatus.OK);
-    }
 
-    /**
-     * 회원의 좋아요 도서 아이디 리스트를 조회합니다.
-     * @param memberId 회원 로그인 아이디
-     * @return 좋아요 도서 아이디 리스트
-     */
-    @GetMapping("/likeList")
-    public ResponseEntity<List<Long>> getLikedBooksIdForCurrentUser(@RequestHeader(name = "X-USER-ID") String memberId){
-        List<Long> bookIdList = bookCommonService.getLikedBooksIdForCurrentUser(memberService.getCustomerIdByMemberLoginId(memberId));
-        return new ResponseEntity<>(bookIdList, HttpStatus.OK);
-    }
-
-    /**
-     * 좋아요를 등록합니다
-     * @param request 좋아요 요청
-     * @param memberId 회원 로그인 아이디
-     * @return 좋아요 정보
-     */
-    @PostMapping("/likes")
-    public ResponseEntity<BookLikeResponse> createBookLikeByMemberId(@RequestBody BookLikeRequest request,
-                                                                     @RequestHeader(name = "X-USER-ID") String memberId) {
-        return ResponseEntity.status(HttpStatus.CREATED).contentType(MediaType.APPLICATION_JSON)
-                .body(bookCommonService.saveBookLike(request, memberService.getCustomerIdByMemberLoginId(memberId)));
-    }
-
-    /**
-     * 좋아요를 삭제합니다.
-     * @param bookId 도서 아이디
-     * @param memberId 회원 로그인 아이디
-     * @return 삭제 성공 여부
-     */
-    @DeleteMapping("/likes/{book-id}")
-    public ResponseEntity<Boolean> deleteBookLikeByMemberId(@PathVariable(name="book-id") Long bookId,
-                                                            @RequestHeader(name = "X-USER-ID") String memberId) {
-        boolean result = bookCommonService.deleteBookLike(bookId, memberService.getCustomerIdByMemberLoginId(memberId));
-        return new ResponseEntity<>(result, HttpStatus.OK);
-    }
 }
