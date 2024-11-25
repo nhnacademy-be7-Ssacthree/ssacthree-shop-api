@@ -122,7 +122,7 @@ public class MemberServiceTest {
         // Given
         String memberLoginId = "testLoginId";
         MemberInfoUpdateRequest updateRequest = new MemberInfoUpdateRequest(
-            memberLoginId, "Updated Name", "010-1234-5678", "updatedEmail@example.com", "19900101"
+            "Updated Name", "010-1234-5678", "updatedEmail@example.com"
         );
 
         Customer customer = new Customer();
@@ -153,7 +153,7 @@ public class MemberServiceTest {
         // Given
         String memberLoginId = "nonExistingId";
         MemberInfoUpdateRequest updateRequest = new MemberInfoUpdateRequest(
-            memberLoginId, "Updated Name", "010-1234-5678", "updatedEmail@example.com", "19900101"
+            "Updated Name", "010-1234-5678", "updatedEmail@example.com"
         );
 
         // Stubbing
@@ -243,5 +243,5 @@ public class MemberServiceTest {
         assertEquals(expectedCustomerId, actualCustomerId);
         verify(memberRepository).findByMemberLoginId(memberLoginId);
     }
-    
+
 }
