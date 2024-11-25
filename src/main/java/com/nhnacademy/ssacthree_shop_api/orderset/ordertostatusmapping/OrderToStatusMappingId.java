@@ -1,16 +1,16 @@
 package com.nhnacademy.ssacthree_shop_api.orderset.ordertostatusmapping;
 
-
 import jakarta.persistence.Embeddable;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
 import java.util.Objects;
 
 @AllArgsConstructor
 @NoArgsConstructor
 @Embeddable
-public class OrderToStatusMappingId {
+public class OrderToStatusMappingId implements Serializable {
     private Long order_id;
     private Long order_status_id;
 
