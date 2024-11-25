@@ -64,25 +64,26 @@ public class OrderDetailServiceImpl implements OrderDetailService {
 
 
 
-            // TODO : 포장 정보 저장
-            Packaging packaging = packagingRepository.findById(orderDetailSaveRequest.getPackagingId())
-                    .orElseThrow(() -> new RuntimeException("포장 정보가 없습니다."));
-
-            OrderDetailPackaging orderDetailPackaging = new OrderDetailPackaging(
-                    null,
-                    packaging,
-                    order,
-                    book,
-                    1
-            );
-            orderDetailPackagingList.add(orderDetailPackaging);
+            // 포장지를 도서에 다는것부터 필요할듯
+//            // TODO : 포장 정보 저장
+//            Packaging packaging = packagingRepository.findById(orderDetailSaveRequest.getPackagingId())
+//                    .orElseThrow(() -> new RuntimeException("포장 정보가 없습니다."));
+//
+//            OrderDetailPackaging orderDetailPackaging = new OrderDetailPackaging(
+//                    null,
+//                    packaging,
+//                    order,
+//                    book,
+//                    1
+//            );
+//            orderDetailPackagingList.add(orderDetailPackaging);
         }
 
         //주문 상세 저장
         orderDetailRepository.saveAll(orderDetails);
 
         // 포장 정보 저장
-        orderDetailPackagingRepository.saveAll(orderDetailPackagingList);
+//        orderDetailPackagingRepository.saveAll(orderDetailPackagingList);
 
 
         //주문 상세 저장 후 뭐 반환?

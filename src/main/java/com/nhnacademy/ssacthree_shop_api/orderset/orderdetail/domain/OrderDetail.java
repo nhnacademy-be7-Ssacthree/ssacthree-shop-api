@@ -47,5 +47,7 @@ public class OrderDetail {
         this.memberCoupon = memberCoupon;
         this.quantity = quantity;
         this.bookpriceAtOrder = bookpriceAtOrder;
+        // 추가해야 복합키 id 만들어짐.
+        this.id = new OrderDetailId(order.getId(), book.getBookId());
     }
 }
