@@ -1,6 +1,5 @@
 package com.nhnacademy.ssacthree_shop_api.bookset.book.dto.response;
 
-import com.nhnacademy.ssacthree_shop_api.bookset.author.dto.AuthorNameResponse;
 import com.nhnacademy.ssacthree_shop_api.bookset.publisher.dto.PublisherNameResponse;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -26,7 +25,7 @@ public class BookBaseResponse {
     private int bookViewCount;
     private int bookDiscount; // 할인율
 
-    private String bookStatus; // 배송 상태
+    private String bookStatus; // 도서 상태
 
     // FK
     private PublisherNameResponse publisher;

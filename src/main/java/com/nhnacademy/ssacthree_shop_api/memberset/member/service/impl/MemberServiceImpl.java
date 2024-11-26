@@ -130,6 +130,7 @@ public class MemberServiceImpl implements MemberService {
             .orElseThrow(() -> new MemberNotFoundException("멤버를 찾을 수 없습니다."));
 
         member.setMemberStatus(MemberStatus.WITHDRAW);
+        member.setPaycoIdNumber(null);
         memberRepository.save(member);
 
         return new MessageResponse("삭제 성공");

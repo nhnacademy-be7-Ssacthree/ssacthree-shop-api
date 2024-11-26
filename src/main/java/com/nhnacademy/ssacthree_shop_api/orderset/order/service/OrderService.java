@@ -1,8 +1,13 @@
 package com.nhnacademy.ssacthree_shop_api.orderset.order.service;
 
 import com.nhnacademy.ssacthree_shop_api.orderset.order.dto.OrderResponse;
+import com.nhnacademy.ssacthree_shop_api.orderset.order.dto.OrderResponseWithCount;
 import com.nhnacademy.ssacthree_shop_api.orderset.order.dto.OrderSaveRequest;
+import java.time.LocalDateTime;
 
 public interface OrderService {
-    OrderResponse saveOrder(OrderSaveRequest orderSaveRequest);
+    OrderResponse createOrder(OrderSaveRequest orderSaveRequest);
+
+    OrderResponseWithCount getOrdersByCustomerAndDate(Long customerId, int page, int size, LocalDateTime startDate, LocalDateTime endDate);
 }
+

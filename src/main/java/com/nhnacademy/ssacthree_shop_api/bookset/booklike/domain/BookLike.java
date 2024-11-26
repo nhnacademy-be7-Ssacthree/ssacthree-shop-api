@@ -2,6 +2,7 @@ package com.nhnacademy.ssacthree_shop_api.bookset.booklike.domain;
 
 import com.nhnacademy.ssacthree_shop_api.bookset.book.domain.Book;
 import com.nhnacademy.ssacthree_shop_api.customer.domain.Customer;
+import com.nhnacademy.ssacthree_shop_api.memberset.member.domain.Member;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -23,6 +24,12 @@ public class BookLike {
     @ManyToOne(fetch = FetchType.LAZY)
     @MapsId("customerId")
     @JoinColumn(name = "customer_id")
-    private Customer customer;
+    private Member member;
+
+    public BookLike(Book book, Member member) {
+        this.book = book;
+        this.member = member;
+        this.bookLikeId = new BookLikeId(book.getBookId(), member.getCustomer().getCustomerId());
+    }
 
 }

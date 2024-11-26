@@ -1,4 +1,4 @@
-package com.nhnacademy.ssacthree_shop_api.orderset.orderdetail.domain.domain;
+package com.nhnacademy.ssacthree_shop_api.orderset.orderdetail.domain;
 
 import com.nhnacademy.ssacthree_shop_api.bookset.book.domain.Book;
 import com.nhnacademy.ssacthree_shop_api.couponset.membercoupon.domain.MemberCoupon;
@@ -39,4 +39,15 @@ public class OrderDetail {
     @NotNull
     @Column(name = "bookprice_at_order")
     private int bookpriceAtOrder;
+
+
+    public OrderDetail(Order order, Book book, MemberCoupon memberCoupon, int quantity, int bookpriceAtOrder) {
+        this.order = order;
+        this.book = book;
+        this.memberCoupon = memberCoupon;
+        this.quantity = quantity;
+        this.bookpriceAtOrder = bookpriceAtOrder;
+        // 추가해야 복합키 id 만들어짐.
+        this.id = new OrderDetailId(order.getId(), book.getBookId());
+    }
 }

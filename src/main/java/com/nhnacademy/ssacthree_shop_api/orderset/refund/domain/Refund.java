@@ -1,6 +1,6 @@
 package com.nhnacademy.ssacthree_shop_api.orderset.refund.domain;
 
-import com.nhnacademy.ssacthree_shop_api.orderset.orderdetail.domain.domain.OrderDetail;
+import com.nhnacademy.ssacthree_shop_api.orderset.orderdetail.domain.OrderDetail;
 import com.nhnacademy.ssacthree_shop_api.orderset.refundreason.domain.RefundReason;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
