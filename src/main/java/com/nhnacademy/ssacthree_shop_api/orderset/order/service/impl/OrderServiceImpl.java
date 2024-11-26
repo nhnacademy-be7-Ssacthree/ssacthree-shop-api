@@ -2,6 +2,17 @@ package com.nhnacademy.ssacthree_shop_api.orderset.order.service.impl;
 
 import com.nhnacademy.ssacthree_shop_api.customer.domain.Customer;
 import com.nhnacademy.ssacthree_shop_api.customer.repository.CustomerRepository;
+import com.nhnacademy.ssacthree_shop_api.memberset.member.domain.Member;
+import com.nhnacademy.ssacthree_shop_api.memberset.member.exception.MemberNotFoundException;
+import com.nhnacademy.ssacthree_shop_api.memberset.member.repository.MemberRepository;
+import com.nhnacademy.ssacthree_shop_api.memberset.pointhistory.domain.PointHistory;
+import com.nhnacademy.ssacthree_shop_api.memberset.pointhistory.dto.PointHistorySaveRequest;
+import com.nhnacademy.ssacthree_shop_api.memberset.pointhistory.service.PointHistoryService;
+import com.nhnacademy.ssacthree_shop_api.memberset.pointorder.domain.PointOrder;
+import com.nhnacademy.ssacthree_shop_api.memberset.pointorder.domain.repository.PointOrderRepository;
+import com.nhnacademy.ssacthree_shop_api.memberset.pointsaverule.domain.PointSaveRule;
+import com.nhnacademy.ssacthree_shop_api.memberset.pointsaverule.exception.PointSaveRuleNotFoundException;
+import com.nhnacademy.ssacthree_shop_api.memberset.pointsaverule.repository.PointSaveRuleRepository;
 import com.nhnacademy.ssacthree_shop_api.orderset.deliveryrule.domain.DeliveryRule;
 import com.nhnacademy.ssacthree_shop_api.orderset.deliveryrule.repository.DeliveryRuleRepository;
 import com.nhnacademy.ssacthree_shop_api.orderset.order.domain.Order;
@@ -13,6 +24,9 @@ import com.nhnacademy.ssacthree_shop_api.orderset.order.repository.OrderReposito
 import com.nhnacademy.ssacthree_shop_api.orderset.order.repository.OrderRepositoryCustom;
 import com.nhnacademy.ssacthree_shop_api.orderset.order.service.OrderService;
 import java.time.LocalDateTime;
+import java.util.Objects;
+import java.util.Optional;
+
 import com.nhnacademy.ssacthree_shop_api.orderset.orderdetail.service.OrderDetailService;
 import com.nhnacademy.ssacthree_shop_api.orderset.orderstatus.domain.OrderStatus;
 import com.nhnacademy.ssacthree_shop_api.orderset.orderstatus.domain.repository.OrderStatusRepository;
@@ -38,6 +52,10 @@ public class OrderServiceImpl implements OrderService {
     private final OrderDetailService orderDetailService;
     private final OrderStatusRepository orderStatusRepository;
     private final OrderToStatusMappingRepository orderToStatusMappingRepository;
+    private final PointHistoryService pointHistoryService;
+    private final PointSaveRuleRepository pointSaveRuleRepository;
+    private final MemberRepository memberRepository;
+    private final PointOrderRepository pointOrderRepository;
 
     @Override
     @Transactional //하나라도 안되면 롤백필요ㅣ.
@@ -45,16 +63,16 @@ public class OrderServiceImpl implements OrderService {
     public OrderResponse createOrder(OrderSaveRequest orderSaveRequest) {
         // 여기서 주문 하나 저장할때 모든 작업들 함.
 
-        // TODO : 레포에서 이렇게 가져오는게 맞을지 ..
+        // TODO : 레포에서 이렇게 가져오는게 맞을지 .. 서비스로 빼고 서비스단 이용하도록 추후 수정.
         // 회원 가져옴
         Customer customer = customerRepository.findById(orderSaveRequest.getCustomerId())
-                .orElseThrow(() -> new IllegalArgumentException("회원 정보를 찾을 수 없습니다. ID: " + orderSaveRequest.getCustomerId()));
+                .orElseThrow(() -> new IllegalArgumentException("고객 정보를 찾을 수 없습니다. ID: " + orderSaveRequest.getCustomerId()));
 
         // 배송 정책 가져옴
         DeliveryRule deliveryRule = deliveryRuleRepository.findById(orderSaveRequest.getDeliveryRuleId())
                 .orElseThrow(() -> new IllegalArgumentException("배송 정책 정보를 찾을 수 없습니다. ID: " + orderSaveRequest.getDeliveryRuleId()));
 
-        // TODO 1 : 주문 정보 생성
+        // TODO 주문 정보 생성
         Order order = new Order(
                 null,
                 customer,
@@ -73,13 +91,15 @@ public class OrderServiceImpl implements OrderService {
                 );
         orderRepository.save(order); // 주문후 줘야하는 정보.. 상세 ; orderKey랑 결제 key랑 결제 금액
 
-        // TODO : 주문 상세 생성 - 리스트 돌면서 하나씩 생성 .. 응답값 생각하기
+        // TODO : 주문 상세 생성 - 리스트 돌면서 하나씩 생성 .. 응답값 생각하기, 최대한 db접근 최소화
         orderDetailService.saveOrderDetails(order, orderSaveRequest.getOrderDetailList());
+
+        // TODO : 포장 테이블 생성 - 주문 상세쪽에서 처리해야할 듯.
+        // 현재는 포장을 받아올 수 없어서 저장 불가함 ...
+
+        // TODO : 주문 완료시 상태 생성 - 결제 완료, 대기
         OrderStatus orderStatus= orderStatusRepository.findById(1L)
                 .orElseThrow(() -> new RuntimeException("상태를 찾을 수 없습니다."));
-
-        // TODO : 주문 상태 생성 - 결제 완료 대기
-        // 일단 주문 + 결제 완료되어야 대기로 됨.
         OrderToStatusMapping orderToStatusMapping = new OrderToStatusMapping(
                 order,
                 orderStatus,
@@ -87,21 +107,44 @@ public class OrderServiceImpl implements OrderService {
         );
         orderToStatusMappingRepository.save(orderToStatusMapping);
 
-        // TODO : 포장 테이블 생성
-        // 현재는 포장을 받아올 수 없어서 저장 불가함 ...
+        // TODO : 포인트 적립, 사용 내역 생성 - 포인트 서비스 - 하나로 묶기 ?
+        Optional<Member> optionalMember = memberRepository.findById(orderSaveRequest.getCustomerId());
 
-        // TODO : 포인트 내역 생성
+        if (!Objects.isNull(optionalMember)) {
+            Member member = optionalMember.get();
+            int pointHistory = 0;
+            PointSaveRule pointSaveRule = pointSaveRuleRepository.findPointSaveRuleByPointSaveRuleName("도서구매적립")
+                    .orElseThrow(() -> new PointSaveRuleNotFoundException("정책이 존재하지 않습니다."));
 
-        // TODO : 포인트, 쿠폰 차감
+            PointHistory savePointHistory = pointHistoryService.savePointHistory(
+                    pointSaveRule,
+                    member,
+                    new PointHistorySaveRequest(orderSaveRequest.getPointToSave(), pointSaveRule.getPointSaveRuleName()));
+        pointOrderRepository.save(new PointOrder(savePointHistory, order));
+            pointHistory += savePointHistory.getPointAmount();
 
-        // TODO : 재고 차감
+            if (0 < orderSaveRequest.getPointToUse() && orderSaveRequest.getPointToUse() <= member.getMemberPoint() ) {
+                PointHistory usePointHistory = pointHistoryService.savePointHistory(
+                        null,
+                        member,
+                        new PointHistorySaveRequest((-1) * orderSaveRequest.getPointToUse(), "도서 포인트 결제")
+                );
+            pointOrderRepository.save(new PointOrder(usePointHistory, order));
+                pointHistory += usePointHistory.getPointAmount();
+            }
+            member.setMemberPoint(member.getMemberPoint() + pointHistory);
+        }
+
+        // TODO : 회원 쿠폰 차감 - 쿠폰 서비스에 구현 : 도서(상세) or 주문에 적용 쿠폰
+
+        // TODO : 장바구니 비우기
+
+        // TODO : 재고 차감 -> 상세에서 처리
+
 
         return new OrderResponse(order.getId());
 
     }
-
-
-
 
     @Override
     public OrderResponseWithCount getOrdersByCustomerAndDate(Long customerId, int page, int size, LocalDateTime startDate, LocalDateTime endDate) {
