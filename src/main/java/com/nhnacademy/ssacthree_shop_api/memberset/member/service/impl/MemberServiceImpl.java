@@ -2,7 +2,11 @@ package com.nhnacademy.ssacthree_shop_api.memberset.member.service.impl;
 
 import com.nhnacademy.ssacthree_shop_api.commons.dto.MessageResponse;
 import com.nhnacademy.ssacthree_shop_api.couponset.coupon.domain.Coupon;
+import com.nhnacademy.ssacthree_shop_api.couponset.coupon.domain.CouponEffectivePeriodUnit;
 import com.nhnacademy.ssacthree_shop_api.couponset.coupon.repository.CouponRepository;
+import com.nhnacademy.ssacthree_shop_api.couponset.couponrule.domain.CouponRule;
+import com.nhnacademy.ssacthree_shop_api.couponset.couponrule.domain.CouponType;
+import com.nhnacademy.ssacthree_shop_api.couponset.couponrule.repository.CouponRuleRepository;
 import com.nhnacademy.ssacthree_shop_api.couponset.membercoupon.dto.MemberCouponCreateRequest;
 import com.nhnacademy.ssacthree_shop_api.couponset.membercoupon.service.MemberCouponService;
 import com.nhnacademy.ssacthree_shop_api.customer.domain.Customer;
@@ -53,6 +57,7 @@ public class MemberServiceImpl implements MemberService {
     private final PointSaveRuleRepository pointSaveRuleRepository;
     private final MemberCouponService memberCouponService;
     private final CouponRepository couponRepository;
+    private final CouponRuleRepository couponRuleRepository;
 
     /**
      * 회원 가입 및 회원가입 포인트 적립
@@ -104,8 +109,25 @@ public class MemberServiceImpl implements MemberService {
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void issueWelcomeCoupon(Member member) {
         try {
-            Coupon coupon = couponRepository.findCouponByCouponName("Welcome 쿠폰")
-                .orElseThrow(() -> new IllegalArgumentException("쿠폰을 찾을 수 없습니다."));
+            Coupon coupon = couponRepository.findByCouponName("Welcome 쿠폰")
+                .orElseGet(() -> {
+                    CouponRule couponRule = couponRuleRepository.findByCouponRuleName("Welcome 쿠폰")
+                            .orElseGet(() -> new CouponRule(
+                                    CouponType.CASH,
+                                    50000,
+                                    10000,
+                                    10000,
+                                    "Welcome 쿠폰"
+                            ));
+                    return new Coupon(
+                            "Welcome 쿠폰",
+                            "회원가입 시 발급되는 쿠폰",
+                            30,
+                            CouponEffectivePeriodUnit.DAY,
+                            null,
+                            couponRule);
+                });
+
             MemberCouponCreateRequest couponRequest = new MemberCouponCreateRequest(
                     coupon.getCouponExpiredAt(),
                     null,
