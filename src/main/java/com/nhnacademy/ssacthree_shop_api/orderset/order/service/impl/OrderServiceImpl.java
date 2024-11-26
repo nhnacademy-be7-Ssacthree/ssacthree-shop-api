@@ -16,10 +16,7 @@ import com.nhnacademy.ssacthree_shop_api.memberset.pointsaverule.repository.Poin
 import com.nhnacademy.ssacthree_shop_api.orderset.deliveryrule.domain.DeliveryRule;
 import com.nhnacademy.ssacthree_shop_api.orderset.deliveryrule.repository.DeliveryRuleRepository;
 import com.nhnacademy.ssacthree_shop_api.orderset.order.domain.Order;
-import com.nhnacademy.ssacthree_shop_api.orderset.order.dto.OrderListResponse;
-import com.nhnacademy.ssacthree_shop_api.orderset.order.dto.OrderResponse;
-import com.nhnacademy.ssacthree_shop_api.orderset.order.dto.OrderResponseWithCount;
-import com.nhnacademy.ssacthree_shop_api.orderset.order.dto.OrderSaveRequest;
+import com.nhnacademy.ssacthree_shop_api.orderset.order.dto.*;
 import com.nhnacademy.ssacthree_shop_api.orderset.order.repository.OrderRepository;
 import com.nhnacademy.ssacthree_shop_api.orderset.order.repository.OrderRepositoryCustom;
 import com.nhnacademy.ssacthree_shop_api.orderset.order.service.OrderService;
@@ -164,4 +161,24 @@ public class OrderServiceImpl implements OrderService {
         // 상태를 포함한 주문 리스트를 생성하여 반환
         return new OrderResponseWithCount(orderPage.getContent(), orderPage.getTotalElements());
     }
+
+    @Override
+    public AdminOrderResponseWithCount adminGetAllOrders(int page, int size, LocalDateTime startDateTime, LocalDateTime endDateTime) {
+        Pageable pageable = PageRequest.of(page, size);
+
+        // 주문 조회 (상태 포함)
+        Page<AdminOrderListResponse> orderPage = orderRepositoryCustom.adminFindAllOrders(startDateTime, endDateTime, pageable);
+
+
+        orderPage.getContent().forEach(order ->
+                log.info("Order ID: {}, Order Date: {}, Total Price: {}, Order Status: {}",
+                        order.getOrderId(),
+                        order.getOrderDate(),
+                        order.getTotalPrice(),
+                        order.getOrderStatus(),
+                        order.getCustomerName(),
+                        order.getOrderNumber()));
+
+        // 상태를 포함한 주문 리스트를 생성하여 반환
+        return new AdminOrderResponseWithCount(orderPage.getContent(), orderPage.getTotalElements());    }
 }
