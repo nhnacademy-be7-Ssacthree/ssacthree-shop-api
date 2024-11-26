@@ -3,11 +3,8 @@ package com.nhnacademy.ssacthree_shop_api.elastic.controller;
 
 import com.nhnacademy.ssacthree_shop_api.config.SecurityConfig;
 import com.nhnacademy.ssacthree_shop_api.elastic.domain.BookDocument;
-import com.nhnacademy.ssacthree_shop_api.elastic.dto.SearchResponse;
 import com.nhnacademy.ssacthree_shop_api.elastic.service.ElasticService;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;

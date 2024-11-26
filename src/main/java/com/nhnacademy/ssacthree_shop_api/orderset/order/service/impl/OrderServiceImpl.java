@@ -5,27 +5,34 @@ import com.nhnacademy.ssacthree_shop_api.customer.repository.CustomerRepository;
 import com.nhnacademy.ssacthree_shop_api.orderset.deliveryrule.domain.DeliveryRule;
 import com.nhnacademy.ssacthree_shop_api.orderset.deliveryrule.repository.DeliveryRuleRepository;
 import com.nhnacademy.ssacthree_shop_api.orderset.order.domain.Order;
-import com.nhnacademy.ssacthree_shop_api.orderset.order.dto.OrderDetailSaveRequest;
+import com.nhnacademy.ssacthree_shop_api.orderset.order.dto.OrderListResponse;
 import com.nhnacademy.ssacthree_shop_api.orderset.order.dto.OrderResponse;
+import com.nhnacademy.ssacthree_shop_api.orderset.order.dto.OrderResponseWithCount;
 import com.nhnacademy.ssacthree_shop_api.orderset.order.dto.OrderSaveRequest;
 import com.nhnacademy.ssacthree_shop_api.orderset.order.repository.OrderRepository;
+import com.nhnacademy.ssacthree_shop_api.orderset.order.repository.OrderRepositoryCustom;
 import com.nhnacademy.ssacthree_shop_api.orderset.order.service.OrderService;
+import java.time.LocalDateTime;
 import com.nhnacademy.ssacthree_shop_api.orderset.orderdetail.service.OrderDetailService;
 import com.nhnacademy.ssacthree_shop_api.orderset.orderstatus.domain.OrderStatus;
 import com.nhnacademy.ssacthree_shop_api.orderset.orderstatus.domain.repository.OrderStatusRepository;
 import com.nhnacademy.ssacthree_shop_api.orderset.ordertostatusmapping.OrderToStatusMapping;
 import com.nhnacademy.ssacthree_shop_api.orderset.ordertostatusmapping.repository.OrderToStatusMappingRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import java.time.LocalDateTime;
-import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class OrderServiceImpl implements OrderService {
 
     private final OrderRepository orderRepository;
+    private final OrderRepositoryCustom orderRepositoryCustom;
     private final CustomerRepository customerRepository;
     private final DeliveryRuleRepository deliveryRuleRepository;
     private final OrderDetailService orderDetailService;
@@ -92,5 +99,27 @@ public class OrderServiceImpl implements OrderService {
 
         return new OrderResponse(order.getId());
 
+    }
+
+
+
+
+    @Override
+    public OrderResponseWithCount getOrdersByCustomerAndDate(Long customerId, int page, int size, LocalDateTime startDate, LocalDateTime endDate) {
+        Pageable pageable = PageRequest.of(page, size);
+
+        // 주문 조회 (상태 포함)
+        Page<OrderListResponse> orderPage = orderRepositoryCustom.findOrdersByCustomerAndDate(customerId, startDate, endDate, pageable);
+
+
+        orderPage.getContent().forEach(order ->
+            log.info("Order ID: {}, Order Date: {}, Total Price: {}, Order Status: {}",
+                order.getOrderId(),
+                order.getOrderDate(),
+                order.getTotalPrice(),
+                order.getOrderStatus()));
+
+        // 상태를 포함한 주문 리스트를 생성하여 반환
+        return new OrderResponseWithCount(orderPage.getContent(), orderPage.getTotalElements());
     }
 }
