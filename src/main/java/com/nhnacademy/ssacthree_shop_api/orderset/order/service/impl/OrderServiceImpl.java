@@ -102,7 +102,7 @@ public class OrderServiceImpl implements OrderService {
 
 
 
-
+    // 멤버 주문 내역 조회
     @Override
     public OrderResponseWithCount getOrdersByCustomerAndDate(Long customerId, int page, int size, LocalDateTime startDate, LocalDateTime endDate) {
         Pageable pageable = PageRequest.of(page, size);
