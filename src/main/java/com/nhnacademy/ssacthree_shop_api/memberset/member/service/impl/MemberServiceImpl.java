@@ -171,4 +171,15 @@ public class MemberServiceImpl implements MemberService {
         }
 
     }
+
+    @Override
+    public MessageResponse activeMember(String memberLoginId) {
+        Member member = memberRepository.findByMemberLoginId(memberLoginId)
+            .orElseThrow(() -> new MemberNotFoundException("멤버를 찾을 수 없습니다."));
+
+        member.setMemberStatus(MemberStatus.ACTIVE);
+
+        return new MessageResponse("휴면 해제가 완료되었습니다.");
+
+    }
 }

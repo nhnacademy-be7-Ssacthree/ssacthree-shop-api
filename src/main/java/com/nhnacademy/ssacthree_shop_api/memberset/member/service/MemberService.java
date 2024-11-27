@@ -19,4 +19,6 @@ public interface MemberService {
     Long getCustomerIdByMemberLoginId(String memberId);
 
     void sleepMember();
+
+    MessageResponse activeMember(String memberLoginId);
 }
