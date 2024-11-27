@@ -4,8 +4,10 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 
 import java.time.LocalDateTime;
+import lombok.Getter;
 
 @Entity
+@Getter
 public class PaymentType {
 
     @Id
