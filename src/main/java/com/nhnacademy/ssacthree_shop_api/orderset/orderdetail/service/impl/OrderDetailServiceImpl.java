@@ -15,6 +15,7 @@ import com.nhnacademy.ssacthree_shop_api.orderset.packaging.domain.Packaging;
 import com.nhnacademy.ssacthree_shop_api.orderset.packaging.repository.PackagingRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.List;
@@ -31,22 +32,24 @@ public class OrderDetailServiceImpl implements OrderDetailService {
 
 
     @Override
-    @Transactional
+    @Transactional(isolation = Isolation.SERIALIZABLE) // 재고차감 때문에
     public void saveOrderDetails(Order order, List<OrderDetailSaveRequest> orderDetailList) {
         // 주문 상세 요청 -> 주문 상세 만들기.. 포인트 등등도 모두 .. 저장
         List<OrderDetail> orderDetails = new ArrayList<>();
         List<OrderDetailPackaging> orderDetailPackagingList = new ArrayList<>();
 
         for (OrderDetailSaveRequest orderDetailSaveRequest : orderDetailList) {
-            //책 수량 확인
+            // 책 수량 확인
             BookInfoResponse bookInfo = bookCommonService.getBook(orderDetailSaveRequest.getBookId());
             if (bookInfo.getStock() - orderDetailSaveRequest.getQuantity() < 0) {
                 throw new RuntimeException("재고가 부족합니다.");
             }
 
-            // TODO : 쿠폰 사용 처리
-            // 일단은 null로 처리
+            // 재고 차감 - 배타락 이용 (읽기, 쓰기 동시 불가하게)
+//            Book book = bookRepository.findOne(orderDetailSaveRequest.getBookId());
 
+            // TODO : 도서 상세당 쿠폰 사용 처리
+            // 일단은 null로 처리
 
             Book book = bookRepository.findByBookId(bookInfo.getBookId())
                     .orElseThrow(() -> new RuntimeException("책 없습니다."));
