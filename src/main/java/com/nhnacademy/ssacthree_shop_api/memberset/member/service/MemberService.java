@@ -11,9 +11,12 @@ public interface MemberService {
 
     MemberInfoGetResponse getMemberInfoById(String memberLoginId);
 
-    MessageResponse updateMember(String memberLoginId, MemberInfoUpdateRequest memberInfoUpdateRequest);
+    MessageResponse updateMember(String memberLoginId,
+        MemberInfoUpdateRequest memberInfoUpdateRequest);
 
     MessageResponse deleteMember(String memberLoginId);
 
     Long getCustomerIdByMemberLoginId(String memberId);
+
+    void sleepMember();
 }
