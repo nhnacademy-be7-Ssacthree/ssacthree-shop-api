@@ -3,6 +3,7 @@ package com.nhnacademy.ssacthree_shop_api.orderset.order.service.impl;
 import com.nhnacademy.ssacthree_shop_api.customer.domain.Customer;
 import com.nhnacademy.ssacthree_shop_api.customer.repository.CustomerRepository;
 import com.nhnacademy.ssacthree_shop_api.memberset.member.domain.Member;
+import com.nhnacademy.ssacthree_shop_api.memberset.member.exception.MemberNotFoundException;
 import com.nhnacademy.ssacthree_shop_api.memberset.member.repository.MemberRepository;
 import com.nhnacademy.ssacthree_shop_api.memberset.pointhistory.domain.PointHistory;
 import com.nhnacademy.ssacthree_shop_api.memberset.pointhistory.dto.PointHistorySaveRequest;
@@ -19,7 +20,6 @@ import com.nhnacademy.ssacthree_shop_api.orderset.order.dto.*;
 import com.nhnacademy.ssacthree_shop_api.orderset.order.repository.OrderRepository;
 import com.nhnacademy.ssacthree_shop_api.orderset.order.repository.OrderRepositoryCustom;
 import com.nhnacademy.ssacthree_shop_api.orderset.order.service.OrderService;
-import com.nhnacademy.ssacthree_shop_api.orderset.orderdetail.dto.OrderDetailResponse;
 import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.Optional;
@@ -49,10 +49,10 @@ public class OrderServiceImpl implements OrderService {
     private final OrderDetailService orderDetailService;
     private final OrderStatusRepository orderStatusRepository;
     private final OrderToStatusMappingRepository orderToStatusMappingRepository;
+    private final PointHistoryService pointHistoryService;
     private final PointSaveRuleRepository pointSaveRuleRepository;
     private final MemberRepository memberRepository;
     private final PointOrderRepository pointOrderRepository;
-    private final PointHistoryService pointHistoryService;
 
     @Override
     @Transactional //하나라도 안되면 롤백필요ㅣ.
@@ -107,8 +107,6 @@ public class OrderServiceImpl implements OrderService {
         // TODO : 포인트 적립, 사용 내역 생성 - 포인트 서비스 - 하나로 묶기 ?
         Optional<Member> optionalMember = memberRepository.findById(orderSaveRequest.getCustomerId());
 
-        if (optionalMember.isPresent()) {
-
         if (!Objects.isNull(optionalMember)) {
             Member member = optionalMember.get();
             int pointHistory = 0;
@@ -145,9 +143,6 @@ public class OrderServiceImpl implements OrderService {
 
     }
 
-
-
-    // 멤버 주문 내역 전체 조회
     @Override
     public OrderResponseWithCount getOrdersByCustomerAndDate(Long customerId, int page, int size, LocalDateTime startDate, LocalDateTime endDate) {
         Pageable pageable = PageRequest.of(page, size);
@@ -186,5 +181,4 @@ public class OrderServiceImpl implements OrderService {
 
         // 상태를 포함한 주문 리스트를 생성하여 반환
         return new AdminOrderResponseWithCount(orderPage.getContent(), orderPage.getTotalElements());    }
-
 }
