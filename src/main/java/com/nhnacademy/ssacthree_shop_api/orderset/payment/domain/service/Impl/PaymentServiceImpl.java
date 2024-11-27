@@ -1,7 +1,6 @@
 package com.nhnacademy.ssacthree_shop_api.orderset.payment.domain.service.Impl;
 
 import com.nhnacademy.ssacthree_shop_api.commons.dto.MessageResponse;
-import com.nhnacademy.ssacthree_shop_api.orderset.deliveryrule.domain.DeliveryRule;
 import com.nhnacademy.ssacthree_shop_api.orderset.order.domain.Order;
 import com.nhnacademy.ssacthree_shop_api.orderset.order.repository.OrderRepository;
 import com.nhnacademy.ssacthree_shop_api.orderset.payment.domain.Payment;
@@ -16,8 +15,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.Optional;
 
 
 @Service
@@ -42,9 +39,8 @@ public class PaymentServiceImpl implements PaymentService {
 
 //        PaymentStatusEnum paymentStatusEnum = PaymentStatusEnum.valueOf(paymentRequest.getStatus());
 
-        //DONE으로 하니까 ...
-        // DONE이랑 CANCLE넣기 -> db도 수정
-        PaymentStatusEnum paymentStatusEnum = PaymentStatusEnum.valueOf("COMPLETE");
+        //DONE or CANCLE
+        PaymentStatusEnum paymentStatusEnum = PaymentStatusEnum.valueOf(paymentRequest.getStatus());
 
         Payment payment = new Payment(
                 null,
