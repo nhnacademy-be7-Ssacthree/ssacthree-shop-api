@@ -25,6 +25,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -214,13 +215,13 @@ public class BookCommonServiceImpl implements BookCommonService {
     }
 
     @Override
-    public BookLikeResponse deleteBookLike(Long bookId, Long customerId) {
+    public Boolean deleteBookLike(Long bookId, Long customerId) {
 
         BookLikeId bookLikeId = new BookLikeId(bookId, customerId);
 
         if (bookLikeRepository.existsById(bookLikeId)) {
             bookLikeRepository.deleteById(bookLikeId);
-            return new BookLikeResponse(bookId, bookRepository.findBookLikeByBookId(bookId));
+            return true;
         } else {
             throw new NotFoundException("해당 좋아요 기록이 존재하지 않습니다.");
         }

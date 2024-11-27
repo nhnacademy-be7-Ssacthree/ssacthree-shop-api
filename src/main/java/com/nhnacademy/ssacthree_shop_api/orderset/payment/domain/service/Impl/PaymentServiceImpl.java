@@ -1,7 +1,6 @@
 package com.nhnacademy.ssacthree_shop_api.orderset.payment.domain.service.Impl;
 
 import com.nhnacademy.ssacthree_shop_api.commons.dto.MessageResponse;
-import com.nhnacademy.ssacthree_shop_api.orderset.deliveryrule.domain.DeliveryRule;
 import com.nhnacademy.ssacthree_shop_api.orderset.order.domain.Order;
 import com.nhnacademy.ssacthree_shop_api.orderset.order.repository.OrderRepository;
 import com.nhnacademy.ssacthree_shop_api.orderset.payment.domain.Payment;
@@ -16,9 +15,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.Optional;
-
 
 @Service
 @RequiredArgsConstructor
@@ -30,21 +26,15 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     public MessageResponse savePayment(PaymentRequest paymentRequest) {
+        // TODO : 적절한 예외 만들기.
         Order order = orderRepository.findById(paymentRequest.getOrderId())
                 .orElseThrow(() -> new IllegalArgumentException("주문 정보를 찾을 수 없습니다. ID: " + paymentRequest.getOrderId()));
 
         // 결제 타입 존재하면 넣기
         PaymentType paymentType = paymentTypeRepository.findById(paymentRequest.getMethod())
                 .orElseThrow(() -> new IllegalArgumentException("결제 타입이 유효하지 않습니다."));
-
-        // 수정
         LocalDateTime approvedAt = ZonedDateTime.parse(paymentRequest.getApprovedAt()).toLocalDateTime();
-
-//        PaymentStatusEnum paymentStatusEnum = PaymentStatusEnum.valueOf(paymentRequest.getStatus());
-
-        //DONE으로 하니까 ...
-        // DONE이랑 CANCLE넣기 -> db도 수정
-        PaymentStatusEnum paymentStatusEnum = PaymentStatusEnum.valueOf("COMPLETE");
+        PaymentStatusEnum paymentStatusEnum = PaymentStatusEnum.valueOf(paymentRequest.getStatus());
 
         Payment payment = new Payment(
                 null,
@@ -57,7 +47,6 @@ public class PaymentServiceImpl implements PaymentService {
         );
 
         paymentRepository.save(payment);
-
         return null;
     }
 }

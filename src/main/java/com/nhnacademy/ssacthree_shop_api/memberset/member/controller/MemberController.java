@@ -119,9 +119,9 @@ public class MemberController {
      * @return 삭제 성공 여부
      */
     @DeleteMapping("/likes/{book-id}")
-    public ResponseEntity<BookLikeResponse> deleteBookLikeByMemberId(@PathVariable(name="book-id") Long bookId,
+    public ResponseEntity<Boolean> deleteBookLikeByMemberId(@PathVariable(name="book-id") Long bookId,
                                                             @RequestHeader(name = "X-USER-ID") String memberId) {
-        BookLikeResponse result = bookCommonService.deleteBookLike(bookId, memberService.getCustomerIdByMemberLoginId(memberId));
+        Boolean result = bookCommonService.deleteBookLike(bookId, memberService.getCustomerIdByMemberLoginId(memberId));
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 }

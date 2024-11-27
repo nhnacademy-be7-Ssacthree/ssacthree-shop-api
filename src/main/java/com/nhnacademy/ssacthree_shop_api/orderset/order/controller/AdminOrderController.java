@@ -1,38 +1,27 @@
 package com.nhnacademy.ssacthree_shop_api.orderset.order.controller;
 
+import com.nhnacademy.ssacthree_shop_api.orderset.order.dto.AdminOrderResponseWithCount;
 import com.nhnacademy.ssacthree_shop_api.orderset.order.dto.OrderResponse;
 import com.nhnacademy.ssacthree_shop_api.orderset.order.dto.OrderResponseWithCount;
 import com.nhnacademy.ssacthree_shop_api.orderset.order.dto.OrderSaveRequest;
 import com.nhnacademy.ssacthree_shop_api.orderset.order.service.OrderService;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/shop/orders")
-public class OrderController {
+@RequestMapping("/api/shop/admin/orders")
+public class AdminOrderController {
 
     private final OrderService orderService;
 
-    @PostMapping
-    ResponseEntity<OrderResponse> createOrder(@RequestBody OrderSaveRequest orderSaveRequest) {
-        OrderResponse orderResponse = orderService.createOrder(orderSaveRequest);
-        return ResponseEntity.ok().body(orderResponse);
-    }
-
-    // 회원 주문 조회
     @GetMapping
-    public ResponseEntity<OrderResponseWithCount> getOrders(
-        @RequestParam("customerId") Long customerId,
+    public AdminOrderResponseWithCount adminGetAllOrders(
         @RequestParam(defaultValue = "0") int page,
         @RequestParam(defaultValue = "10") int size,
         @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
@@ -49,10 +38,10 @@ public class OrderController {
         LocalDateTime startDateTime = startDate.atStartOfDay();
         LocalDateTime endDateTime = endDate.atTime(23, 59, 59);
         // 서비스 호출
-        OrderResponseWithCount response = orderService.getOrdersByCustomerAndDate(
-            customerId, page, size, startDateTime, endDateTime);
+        AdminOrderResponseWithCount response = orderService.adminGetAllOrders(
+           page, size, startDateTime, endDateTime);
 
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(response).getBody();
     }
 
 }
