@@ -19,6 +19,7 @@ import com.nhnacademy.ssacthree_shop_api.orderset.order.dto.*;
 import com.nhnacademy.ssacthree_shop_api.orderset.order.repository.OrderRepository;
 import com.nhnacademy.ssacthree_shop_api.orderset.order.repository.OrderRepositoryCustom;
 import com.nhnacademy.ssacthree_shop_api.orderset.order.service.OrderService;
+import com.nhnacademy.ssacthree_shop_api.orderset.orderdetail.dto.OrderDetailResponse;
 import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.Optional;
@@ -145,7 +146,7 @@ public class OrderServiceImpl implements OrderService {
 
 
 
-    // 멤버 주문 내역 조회
+    // 멤버 주문 내역 전체 조회
     @Override
     public OrderResponseWithCount getOrdersByCustomerAndDate(Long customerId, int page, int size, LocalDateTime startDate, LocalDateTime endDate) {
         Pageable pageable = PageRequest.of(page, size);
@@ -184,4 +185,5 @@ public class OrderServiceImpl implements OrderService {
 
         // 상태를 포함한 주문 리스트를 생성하여 반환
         return new AdminOrderResponseWithCount(orderPage.getContent(), orderPage.getTotalElements());    }
+
 }
