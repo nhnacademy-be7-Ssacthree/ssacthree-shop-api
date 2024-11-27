@@ -47,6 +47,6 @@ public interface BookCommonService {
     BookLikeResponse saveBookLike(BookLikeRequest bookLikeRequest, Long customerId);
 
     // 좋아요 삭제
-    BookLikeResponse deleteBookLike(Long bookId, Long customerId);
+    Boolean deleteBookLike(Long bookId, Long customerId);
 
 }
