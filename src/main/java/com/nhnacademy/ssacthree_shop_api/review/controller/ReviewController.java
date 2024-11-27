@@ -30,8 +30,8 @@ public class ReviewController {
 
     @GetMapping("/books/reviews/{book-id}")
     public ResponseEntity<Page<BookReviewResponse>> getReviewsByBookId(@PathVariable("book-id") Long bookId,
-        @RequestParam(defaultValue = "0") int page,
-        @RequestParam(defaultValue = "10") int size,
+        @RequestParam int page,
+        @RequestParam int size,
         @RequestParam("sort") String[] sort) {
         Pageable pageable = PageRequestBuilder.createPageable(page, size, sort);
         Page<BookReviewResponse> reviews = reviewService.getReviewsByBookId(pageable, bookId);
