@@ -1,5 +1,6 @@
 package com.nhnacademy.ssacthree_shop_api.review.controller;
 
+import com.nhnacademy.ssacthree_shop_api.commons.paging.PageRequestBuilder;
 import com.nhnacademy.ssacthree_shop_api.review.dto.MemberReviewResponse;
 import com.nhnacademy.ssacthree_shop_api.review.dto.ReviewRequestWithUrl;
 import com.nhnacademy.ssacthree_shop_api.review.dto.BookReviewResponse;
@@ -7,6 +8,8 @@ import com.nhnacademy.ssacthree_shop_api.review.dto.ReviewResponse;
 import com.nhnacademy.ssacthree_shop_api.review.service.ReviewService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -26,8 +29,12 @@ public class ReviewController {
     private final ReviewService reviewService;
 
     @GetMapping("/books/reviews/{book-id}")
-    public ResponseEntity<List<BookReviewResponse>> getReviewsByBookId(@PathVariable("book-id") Long bookId) {
-        List<BookReviewResponse> reviews = reviewService.getReviewsByBookId(bookId);
+    public ResponseEntity<Page<BookReviewResponse>> getReviewsByBookId(@PathVariable("book-id") Long bookId,
+        @RequestParam(defaultValue = "0") int page,
+        @RequestParam(defaultValue = "10") int size,
+        @RequestParam("sort") String[] sort) {
+        Pageable pageable = PageRequestBuilder.createPageable(page, size, sort);
+        Page<BookReviewResponse> reviews = reviewService.getReviewsByBookId(pageable, bookId);
         return new ResponseEntity<>(reviews, HttpStatus.OK);
     }
 
