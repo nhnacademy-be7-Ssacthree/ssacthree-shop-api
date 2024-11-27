@@ -2,6 +2,16 @@ package com.nhnacademy.ssacthree_shop_api.orderset.order.service.impl;
 
 import com.nhnacademy.ssacthree_shop_api.customer.domain.Customer;
 import com.nhnacademy.ssacthree_shop_api.customer.repository.CustomerRepository;
+import com.nhnacademy.ssacthree_shop_api.memberset.member.domain.Member;
+import com.nhnacademy.ssacthree_shop_api.memberset.member.repository.MemberRepository;
+import com.nhnacademy.ssacthree_shop_api.memberset.pointhistory.domain.PointHistory;
+import com.nhnacademy.ssacthree_shop_api.memberset.pointhistory.dto.PointHistorySaveRequest;
+import com.nhnacademy.ssacthree_shop_api.memberset.pointhistory.service.PointHistoryService;
+import com.nhnacademy.ssacthree_shop_api.memberset.pointorder.domain.PointOrder;
+import com.nhnacademy.ssacthree_shop_api.memberset.pointorder.domain.repository.PointOrderRepository;
+import com.nhnacademy.ssacthree_shop_api.memberset.pointsaverule.domain.PointSaveRule;
+import com.nhnacademy.ssacthree_shop_api.memberset.pointsaverule.exception.PointSaveRuleNotFoundException;
+import com.nhnacademy.ssacthree_shop_api.memberset.pointsaverule.repository.PointSaveRuleRepository;
 import com.nhnacademy.ssacthree_shop_api.orderset.deliveryrule.domain.DeliveryRule;
 import com.nhnacademy.ssacthree_shop_api.orderset.deliveryrule.repository.DeliveryRuleRepository;
 import com.nhnacademy.ssacthree_shop_api.orderset.order.domain.Order;
@@ -38,6 +48,10 @@ public class OrderServiceImpl implements OrderService {
     private final OrderDetailService orderDetailService;
     private final OrderStatusRepository orderStatusRepository;
     private final OrderToStatusMappingRepository orderToStatusMappingRepository;
+    private final PointSaveRuleRepository pointSaveRuleRepository;
+    private final MemberRepository memberRepository;
+    private final PointOrderRepository pointOrderRepository;
+    private final PointHistoryService pointHistoryService;
 
     @Override
     @Transactional //하나라도 안되면 롤백필요ㅣ.
@@ -91,6 +105,7 @@ public class OrderServiceImpl implements OrderService {
 
         // TODO : 포인트 적립, 사용 내역 생성 - 포인트 서비스 - 하나로 묶기 ?
         Optional<Member> optionalMember = memberRepository.findById(orderSaveRequest.getCustomerId());
+
 
         if (!Objects.isNull(optionalMember)) {
             Member member = optionalMember.get();
