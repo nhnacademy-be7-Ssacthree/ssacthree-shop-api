@@ -9,8 +9,6 @@ import java.util.List;
 public interface OrderDetailService {
     // TODO : 일단 void인데 주문 상세응답?
     void saveOrderDetails(Order order, List<OrderDetailSaveRequest> orderDetailList);
-
-
     OrderDetailResponse getOrderDetail(Long orderId);
 
 }
