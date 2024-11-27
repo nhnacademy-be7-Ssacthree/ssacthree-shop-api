@@ -1,6 +1,7 @@
 package com.nhnacademy.ssacthree_shop_api.orderset.order.repository.impl;
 
 import com.nhnacademy.ssacthree_shop_api.orderset.order.domain.QOrder;
+import com.nhnacademy.ssacthree_shop_api.orderset.order.dto.AdminOrderListResponse;
 import com.nhnacademy.ssacthree_shop_api.orderset.order.dto.OrderListResponse;
 import com.nhnacademy.ssacthree_shop_api.orderset.order.dto.OrderResponse;
 import com.nhnacademy.ssacthree_shop_api.orderset.order.repository.OrderRepositoryCustom;
@@ -70,5 +71,52 @@ public class OrderRepositoryImpl implements OrderRepositoryCustom {
 
         return new PageImpl<>(results, pageable, total);
   }
+
+    @Override
+    public Page<AdminOrderListResponse> adminFindAllOrders(LocalDateTime startDate,
+                                                           LocalDateTime endDate,
+                                                           Pageable pageable) {
+        QOrder order = QOrder.order;
+        QOrderToStatusMapping orderToStatusMapping = QOrderToStatusMapping.orderToStatusMapping;
+        QOrderStatus orderStatus = QOrderStatus.orderStatus;
+
+        List<Tuple> rawResults = queryFactory
+                .select(
+                        order.id,
+                        order.ordered_date,
+                        order.total_price,
+                        orderToStatusMapping.orderStatus.orderStatusEnum.stringValue(),
+                        order.customer.customerName,
+                        order.order_number
+                )
+                .from(order)
+                .leftJoin(orderToStatusMapping).on(order.id.eq(orderToStatusMapping.order.id))
+                .leftJoin(orderStatus).on(orderToStatusMapping.orderStatus.id.eq(orderStatus.id))
+                .where(
+                        order.ordered_date.between(startDate, endDate)
+                )
+                .fetch();
+
+        List<AdminOrderListResponse> results = rawResults.stream()
+                .map(tuple -> new AdminOrderListResponse(
+                        tuple.get(order.id),
+                        Objects.requireNonNull(tuple.get(order.ordered_date)).toLocalDate(), // LocalDateTime → LocalDate 변환
+                        tuple.get(order.total_price),
+                        tuple.get(orderToStatusMapping.orderStatus.orderStatusEnum.stringValue()),
+                        tuple.get(order.customer.customerName),
+                        tuple.get(order.order_number)
+                ))
+                .collect(Collectors.toList());
+
+        Long total = queryFactory
+                .select(order.count())
+                .from(order)
+                .where(
+                        order.ordered_date.between(startDate, endDate)
+                )
+                .fetchOne();
+
+        return new PageImpl<>(results, pageable, total);
+    }
 
 }

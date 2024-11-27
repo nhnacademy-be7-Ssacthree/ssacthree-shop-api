@@ -16,7 +16,6 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 
-
 @Service
 @RequiredArgsConstructor
 public class PaymentServiceImpl implements PaymentService {
@@ -27,19 +26,14 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     public MessageResponse savePayment(PaymentRequest paymentRequest) {
+        // TODO : 적절한 예외 만들기.
         Order order = orderRepository.findById(paymentRequest.getOrderId())
                 .orElseThrow(() -> new IllegalArgumentException("주문 정보를 찾을 수 없습니다. ID: " + paymentRequest.getOrderId()));
 
         // 결제 타입 존재하면 넣기
         PaymentType paymentType = paymentTypeRepository.findById(paymentRequest.getMethod())
                 .orElseThrow(() -> new IllegalArgumentException("결제 타입이 유효하지 않습니다."));
-
-        // 수정
         LocalDateTime approvedAt = ZonedDateTime.parse(paymentRequest.getApprovedAt()).toLocalDateTime();
-
-//        PaymentStatusEnum paymentStatusEnum = PaymentStatusEnum.valueOf(paymentRequest.getStatus());
-
-        //DONE or CANCLE
         PaymentStatusEnum paymentStatusEnum = PaymentStatusEnum.valueOf(paymentRequest.getStatus());
 
         Payment payment = new Payment(
@@ -53,7 +47,6 @@ public class PaymentServiceImpl implements PaymentService {
         );
 
         paymentRepository.save(payment);
-
         return null;
     }
 }
