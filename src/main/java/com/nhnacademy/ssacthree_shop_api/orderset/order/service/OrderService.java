@@ -16,6 +16,6 @@ public interface OrderService {
 
     AdminOrderResponseWithCount adminGetAllOrders(int page, int size, LocalDateTime startDateTime, LocalDateTime endDateTime);
 
-   Order getOrder(Long orderId);
+//   Order getOrder(Long orderId);
 }
 

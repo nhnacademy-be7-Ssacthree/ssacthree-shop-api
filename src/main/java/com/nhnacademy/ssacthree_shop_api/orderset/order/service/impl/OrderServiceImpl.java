@@ -185,13 +185,13 @@ public class OrderServiceImpl implements OrderService {
 
 
     // OrderId로 order 객체 반환
-    @Override
-    public Order getOrder(Long orderId) {
-        Optional<Order> optionalOrder = orderRepository.findById(orderId);
-        if (optionalOrder.isPresent()) {
-            return optionalOrder.get();
-        } else {
-            throw new NotFoundException("Order not found with id: " + orderId);
-        }
-    }
+//    @Override
+//    public Order getOrder(Long orderId) {
+//        Optional<Order> optionalOrder = orderRepository.findById(orderId);
+//        if (optionalOrder.isPresent()) {
+//            return optionalOrder.get();
+//        } else {
+//            throw new NotFoundException("Order not found with id: " + orderId);
+//        }
+//    }
 }

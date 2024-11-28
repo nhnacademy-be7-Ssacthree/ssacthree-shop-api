@@ -20,9 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 @RequestMapping("/api/shop/orderDetail")
 public class OrderDetailController {
-
   private final OrderDetailService orderDetailService;
-  private final OrderService orderService;
 
   // orderId로 조회 (마이페이지에서 접근)
   @GetMapping

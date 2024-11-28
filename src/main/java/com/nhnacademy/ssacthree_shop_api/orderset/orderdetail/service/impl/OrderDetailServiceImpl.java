@@ -4,6 +4,7 @@ import com.nhnacademy.ssacthree_shop_api.bookset.book.domain.Book;
 import com.nhnacademy.ssacthree_shop_api.bookset.book.dto.response.BookInfoResponse;
 import com.nhnacademy.ssacthree_shop_api.bookset.book.repository.BookRepository;
 import com.nhnacademy.ssacthree_shop_api.bookset.book.service.BookCommonService;
+import com.nhnacademy.ssacthree_shop_api.commons.exception.NotFoundException;
 import com.nhnacademy.ssacthree_shop_api.orderset.deliveryrule.domain.DeliveryRule;
 import com.nhnacademy.ssacthree_shop_api.orderset.order.domain.Order;
 import com.nhnacademy.ssacthree_shop_api.orderset.order.dto.OrderDetailSaveRequest;
@@ -42,7 +43,6 @@ public class OrderDetailServiceImpl implements OrderDetailService {
     private final PackagingRepository packagingRepository;
     private final OrderDetailPackagingRepository orderDetailPackagingRepository;
     private final OrderRepositoryCustom orderRepositoryCustom;
-    private final OrderService orderService;
 
     @Override
     @Transactional(isolation = Isolation.SERIALIZABLE) // 재고차감 때문에
@@ -118,7 +118,14 @@ public class OrderDetailServiceImpl implements OrderDetailService {
     @Override
     public Boolean comparePhoneNumber(Long orderId,String phoneNumber){
         // orderId로 조회 후 비교
-        Order order = orderService.getOrder(orderId);
+        Optional<Order> optionalOrder = orderRepository.findById(orderId);
+        Order order;
+        if (optionalOrder.isPresent()) {
+            order = optionalOrder.get();
+        } else {
+            throw new NotFoundException("Order not found with id: " + orderId);
+        }
+
         String receiverPhone = order.getReceiverPhone();
         return receiverPhone.equals(phoneNumber);
     }
