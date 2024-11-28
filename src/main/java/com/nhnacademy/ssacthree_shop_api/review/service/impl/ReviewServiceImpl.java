@@ -23,7 +23,6 @@ import com.nhnacademy.ssacthree_shop_api.review.dto.ReviewRequestWithUrl;
 import com.nhnacademy.ssacthree_shop_api.review.dto.BookReviewResponse;
 import com.nhnacademy.ssacthree_shop_api.review.dto.ReviewResponse;
 import com.nhnacademy.ssacthree_shop_api.review.exception.ReviewNotFoundException;
-import com.nhnacademy.ssacthree_shop_api.review.repository.ReviewCustomRepository;
 import com.nhnacademy.ssacthree_shop_api.review.repository.ReviewRepository;
 import com.nhnacademy.ssacthree_shop_api.review.service.ReviewService;
 import java.time.LocalDateTime;
@@ -32,8 +31,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -51,17 +48,22 @@ public class ReviewServiceImpl implements ReviewService {
     private final OrderDetailRepository orderDetailRepository;
     private final PointHistoryRepository pointHistoryRepository;
     private final PointSaveRuleRepository pointSaveRuleRepository;
-    private final ReviewCustomRepository reviewCustomRepository;
 
     @Override
     @Transactional(readOnly = true)
-    public Page<BookReviewResponse> getReviewsByBookId(Pageable pageable, Long bookId) {
-        // 책 존재 여부 확인
-        bookRepository.findByBookId(bookId)
-            .orElseThrow(() -> new BookNotFoundException("해당 책을 찾을 수 없습니다."));
+    public List<BookReviewResponse> getReviewsByBookId(Long bookId) {
+        Book book = bookRepository.findByBookId(bookId).orElseThrow(() -> new BookNotFoundException("해당 책을 찾을 수 없습니다."));
+        List<Review> reviews = reviewRepository.findAllByBook(book);
+        List<BookReviewResponse> bookReviewRespons = new ArrayList<>();
 
-        // QueryDSL을 이용한 리뷰 조회 및 페이징 처리
-        return reviewCustomRepository.findReviewsByBookId(bookId, pageable);
+        for (Review review : reviews) {
+            Member member = memberRepository.findById(review.getCustomer().getCustomerId()).orElseThrow(
+                () -> new MemberNotFoundException("해당 회원을 찾을 수 없습니다."));
+            BookReviewResponse bookReviewResponse = new BookReviewResponse(member.getMemberLoginId(),review.getReviewRate(),review.getReviewTitle(),review.getReviewContent(),review.getReviewCreatedAt(),review.getReviewImageUrl());
+            bookReviewRespons.add(bookReviewResponse);
+        }
+
+        return bookReviewRespons;
     }
 
     @Override //리뷰 작성 저장

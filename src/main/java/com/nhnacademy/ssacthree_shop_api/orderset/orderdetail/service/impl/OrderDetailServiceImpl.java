@@ -4,36 +4,31 @@ import com.nhnacademy.ssacthree_shop_api.bookset.book.domain.Book;
 import com.nhnacademy.ssacthree_shop_api.bookset.book.dto.response.BookInfoResponse;
 import com.nhnacademy.ssacthree_shop_api.bookset.book.repository.BookRepository;
 import com.nhnacademy.ssacthree_shop_api.bookset.book.service.BookCommonService;
-import com.nhnacademy.ssacthree_shop_api.orderset.deliveryrule.domain.DeliveryRule;
 import com.nhnacademy.ssacthree_shop_api.orderset.order.domain.Order;
 import com.nhnacademy.ssacthree_shop_api.orderset.order.dto.OrderDetailSaveRequest;
-import com.nhnacademy.ssacthree_shop_api.orderset.order.repository.OrderRepository;
 import com.nhnacademy.ssacthree_shop_api.orderset.orderdetail.domain.OrderDetail;
-import com.nhnacademy.ssacthree_shop_api.orderset.orderdetail.dto.OrderDetailDTO;
-import com.nhnacademy.ssacthree_shop_api.orderset.orderdetail.dto.OrderDetailResponse;
 import com.nhnacademy.ssacthree_shop_api.orderset.orderdetail.repo.OrderDetailRepository;
 import com.nhnacademy.ssacthree_shop_api.orderset.orderdetail.service.OrderDetailService;
 import com.nhnacademy.ssacthree_shop_api.orderset.orderdetailpackaging.domain.OrderDetailPackaging;
 import com.nhnacademy.ssacthree_shop_api.orderset.orderdetailpackaging.domain.repository.OrderDetailPackagingRepository;
 import com.nhnacademy.ssacthree_shop_api.orderset.packaging.domain.Packaging;
 import com.nhnacademy.ssacthree_shop_api.orderset.packaging.repository.PackagingRepository;
+
 import com.nhnacademy.ssacthree_shop_api.orderset.payment.domain.Payment;
 import com.nhnacademy.ssacthree_shop_api.orderset.payment.domain.repository.PaymentRepository;
 import jakarta.persistence.EntityNotFoundException;
+
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 
-@Slf4j
 @Service
 @RequiredArgsConstructor
 public class OrderDetailServiceImpl implements OrderDetailService {
 
-    private final OrderRepository orderRepository;
     private final OrderDetailRepository orderDetailRepository;
     private final BookCommonService bookCommonService;
     private final BookRepository bookRepository;
@@ -100,6 +95,7 @@ public class OrderDetailServiceImpl implements OrderDetailService {
         //주문 상세 저장 후 뭐 반환?
 
     }
+
 
     // 주문 상세 조회 (주문+주문상세+결제내역)
     // 각 service에 API 없어서 직접 repo 사용

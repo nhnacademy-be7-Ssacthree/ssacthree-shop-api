@@ -26,7 +26,7 @@ public class BookUpdateRequest {
     private int bookViewCount;
     private int bookDiscount; // 할인율
 
-//    private String bookStatus; // 도서 상태
+    private String bookStatus; // 도서 상태
 
     // FK
     private Long publisherId;

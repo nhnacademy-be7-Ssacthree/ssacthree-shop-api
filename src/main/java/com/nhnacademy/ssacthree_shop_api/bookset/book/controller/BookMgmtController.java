@@ -1,6 +1,5 @@
 package com.nhnacademy.ssacthree_shop_api.bookset.book.controller;
 
-import com.nhnacademy.ssacthree_shop_api.bookset.book.dto.request.BookDeleteRequest;
 import com.nhnacademy.ssacthree_shop_api.bookset.book.dto.request.BookSaveRequest;
 import com.nhnacademy.ssacthree_shop_api.bookset.book.dto.request.BookUpdateRequest;
 import com.nhnacademy.ssacthree_shop_api.bookset.book.dto.response.BookBaseResponse;
@@ -51,8 +50,8 @@ public class BookMgmtController {
     }
 
     @PutMapping
-    public ResponseEntity<MessageResponse> updateBook(@Valid @RequestBody BookSaveRequest bookSaveRequest) {
-        bookMgmtService.updateBook(bookSaveRequest);
+    public ResponseEntity<MessageResponse> updateBook(@Valid @RequestBody BookUpdateRequest bookUpdateRequest) {
+        bookMgmtService.updateBook(bookUpdateRequest);
         MessageResponse messageResponse = new MessageResponse(BOOK_UPDATE_SUCCESS_MESSAGE);
         return ResponseEntity.status(HttpStatus.OK).body(messageResponse);
     }
