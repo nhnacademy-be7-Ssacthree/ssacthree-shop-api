@@ -13,6 +13,7 @@ import lombok.NoArgsConstructor;
 public class OrderDetailDTO {
   private Long bookId;  // 클릭 시 해당 책 조회 하는 경우가 있을수도
   private String bookName;
+  private String bookThumbnailImageUrl;
   private int quantity;
   private int bookPriceAtOrder;
 //  private MemberCoupon memberCoupon = null; // 회원이 아니면 쿠폰 정보도 없음 or 쿠폰 사용 안했을 때

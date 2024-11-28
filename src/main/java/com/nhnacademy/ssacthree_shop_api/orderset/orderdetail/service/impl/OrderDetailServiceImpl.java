@@ -156,6 +156,7 @@ public class OrderDetailServiceImpl implements OrderDetailService {
                 .map(orderDetail -> new OrderDetailDTO(
                         orderDetail.getBook().getBookId(),
                         orderDetail.getBook().getBookName(),
+                        orderDetail.getBook().getBookThumbnailImageUrl(),
                         orderDetail.getQuantity(),
                         orderDetail.getBookpriceAtOrder()
                 ))
@@ -163,9 +164,10 @@ public class OrderDetailServiceImpl implements OrderDetailService {
 
         // log 확인
         orderDetailList.forEach(orderDetail ->
-                log.info("OrderDetailDTO - BookId: {}, BookName: {}, Quantity: {}, BookPriceAtOrder: {}",
+                log.info("OrderDetailDTO - BookId: {}, BookName: {}, bookThumbnailIMG: {}, Quantity: {}, BookPriceAtOrder: {}",
                         orderDetail.getBookId(),
                         orderDetail.getBookName(),
+                        orderDetail.getBookThumbnailImageUrl(),
                         orderDetail.getQuantity(),
                         orderDetail.getBookPriceAtOrder())
         );
