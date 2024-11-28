@@ -1,13 +1,10 @@
 package com.nhnacademy.ssacthree_shop_api.memberset.member.service.impl;
 
 import com.nhnacademy.ssacthree_shop_api.commons.dto.MessageResponse;
-import com.nhnacademy.ssacthree_shop_api.couponset.coupon.domain.Coupon;
-import com.nhnacademy.ssacthree_shop_api.couponset.coupon.domain.CouponEffectivePeriodUnit;
 import com.nhnacademy.ssacthree_shop_api.couponset.coupon.repository.CouponRepository;
-import com.nhnacademy.ssacthree_shop_api.couponset.couponrule.domain.CouponRule;
-import com.nhnacademy.ssacthree_shop_api.couponset.couponrule.domain.CouponType;
+import com.nhnacademy.ssacthree_shop_api.couponset.coupon.service.CouponService;
 import com.nhnacademy.ssacthree_shop_api.couponset.couponrule.repository.CouponRuleRepository;
-import com.nhnacademy.ssacthree_shop_api.couponset.membercoupon.dto.MemberCouponCreateRequest;
+import com.nhnacademy.ssacthree_shop_api.couponset.couponrule.service.CouponRuleService;
 import com.nhnacademy.ssacthree_shop_api.couponset.membercoupon.service.MemberCouponService;
 import com.nhnacademy.ssacthree_shop_api.customer.domain.Customer;
 import com.nhnacademy.ssacthree_shop_api.customer.dto.CustomerCreateRequest;
@@ -17,6 +14,7 @@ import com.nhnacademy.ssacthree_shop_api.memberset.member.domain.MemberStatus;
 import com.nhnacademy.ssacthree_shop_api.memberset.member.dto.MemberInfoGetResponse;
 import com.nhnacademy.ssacthree_shop_api.memberset.member.dto.MemberInfoUpdateRequest;
 import com.nhnacademy.ssacthree_shop_api.memberset.member.dto.MemberRegisterRequest;
+import com.nhnacademy.ssacthree_shop_api.memberset.member.event.MemberRegisteredEvent;
 import com.nhnacademy.ssacthree_shop_api.memberset.member.exception.AlreadyMemberException;
 import com.nhnacademy.ssacthree_shop_api.memberset.member.exception.MemberNotFoundException;
 import com.nhnacademy.ssacthree_shop_api.memberset.member.repository.MemberCustomRepository;
@@ -36,10 +34,10 @@ import java.time.temporal.ChronoUnit;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
@@ -57,7 +55,11 @@ public class MemberServiceImpl implements MemberService {
     private final PointSaveRuleRepository pointSaveRuleRepository;
     private final MemberCouponService memberCouponService;
     private final CouponRepository couponRepository;
+    private final CouponService couponService;
     private final CouponRuleRepository couponRuleRepository;
+    private final CouponRuleService couponRuleService;
+
+    private final ApplicationEventPublisher applicationEventPublisher;
 
     /**
      * 회원 가입 및 회원가입 포인트 적립
@@ -101,45 +103,9 @@ public class MemberServiceImpl implements MemberService {
             new PointHistorySaveRequest(pointSaveRule.getPointSaveAmount(), "회원 가입 포인트 적립"));
         member.setMemberPoint(member.getMemberPoint() + savedPointHistory.getPointAmount());
 
-        issueWelcomeCoupon(member);
+        applicationEventPublisher.publishEvent(new MemberRegisteredEvent((member)));
 
         return new MessageResponse("생성 성공");
-    }
-
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public void issueWelcomeCoupon(Member member) {
-        try {
-            Coupon coupon = couponRepository.findByCouponName("Welcome 쿠폰")
-                .orElseGet(() -> {
-                    CouponRule couponRule = couponRuleRepository.findByCouponRuleName("Welcome 쿠폰")
-                            .orElseGet(() -> new CouponRule(
-                                    CouponType.CASH,
-                                    50000,
-                                    10000,
-                                    10000,
-                                    "Welcome 쿠폰"
-                            ));
-                    return new Coupon(
-                            "Welcome 쿠폰",
-                            "회원가입 시 발급되는 쿠폰",
-                            30,
-                            CouponEffectivePeriodUnit.DAY,
-                            null,
-                            couponRule);
-                });
-
-            MemberCouponCreateRequest couponRequest = new MemberCouponCreateRequest(
-                    coupon.getCouponExpiredAt(),
-                    null,
-                    coupon.getCouponId(),
-                    member.getId()
-            );
-            memberCouponService.createMemberCoupon(couponRequest);
-            log.info("Welcome 쿠폰이 성공적으로 발급되었습니다.");
-        } catch (Exception e) {
-            log.error("Welcome 쿠폰 발급에 실패했습니다: {}", e.getMessage());
-            // 쿠폰 발급 실패에 대한 추가 처리 (필요 시)
-        }
     }
 
     @Transactional(readOnly = true)
