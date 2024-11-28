@@ -27,6 +27,7 @@ import java.util.Optional;
 import com.nhnacademy.ssacthree_shop_api.orderset.orderdetail.service.OrderDetailService;
 import com.nhnacademy.ssacthree_shop_api.orderset.orderstatus.domain.OrderStatus;
 import com.nhnacademy.ssacthree_shop_api.orderset.orderstatus.domain.repository.OrderStatusRepository;
+import com.nhnacademy.ssacthree_shop_api.orderset.ordertostatusmapping.OrderStatusEnum;
 import com.nhnacademy.ssacthree_shop_api.orderset.ordertostatusmapping.OrderToStatusMapping;
 import com.nhnacademy.ssacthree_shop_api.orderset.ordertostatusmapping.repository.OrderToStatusMappingRepository;
 import lombok.RequiredArgsConstructor;
@@ -85,7 +86,7 @@ public class OrderServiceImpl implements OrderService {
                 orderSaveRequest.getDetailAddress(),
                 orderSaveRequest.getOrderRequest(),
                 orderSaveRequest.getDeliveryDate()
-                );
+        );
         orderRepository.save(order); // 주문후 줘야하는 정보.. 상세 ; orderKey랑 결제 key랑 결제 금액
 
         // TODO : 주문 상세 생성 - 리스트 돌면서 하나씩 생성 .. 응답값 생각하기, 최대한 db접근 최소화
@@ -117,7 +118,7 @@ public class OrderServiceImpl implements OrderService {
                     pointSaveRule,
                     member,
                     new PointHistorySaveRequest(orderSaveRequest.getPointToSave(), pointSaveRule.getPointSaveRuleName()));
-        pointOrderRepository.save(new PointOrder(savePointHistory, order));
+            pointOrderRepository.save(new PointOrder(savePointHistory, order));
             pointHistory += savePointHistory.getPointAmount();
 
             if (0 < orderSaveRequest.getPointToUse() && orderSaveRequest.getPointToUse() <= member.getMemberPoint() ) {
@@ -126,7 +127,7 @@ public class OrderServiceImpl implements OrderService {
                         member,
                         new PointHistorySaveRequest((-1) * orderSaveRequest.getPointToUse(), "도서 포인트 결제")
                 );
-            pointOrderRepository.save(new PointOrder(usePointHistory, order));
+                pointOrderRepository.save(new PointOrder(usePointHistory, order));
                 pointHistory += usePointHistory.getPointAmount();
             }
             member.setMemberPoint(member.getMemberPoint() + pointHistory);
@@ -152,11 +153,11 @@ public class OrderServiceImpl implements OrderService {
 
 
         orderPage.getContent().forEach(order ->
-            log.info("Order ID: {}, Order Date: {}, Total Price: {}, Order Status: {}",
-                order.getOrderId(),
-                order.getOrderDate(),
-                order.getTotalPrice(),
-                order.getOrderStatus()));
+                log.info("Order ID: {}, Order Date: {}, Total Price: {}, Order Status: {}",
+                        order.getOrderId(),
+                        order.getOrderDate(),
+                        order.getTotalPrice(),
+                        order.getOrderStatus()));
 
         // 상태를 포함한 주문 리스트를 생성하여 반환
         return new OrderResponseWithCount(orderPage.getContent(), orderPage.getTotalElements());
@@ -181,4 +182,20 @@ public class OrderServiceImpl implements OrderService {
 
         // 상태를 포함한 주문 리스트를 생성하여 반환
         return new AdminOrderResponseWithCount(orderPage.getContent(), orderPage.getTotalElements());    }
+
+    @Override
+    public void changeOrderstatus(String orderId) {
+        Optional<OrderToStatusMapping> order = orderToStatusMappingRepository.findByOrderIdOrderByOrderStatusCreatedAtDesc(Long.valueOf(orderId), PageRequest.of(0, 1)).stream().findFirst();
+
+        // 제일 최신이 대기중이 맞다면, 배송중으로 하나 더 생성
+        if (order.get().getOrderStatus().getOrderStatusEnum() == OrderStatusEnum.PENDING) {
+            Optional<OrderStatus> orderStatus = orderStatusRepository.findById(Long.valueOf(2));
+            OrderToStatusMapping orderToStatusMapping = new OrderToStatusMapping(
+                    order.get().getOrder(),
+                    orderStatus.get(),
+                    LocalDateTime.now()
+            );
+            orderToStatusMappingRepository.save(orderToStatusMapping);
+        }
+    }
 }
