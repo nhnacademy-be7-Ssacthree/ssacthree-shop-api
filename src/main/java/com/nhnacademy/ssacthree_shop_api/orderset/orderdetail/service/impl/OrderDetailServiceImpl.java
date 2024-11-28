@@ -8,6 +8,8 @@ import com.nhnacademy.ssacthree_shop_api.orderset.deliveryrule.domain.DeliveryRu
 import com.nhnacademy.ssacthree_shop_api.orderset.order.domain.Order;
 import com.nhnacademy.ssacthree_shop_api.orderset.order.dto.OrderDetailSaveRequest;
 import com.nhnacademy.ssacthree_shop_api.orderset.order.repository.OrderRepository;
+import com.nhnacademy.ssacthree_shop_api.orderset.order.repository.OrderRepositoryCustom;
+import com.nhnacademy.ssacthree_shop_api.orderset.order.service.OrderService;
 import com.nhnacademy.ssacthree_shop_api.orderset.orderdetail.domain.OrderDetail;
 import com.nhnacademy.ssacthree_shop_api.orderset.orderdetail.dto.OrderDetailDTO;
 import com.nhnacademy.ssacthree_shop_api.orderset.orderdetail.dto.OrderDetailResponse;
@@ -15,7 +17,6 @@ import com.nhnacademy.ssacthree_shop_api.orderset.orderdetail.repo.OrderDetailRe
 import com.nhnacademy.ssacthree_shop_api.orderset.orderdetail.service.OrderDetailService;
 import com.nhnacademy.ssacthree_shop_api.orderset.orderdetailpackaging.domain.OrderDetailPackaging;
 import com.nhnacademy.ssacthree_shop_api.orderset.orderdetailpackaging.domain.repository.OrderDetailPackagingRepository;
-import com.nhnacademy.ssacthree_shop_api.orderset.packaging.domain.Packaging;
 import com.nhnacademy.ssacthree_shop_api.orderset.packaging.repository.PackagingRepository;
 import com.nhnacademy.ssacthree_shop_api.orderset.payment.domain.Payment;
 import com.nhnacademy.ssacthree_shop_api.orderset.payment.domain.repository.PaymentRepository;
@@ -40,7 +41,8 @@ public class OrderDetailServiceImpl implements OrderDetailService {
     private final BookRepository bookRepository;
     private final PackagingRepository packagingRepository;
     private final OrderDetailPackagingRepository orderDetailPackagingRepository;
-
+    private final OrderRepositoryCustom orderRepositoryCustom;
+    private final OrderService orderService;
 
     @Override
     @Transactional(isolation = Isolation.SERIALIZABLE) // 재고차감 때문에
@@ -104,7 +106,22 @@ public class OrderDetailServiceImpl implements OrderDetailService {
 
     }
 
-
+    // orderNumber로 orderId 조회
+    @Override
+    public Optional<Long> getOrderId(String orderNumber) {
+        Optional<Long> orderId = orderRepositoryCustom.findOrderIdByOrderNumber(orderNumber);
+        return orderId;
+    }
+    
+    
+    // 주문 내역의 전화번호와 입력 된 전화번호가 일치하는지 확인
+    @Override
+    public Boolean comparePhoneNumber(Long orderId,String phoneNumber){
+        // orderId로 조회 후 비교
+        Order order = orderService.getOrder(orderId);
+        String receiverPhone = order.getReceiverPhone();
+        return receiverPhone.equals(phoneNumber);
+    }
 
 
 
@@ -193,4 +210,7 @@ public class OrderDetailServiceImpl implements OrderDetailService {
             return "결제 취소";
         }
     }
+
+
+
 }

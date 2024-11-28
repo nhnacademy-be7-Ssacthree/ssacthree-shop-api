@@ -1,5 +1,6 @@
 package com.nhnacademy.ssacthree_shop_api.orderset.order.service.impl;
 
+import com.nhnacademy.ssacthree_shop_api.commons.exception.NotFoundException;
 import com.nhnacademy.ssacthree_shop_api.customer.domain.Customer;
 import com.nhnacademy.ssacthree_shop_api.customer.repository.CustomerRepository;
 import com.nhnacademy.ssacthree_shop_api.memberset.member.domain.Member;
@@ -181,4 +182,16 @@ public class OrderServiceImpl implements OrderService {
 
         // 상태를 포함한 주문 리스트를 생성하여 반환
         return new AdminOrderResponseWithCount(orderPage.getContent(), orderPage.getTotalElements());    }
+
+
+    // OrderId로 order 객체 반환
+    @Override
+    public Order getOrder(Long orderId) {
+        Optional<Order> optionalOrder = orderRepository.findById(orderId);
+        if (optionalOrder.isPresent()) {
+            return optionalOrder.get();
+        } else {
+            throw new NotFoundException("Order not found with id: " + orderId);
+        }
+    }
 }
