@@ -24,6 +24,7 @@ import com.nhnacademy.ssacthree_shop_api.orderset.order.service.OrderService;
 import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.UUID;
 
 import com.nhnacademy.ssacthree_shop_api.orderset.orderdetail.service.OrderDetailService;
 import com.nhnacademy.ssacthree_shop_api.orderset.orderstatus.domain.OrderStatus;
@@ -86,7 +87,8 @@ public class OrderServiceImpl implements OrderService {
                 orderSaveRequest.getRoadAddress(),
                 orderSaveRequest.getDetailAddress(),
                 orderSaveRequest.getOrderRequest(),
-                orderSaveRequest.getDeliveryDate()
+                orderSaveRequest.getDeliveryDate(),
+                null
         );
         orderRepository.save(order); // 주문후 줘야하는 정보.. 상세 ; orderKey랑 결제 key랑 결제 금액
 
@@ -203,6 +205,13 @@ public class OrderServiceImpl implements OrderService {
                         newOrderStatus.get(),
                         LocalDateTime.now()
                 );
+
+                // 운송장 번호 발급
+                String uuid = UUID.randomUUID().toString();
+                String randomPart = uuid.replaceAll("[^a-zA-Z0-9]", "").substring(0, 9).toUpperCase();
+                Optional<Order> targetOrder = orderRepository.findById(orderId);
+                targetOrder.get().setInvoice_number("INV" + randomPart);
+
                 orderToStatusMappingRepository.save(orderToStatusMapping);
                 return true;
             }
