@@ -29,6 +29,7 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Slf4j
 @Service
@@ -80,17 +81,20 @@ public class OrderDetailServiceImpl implements OrderDetailService {
 
 
             //TODO : 포장 정보 저장 - 수량은 일단 1로 설정
-            Packaging packaging = packagingRepository.findById(orderDetailSaveRequest.getPackagingId())
-                    .orElseThrow(() -> new RuntimeException("포장 정보가 없습니다."));
+            Long packagingId = orderDetailSaveRequest.getPackagingId();
+            if (Objects.nonNull(packagingId)) {
+                Packaging packaging = packagingRepository.findById(packagingId)
+                        .orElseThrow(() -> new RuntimeException("포장 정보가 없습니다."));
 
-            OrderDetailPackaging orderDetailPackaging = new OrderDetailPackaging(
-                    null,
-                    packaging,
-                    order,
-                    book,
-                    1
-            );
-            orderDetailPackagingList.add(orderDetailPackaging);
+                OrderDetailPackaging orderDetailPackaging = new OrderDetailPackaging(
+                        null,
+                        packaging,
+                        order,
+                        book,
+                        1
+                );
+                orderDetailPackagingList.add(orderDetailPackaging);
+            }
         }
 
         //주문 상세 저장
