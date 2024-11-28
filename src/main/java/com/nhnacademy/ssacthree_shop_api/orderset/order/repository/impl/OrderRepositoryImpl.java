@@ -49,7 +49,9 @@ public class OrderRepositoryImpl implements OrderRepositoryCustom {
             order.customer.customerId.eq(customerId)
                 .and(order.ordered_date.between(startDate, endDate))
         )
-        .fetch();
+            .offset(pageable.getOffset())
+            .limit(pageable.getPageSize())
+            .fetch();
 
     List<OrderListResponse> results = rawResults.stream()
         .map(tuple -> new OrderListResponse(
@@ -95,6 +97,8 @@ public class OrderRepositoryImpl implements OrderRepositoryCustom {
                 .where(
                         order.ordered_date.between(startDate, endDate)
                 )
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
                 .fetch();
 
         List<AdminOrderListResponse> results = rawResults.stream()
