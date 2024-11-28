@@ -1,4 +1,5 @@
 package com.nhnacademy.ssacthree_shop_api.orderset.orderdetail.service.impl;
+
 import com.nhnacademy.ssacthree_shop_api.bookset.book.domain.Book;
 import com.nhnacademy.ssacthree_shop_api.bookset.book.dto.response.BookInfoResponse;
 import com.nhnacademy.ssacthree_shop_api.bookset.book.repository.BookRepository;
@@ -16,10 +17,11 @@ import com.nhnacademy.ssacthree_shop_api.orderset.orderdetailpackaging.domain.Or
 import com.nhnacademy.ssacthree_shop_api.orderset.orderdetailpackaging.domain.repository.OrderDetailPackagingRepository;
 import com.nhnacademy.ssacthree_shop_api.orderset.packaging.domain.Packaging;
 import com.nhnacademy.ssacthree_shop_api.orderset.packaging.repository.PackagingRepository;
+
 import com.nhnacademy.ssacthree_shop_api.orderset.payment.domain.Payment;
 import com.nhnacademy.ssacthree_shop_api.orderset.payment.domain.repository.PaymentRepository;
 import jakarta.persistence.EntityNotFoundException;
-import java.util.Optional;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -39,24 +41,32 @@ public class OrderDetailServiceImpl implements OrderDetailService {
     private final BookRepository bookRepository;
     private final PackagingRepository packagingRepository;
     private final OrderDetailPackagingRepository orderDetailPackagingRepository;
+    private final PaymentRepository paymentRepository;
+
+
+
     @Override
     @Transactional(isolation = Isolation.SERIALIZABLE) // 재고차감 때문에
     public void saveOrderDetails(Order order, List<OrderDetailSaveRequest> orderDetailList) {
         // 주문 상세 요청 -> 주문 상세 만들기.. 포인트 등등도 모두 .. 저장
         List<OrderDetail> orderDetails = new ArrayList<>();
         List<OrderDetailPackaging> orderDetailPackagingList = new ArrayList<>();
+
         for (OrderDetailSaveRequest orderDetailSaveRequest : orderDetailList) {
             // 책 수량 확인
             BookInfoResponse bookInfo = bookCommonService.getBook(orderDetailSaveRequest.getBookId());
             if (bookInfo.getStock() - orderDetailSaveRequest.getQuantity() < 0) {
                 throw new RuntimeException("재고가 부족합니다.");
             }
+
             // 재고 차감 - 배타락 이용 (읽기, 쓰기 동시 불가하게)
 //            Book book = bookRepository.findOne(orderDetailSaveRequest.getBookId());
+
             // TODO : 도서 상세당 쿠폰 사용 처리
             // 일단은 null로 처리
             Book book = bookRepository.findByBookId(bookInfo.getBookId())
                     .orElseThrow(() -> new RuntimeException("책 없습니다."));
+
             //TODO : 주문 상세 리스트 저장
             OrderDetail orderDetail = new OrderDetail(
                     order,
@@ -66,33 +76,33 @@ public class OrderDetailServiceImpl implements OrderDetailService {
                     orderDetailSaveRequest.getBookPriceAtOrder()
             );
             orderDetails.add(orderDetail);
-            // 포장지를 도서에 다는것부터 필요할듯
-//            // TODO : 포장 정보 저장
-//            Packaging packaging = packagingRepository.findById(orderDetailSaveRequest.getPackagingId())
-//                    .orElseThrow(() -> new RuntimeException("포장 정보가 없습니다."));
-//
-//            OrderDetailPackaging orderDetailPackaging = new OrderDetailPackaging(
-//                    null,
-//                    packaging,
-//                    order,
-//                    book,
-//                    1
-//            );
-//            orderDetailPackagingList.add(orderDetailPackaging);
+
+
+
+            //TODO : 포장 정보 저장 - 수량은 일단 1로 설정
+            Packaging packaging = packagingRepository.findById(orderDetailSaveRequest.getPackagingId())
+                    .orElseThrow(() -> new RuntimeException("포장 정보가 없습니다."));
+
+            OrderDetailPackaging orderDetailPackaging = new OrderDetailPackaging(
+                    null,
+                    packaging,
+                    order,
+                    book,
+                    1
+            );
+            orderDetailPackagingList.add(orderDetailPackaging);
         }
+
         //주문 상세 저장
         orderDetailRepository.saveAll(orderDetails);
+
         // 포장 정보 저장
-//        orderDetailPackagingRepository.saveAll(orderDetailPackagingList);
+        orderDetailPackagingRepository.saveAll(orderDetailPackagingList);
+
         //주문 상세 저장 후 뭐 반환?
 
     }
 
-
-
-
-
-    private final PaymentRepository paymentRepository;
 
     // 주문 상세 조회 (주문+주문상세+결제내역)
     // 각 service에 API 없어서 직접 repo 사용
@@ -141,7 +151,6 @@ public class OrderDetailServiceImpl implements OrderDetailService {
         DeliveryRule deliveryRule = order.getDeliveryRuleId();
         int deliveryFee = deliveryRule.getDeliveryFee();
 
-
         // 5. DTO 매핑
         OrderDetailResponse orderDetailResponse = new OrderDetailResponse(
                 order.getId(),
@@ -167,8 +176,6 @@ public class OrderDetailServiceImpl implements OrderDetailService {
         );
         return orderDetailResponse;
     }
-
-
     public String convertPaymentStatus(Payment payment){
         log.info("payment상태변환");
         if(payment.getPaymentStatus().name().equals("DONE")){
