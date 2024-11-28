@@ -4,25 +4,21 @@ import com.nhnacademy.ssacthree_shop_api.bookset.book.domain.Book;
 import com.nhnacademy.ssacthree_shop_api.bookset.book.dto.response.BookInfoResponse;
 import com.nhnacademy.ssacthree_shop_api.bookset.book.repository.BookRepository;
 import com.nhnacademy.ssacthree_shop_api.bookset.book.service.BookCommonService;
-import com.nhnacademy.ssacthree_shop_api.commons.exception.NotFoundException;
 import com.nhnacademy.ssacthree_shop_api.orderset.deliveryrule.domain.DeliveryRule;
 import com.nhnacademy.ssacthree_shop_api.orderset.order.domain.Order;
 import com.nhnacademy.ssacthree_shop_api.orderset.order.dto.OrderDetailSaveRequest;
 import com.nhnacademy.ssacthree_shop_api.orderset.order.repository.OrderRepository;
-import com.nhnacademy.ssacthree_shop_api.orderset.order.repository.OrderRepositoryCustom;
-import com.nhnacademy.ssacthree_shop_api.orderset.order.service.OrderService;
 import com.nhnacademy.ssacthree_shop_api.orderset.orderdetail.domain.OrderDetail;
-import com.nhnacademy.ssacthree_shop_api.orderset.orderdetail.dto.OrderDetailDTO;
-import com.nhnacademy.ssacthree_shop_api.orderset.orderdetail.dto.OrderDetailResponse;
 import com.nhnacademy.ssacthree_shop_api.orderset.orderdetail.repo.OrderDetailRepository;
 import com.nhnacademy.ssacthree_shop_api.orderset.orderdetail.service.OrderDetailService;
 import com.nhnacademy.ssacthree_shop_api.orderset.orderdetailpackaging.domain.OrderDetailPackaging;
 import com.nhnacademy.ssacthree_shop_api.orderset.orderdetailpackaging.domain.repository.OrderDetailPackagingRepository;
 import com.nhnacademy.ssacthree_shop_api.orderset.packaging.repository.PackagingRepository;
+
 import com.nhnacademy.ssacthree_shop_api.orderset.payment.domain.Payment;
 import com.nhnacademy.ssacthree_shop_api.orderset.payment.domain.repository.PaymentRepository;
 import jakarta.persistence.EntityNotFoundException;
-import java.util.Optional;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -43,6 +39,9 @@ public class OrderDetailServiceImpl implements OrderDetailService {
     private final PackagingRepository packagingRepository;
     private final OrderDetailPackagingRepository orderDetailPackagingRepository;
     private final OrderRepositoryCustom orderRepositoryCustom;
+    private final PaymentRepository paymentRepository;
+
+
 
     @Override
     @Transactional(isolation = Isolation.SERIALIZABLE) // 재고차감 때문에
@@ -63,10 +62,8 @@ public class OrderDetailServiceImpl implements OrderDetailService {
 
             // TODO : 도서 상세당 쿠폰 사용 처리
             // 일단은 null로 처리
-
             Book book = bookRepository.findByBookId(bookInfo.getBookId())
                     .orElseThrow(() -> new RuntimeException("책 없습니다."));
-
 
             //TODO : 주문 상세 리스트 저장
             OrderDetail orderDetail = new OrderDetail(
@@ -80,27 +77,25 @@ public class OrderDetailServiceImpl implements OrderDetailService {
 
 
 
-            // 포장지를 도서에 다는것부터 필요할듯
-//            // TODO : 포장 정보 저장
-//            Packaging packaging = packagingRepository.findById(orderDetailSaveRequest.getPackagingId())
-//                    .orElseThrow(() -> new RuntimeException("포장 정보가 없습니다."));
-//
-//            OrderDetailPackaging orderDetailPackaging = new OrderDetailPackaging(
-//                    null,
-//                    packaging,
-//                    order,
-//                    book,
-//                    1
-//            );
-//            orderDetailPackagingList.add(orderDetailPackaging);
+            //TODO : 포장 정보 저장 - 수량은 일단 1로 설정
+            Packaging packaging = packagingRepository.findById(orderDetailSaveRequest.getPackagingId())
+                    .orElseThrow(() -> new RuntimeException("포장 정보가 없습니다."));
+
+            OrderDetailPackaging orderDetailPackaging = new OrderDetailPackaging(
+                    null,
+                    packaging,
+                    order,
+                    book,
+                    1
+            );
+            orderDetailPackagingList.add(orderDetailPackaging);
         }
 
         //주문 상세 저장
         orderDetailRepository.saveAll(orderDetails);
 
         // 포장 정보 저장
-//        orderDetailPackagingRepository.saveAll(orderDetailPackagingList);
-
+        orderDetailPackagingRepository.saveAll(orderDetailPackagingList);
 
         //주문 상세 저장 후 뭐 반환?
 
@@ -112,8 +107,8 @@ public class OrderDetailServiceImpl implements OrderDetailService {
         Optional<Long> orderId = orderRepositoryCustom.findOrderIdByOrderNumber(orderNumber);
         return orderId;
     }
-    
-    
+
+
     // 주문 내역의 전화번호와 입력 된 전화번호가 일치하는지 확인
     @Override
     public Boolean comparePhoneNumber(Long orderId,String phoneNumber){
