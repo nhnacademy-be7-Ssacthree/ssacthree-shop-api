@@ -47,12 +47,29 @@ public class MemberCouponServiceImpl implements MemberCouponService {
     }
 
     @Override
+    @Transactional
     public MemberCoupon createMemberCoupon(MemberCouponCreateRequest memberCouponCreateRequest) {
         Member customer = memberRepository.findById(memberCouponCreateRequest.getCustomerId())
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다."));
 
         Coupon coupon = couponRepository.findById(memberCouponCreateRequest.getCouponId())
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 쿠폰입니다."));
+
+        LocalDateTime now = LocalDateTime.now();
+
+        if (coupon.getCouponEffectivePeriod() > 0 && coupon.getCouponEffectivePeriodUnit() != null) {
+            switch (coupon.getCouponEffectivePeriodUnit()) {
+                case DAY:
+                    memberCouponCreateRequest.setMemberCouponExpiredAt(now.plusDays(coupon.getCouponEffectivePeriod()));
+                    break;
+                case MONTH:
+                    memberCouponCreateRequest.setMemberCouponExpiredAt(now.plusMonths(coupon.getCouponEffectivePeriod()));
+                    break;
+                case YEAR:
+                    memberCouponCreateRequest.setMemberCouponExpiredAt(now.plusYears(coupon.getCouponEffectivePeriod()));
+                    break;
+            }
+        }
 
         MemberCoupon memberCoupon = new MemberCoupon(
             coupon,
