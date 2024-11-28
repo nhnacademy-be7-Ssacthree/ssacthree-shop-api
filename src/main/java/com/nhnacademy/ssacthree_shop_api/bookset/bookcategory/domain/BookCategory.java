@@ -15,6 +15,7 @@ public class BookCategory {
     @EmbeddedId
     private BookCategoryId bookCategoryId;
 
+    @Setter
     @ManyToOne(fetch = FetchType.LAZY)
     @MapsId("bookId")
     @JoinColumn(name = "book_id")
