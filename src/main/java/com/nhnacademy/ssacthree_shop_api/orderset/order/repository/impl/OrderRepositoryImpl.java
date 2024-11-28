@@ -8,6 +8,7 @@ import com.nhnacademy.ssacthree_shop_api.orderset.order.repository.OrderReposito
 import com.nhnacademy.ssacthree_shop_api.orderset.orderstatus.domain.QOrderStatus;
 import com.nhnacademy.ssacthree_shop_api.orderset.ordertostatusmapping.QOrderToStatusMapping;
 import com.querydsl.core.Tuple;
+import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -23,63 +24,63 @@ import org.springframework.data.domain.Pageable;
 @RequiredArgsConstructor
 public class OrderRepositoryImpl implements OrderRepositoryCustom {
 
-  private final JPAQueryFactory queryFactory;
+    private final JPAQueryFactory queryFactory;
 
-  @Override
-  public Page<OrderListResponse> findOrdersByCustomerAndDate(
-          Long customerId,
-          LocalDateTime startDate,
-          LocalDateTime endDate,
-          Pageable pageable) {
-    QOrder order = QOrder.order;
-    QOrderToStatusMapping orderToStatusMapping = QOrderToStatusMapping.orderToStatusMapping;
-    QOrderStatus orderStatus = QOrderStatus.orderStatus;
+    @Override
+    public Page<OrderListResponse> findOrdersByCustomerAndDate(
+            Long customerId,
+            LocalDateTime startDate,
+            LocalDateTime endDate,
+            Pageable pageable) {
+        QOrder order = QOrder.order;
+        QOrderToStatusMapping orderToStatusMapping = QOrderToStatusMapping.orderToStatusMapping;
+        QOrderStatus orderStatus = QOrderStatus.orderStatus;
 
-    List<Tuple> rawResults = queryFactory
-        .select(
-            order.id,
-            order.ordered_date,
-            order.total_price,
-            orderToStatusMapping.orderStatus.orderStatusEnum.stringValue()
-        )
-        .from(order)
-        .leftJoin(orderToStatusMapping).on(order.id.eq(orderToStatusMapping.order.id))
-        .leftJoin(orderStatus).on(orderToStatusMapping.orderStatus.id.eq(orderStatus.id))
-        .where(
-            order.customer.customerId.eq(customerId)
-                .and(order.ordered_date.between(startDate, endDate))
-        )
-            .offset(pageable.getOffset())
-            .limit(pageable.getPageSize())
-            .fetch();
+        List<Tuple> rawResults = queryFactory
+                .select(
+                        order.id,
+                        order.ordered_date,
+                        order.total_price,
+                        orderToStatusMapping.orderStatus.orderStatusEnum.stringValue()
+                )
+                .from(order)
+                .leftJoin(orderToStatusMapping).on(order.id.eq(orderToStatusMapping.order.id))
+                .leftJoin(orderStatus).on(orderToStatusMapping.orderStatus.id.eq(orderStatus.id))
+                .where(
+                        order.customer.customerId.eq(customerId)
+                                .and(order.ordered_date.between(startDate, endDate))
+                )
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
 
-    List<OrderListResponse> results = rawResults.stream()
-        .map(tuple -> new OrderListResponse(
-            tuple.get(order.id),
-            Objects.requireNonNull(tuple.get(order.ordered_date)).toLocalDate(), // LocalDateTime → LocalDate 변환
-            tuple.get(order.total_price),
-            tuple.get(orderToStatusMapping.orderStatus.orderStatusEnum.stringValue())
-        ))
-        .collect(Collectors.toList());
+        List<OrderListResponse> results = rawResults.stream()
+                .map(tuple -> new OrderListResponse(
+                        tuple.get(order.id),
+                        Objects.requireNonNull(tuple.get(order.ordered_date)).toLocalDate(), // LocalDateTime → LocalDate 변환
+                        tuple.get(order.total_price),
+                        tuple.get(orderToStatusMapping.orderStatus.orderStatusEnum.stringValue())
+                ))
+                .collect(Collectors.toList());
 
         Long total = queryFactory
-            .select(order.count())
-            .from(order)
-            .where(
-                  order.customer.customerId.eq(customerId)
-                      .and(order.ordered_date.between(startDate, endDate))
-            )
-            .fetchOne();
+                .select(order.count())
+                .from(order)
+                .where(
+                        order.customer.customerId.eq(customerId)
+                                .and(order.ordered_date.between(startDate, endDate))
+                )
+                .fetchOne();
 
         return new PageImpl<>(results, pageable, total);
-  }
+    }
 
     @Override
     public Page<AdminOrderListResponse> adminFindAllOrders(LocalDateTime startDate,
                                                            LocalDateTime endDate,
                                                            Pageable pageable) {
         QOrder order = QOrder.order;
-        QOrderToStatusMapping orderToStatusMapping = QOrderToStatusMapping.orderToStatusMapping;
+        QOrderToStatusMapping orderToStatusMapping = new QOrderToStatusMapping("subOrderToStatusMapping");
         QOrderStatus orderStatus = QOrderStatus.orderStatus;
 
         List<Tuple> rawResults = queryFactory
@@ -92,7 +93,14 @@ public class OrderRepositoryImpl implements OrderRepositoryCustom {
                         order.order_number
                 )
                 .from(order)
-                .leftJoin(orderToStatusMapping).on(order.id.eq(orderToStatusMapping.order.id))
+                .leftJoin(orderToStatusMapping)
+                .on(order.id.eq(orderToStatusMapping.order.id)
+                        .and(orderToStatusMapping.orderStatusCreatedAt.eq(
+                                JPAExpressions.select(orderToStatusMapping.orderStatusCreatedAt.max())
+                                        .from(orderToStatusMapping)
+                                        .where(orderToStatusMapping.order.id.eq(order.id))
+                        ))
+                )
                 .leftJoin(orderStatus).on(orderToStatusMapping.orderStatus.id.eq(orderStatus.id))
                 .where(
                         order.ordered_date.between(startDate, endDate)
