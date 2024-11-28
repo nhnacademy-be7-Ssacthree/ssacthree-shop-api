@@ -15,6 +15,7 @@ import com.nhnacademy.ssacthree_shop_api.memberset.member.domain.MemberStatus;
 import com.nhnacademy.ssacthree_shop_api.memberset.member.dto.MemberInfoGetResponse;
 import com.nhnacademy.ssacthree_shop_api.memberset.member.dto.MemberInfoUpdateRequest;
 import com.nhnacademy.ssacthree_shop_api.memberset.member.dto.MemberRegisterRequest;
+import com.nhnacademy.ssacthree_shop_api.memberset.member.event.MemberRegisteredEvent;
 import com.nhnacademy.ssacthree_shop_api.memberset.member.exception.AlreadyMemberException;
 import com.nhnacademy.ssacthree_shop_api.memberset.member.exception.MemberNotFoundException;
 import com.nhnacademy.ssacthree_shop_api.memberset.member.repository.MemberCustomRepository;
@@ -35,6 +36,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 @ExtendWith(MockitoExtension.class)
@@ -60,6 +62,9 @@ public class MemberServiceTest {
 
     @Mock
     private PointSaveRuleRepository pointSaveRuleRepository;
+
+    @Mock
+    private ApplicationEventPublisher applicationEventPublisher;
 
     @InjectMocks
     private MemberServiceImpl memberService;
@@ -97,6 +102,7 @@ public class MemberServiceTest {
         verify(passwordEncoder).encode("password123");
         verify(memberGradeRepository).findById(1L);
         verify(memberRepository).save(any(Member.class));
+        verify(applicationEventPublisher).publishEvent(any(MemberRegisteredEvent.class));
     }
 
     @Test
