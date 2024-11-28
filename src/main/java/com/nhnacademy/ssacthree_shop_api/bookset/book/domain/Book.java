@@ -64,14 +64,14 @@ public class Book {
     @ManyToOne
     @JoinColumn(name = "publisher_id")
     private  Publisher publisher;
-
-    @OneToMany(mappedBy="book", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    //orphanRemoval = true 도서 수정 시 연결된 자식 엔티티가 부모와의 관계가 끊어졌을 때 JPA가 이를 자동으로 삭제
+    @OneToMany(mappedBy="book", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<BookCategory> bookCategories = new HashSet<>();
 
-    @OneToMany(mappedBy="book", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy="book", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<BookAuthor> bookAuthors = new HashSet<>();
 
-    @OneToMany(mappedBy="book", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy="book", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<BookTag> bookTags = new HashSet<>();
 
     public void addCategory(BookCategory bookCategory) {
@@ -95,14 +95,23 @@ public class Book {
     }
 
     public void clearCategories() {
-        bookCategories.clear();
+        for (BookCategory bookCategory : bookCategories) {
+            bookCategory.setBook(null); // 부모 관계 끊기
+        }
+        bookCategories.clear(); // Set 비우기
     }
 
     public void clearTags() {
+        for (BookTag bookTag : bookTags) {
+            bookTag.setBook(null);
+        }
         bookTags.clear();
     }
 
     public void clearAuthors() {
+        for (BookAuthor bookAuthor : bookAuthors) {
+            bookAuthor.setBook(null);
+        }
         bookAuthors.clear();
     }
 

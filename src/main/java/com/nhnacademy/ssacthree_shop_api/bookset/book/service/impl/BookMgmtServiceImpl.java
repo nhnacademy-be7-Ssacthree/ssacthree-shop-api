@@ -208,31 +208,37 @@ public class BookMgmtServiceImpl implements BookMgmtService {
         }
 
         // 카테고리 업데이트
-        if (hasCategoryChanges(book.getBookCategories(), bookUpdateRequest.getCategoryIdList())) {
+        if (bookUpdateRequest.getCategoryIdList() == null || bookUpdateRequest.getCategoryIdList().isEmpty()) {
+            book.clearCategories();
+        } else if (hasCategoryChanges(book.getBookCategories(), bookUpdateRequest.getCategoryIdList())) {
             book.clearCategories();
             for (Long categoryId : bookUpdateRequest.getCategoryIdList()) {
                 Category category = categoryRepository.findById(categoryId)
-                        .orElseThrow(() -> new CategoryNotFoundException("카테고리가 존재하지 않습니다."));
+                    .orElseThrow(() -> new CategoryNotFoundException("카테고리가 존재하지 않습니다."));
                 book.addCategory(new BookCategory(book, category));
             }
         }
 
         // 태그 업데이트
-        if (hasTagChanges(book.getBookTags(), bookUpdateRequest.getTagIdList())) {
+        if (bookUpdateRequest.getTagIdList() == null || bookUpdateRequest.getTagIdList().isEmpty()) {
+            book.clearTags();
+        } else if (hasTagChanges(book.getBookTags(), bookUpdateRequest.getTagIdList())) {
             book.clearTags();
             for (Long tagId : bookUpdateRequest.getTagIdList()) {
                 Tag tag = tagRepository.findById(tagId)
-                        .orElseThrow(() -> new TagNotFoundException("태그가 존재하지 않습니다."));
+                    .orElseThrow(() -> new TagNotFoundException("태그가 존재하지 않습니다."));
                 book.addTag(new BookTag(book, tag));
             }
         }
 
         // 작가 업데이트
-        if (hasAuthorChanges(book.getBookAuthors(), bookUpdateRequest.getAuthorIdList())) {
+        if (bookUpdateRequest.getAuthorIdList() == null || bookUpdateRequest.getAuthorIdList().isEmpty()) {
+            book.clearAuthors();
+        } else if (hasAuthorChanges(book.getBookAuthors(), bookUpdateRequest.getAuthorIdList())) {
             book.clearAuthors();
             for (Long authorId : bookUpdateRequest.getAuthorIdList()) {
                 Author author = authorRepository.findById(authorId)
-                        .orElseThrow(() -> new AuthorNotFoundException("작가가 존재하지 않습니다."));
+                    .orElseThrow(() -> new AuthorNotFoundException("작가가 존재하지 않습니다."));
                 book.addAuthor(new BookAuthor(book, author));
             }
         }
@@ -305,6 +311,9 @@ public class BookMgmtServiceImpl implements BookMgmtService {
 
 
     private boolean hasCategoryChanges(Set<BookCategory> existingCategories, List<Long> newCategoryIds) {
+        if (newCategoryIds == null || newCategoryIds.isEmpty()) {
+            return !existingCategories.isEmpty(); // 새 데이터가 없으면 기존 데이터가 있는지 확인
+        }
         Set<Long> existingCategoryIds = existingCategories.stream()
             .map(cat -> cat.getCategory().getCategoryId())
             .collect(Collectors.toSet());
@@ -312,6 +321,9 @@ public class BookMgmtServiceImpl implements BookMgmtService {
     }
 
     private boolean hasTagChanges(Set<BookTag> existingTags, List<Long> newTagIds) {
+        if (newTagIds == null || newTagIds.isEmpty()) {
+            return !existingTags.isEmpty();
+        }
         Set<Long> existingTagIds = existingTags.stream()
             .map(tag -> tag.getTag().getTagId())
             .collect(Collectors.toSet());
@@ -319,11 +331,15 @@ public class BookMgmtServiceImpl implements BookMgmtService {
     }
 
     private boolean hasAuthorChanges(Set<BookAuthor> existingAuthors, List<Long> newAuthorIds) {
+        if (newAuthorIds == null || newAuthorIds.isEmpty()) {
+            return !existingAuthors.isEmpty();
+        }
         Set<Long> existingAuthorIds = existingAuthors.stream()
             .map(author -> author.getAuthor().getAuthorId())
             .collect(Collectors.toSet());
         return !existingAuthorIds.equals(new HashSet<>(newAuthorIds));
     }
+
 
     private BookSearchResponse addAuthorsToBook(BookSearchResponse book) {
         List<AuthorNameResponse> authors = bookRepository.findAuthorsByBookId(book.getBookId());
