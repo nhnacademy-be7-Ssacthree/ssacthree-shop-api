@@ -13,6 +13,11 @@ import com.nhnacademy.ssacthree_shop_api.orderset.orderdetailpackaging.domain.Or
 import com.nhnacademy.ssacthree_shop_api.orderset.orderdetailpackaging.domain.repository.OrderDetailPackagingRepository;
 import com.nhnacademy.ssacthree_shop_api.orderset.packaging.domain.Packaging;
 import com.nhnacademy.ssacthree_shop_api.orderset.packaging.repository.PackagingRepository;
+
+import com.nhnacademy.ssacthree_shop_api.orderset.payment.domain.Payment;
+import com.nhnacademy.ssacthree_shop_api.orderset.payment.domain.repository.PaymentRepository;
+import jakarta.persistence.EntityNotFoundException;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
@@ -29,6 +34,8 @@ public class OrderDetailServiceImpl implements OrderDetailService {
     private final BookRepository bookRepository;
     private final PackagingRepository packagingRepository;
     private final OrderDetailPackagingRepository orderDetailPackagingRepository;
+    private final PaymentRepository paymentRepository;
+
 
 
     @Override
@@ -50,10 +57,8 @@ public class OrderDetailServiceImpl implements OrderDetailService {
 
             // TODO : 도서 상세당 쿠폰 사용 처리
             // 일단은 null로 처리
-
             Book book = bookRepository.findByBookId(bookInfo.getBookId())
                     .orElseThrow(() -> new RuntimeException("책 없습니다."));
-
 
             //TODO : 주문 상세 리스트 저장
             OrderDetail orderDetail = new OrderDetail(
@@ -67,29 +72,112 @@ public class OrderDetailServiceImpl implements OrderDetailService {
 
 
 
-            // 포장지를 도서에 다는것부터 필요할듯
-//            // TODO : 포장 정보 저장
-//            Packaging packaging = packagingRepository.findById(orderDetailSaveRequest.getPackagingId())
-//                    .orElseThrow(() -> new RuntimeException("포장 정보가 없습니다."));
-//
-//            OrderDetailPackaging orderDetailPackaging = new OrderDetailPackaging(
-//                    null,
-//                    packaging,
-//                    order,
-//                    book,
-//                    1
-//            );
-//            orderDetailPackagingList.add(orderDetailPackaging);
+            //TODO : 포장 정보 저장 - 수량은 일단 1로 설정
+            Packaging packaging = packagingRepository.findById(orderDetailSaveRequest.getPackagingId())
+                    .orElseThrow(() -> new RuntimeException("포장 정보가 없습니다."));
+
+            OrderDetailPackaging orderDetailPackaging = new OrderDetailPackaging(
+                    null,
+                    packaging,
+                    order,
+                    book,
+                    1
+            );
+            orderDetailPackagingList.add(orderDetailPackaging);
         }
 
         //주문 상세 저장
         orderDetailRepository.saveAll(orderDetails);
 
         // 포장 정보 저장
-//        orderDetailPackagingRepository.saveAll(orderDetailPackagingList);
-
+        orderDetailPackagingRepository.saveAll(orderDetailPackagingList);
 
         //주문 상세 저장 후 뭐 반환?
 
+    }
+
+
+    // 주문 상세 조회 (주문+주문상세+결제내역)
+    // 각 service에 API 없어서 직접 repo 사용
+    /* 필요 repo
+    *   1. Order / 2. OrderDetail / 3. DeliveryRule / 4. Book / 5. Payment / 6. PaymentStatus / 7. Coupon(제외)
+    */
+    @Override
+    public OrderDetailResponse getOrderDetail(Long orderId) {
+        // 1. 주문 정보 조회
+        Order order = orderRepository.findById(orderId)
+            .orElseThrow(() -> new EntityNotFoundException("해당 주문을 찾을 수 없습니다: " + orderId));
+
+
+        // 2. 주문 상세 정보 조회
+        
+        List<OrderDetail> orderDetails = orderDetailRepository.findByOrderId(orderId);
+        log.info("주문상세조회성공");
+        List<OrderDetailDTO> orderDetailList = orderDetails.stream()
+            .map(orderDetail -> new OrderDetailDTO(
+                orderDetail.getBook().getBookId(),
+                orderDetail.getBook().getBookName(),
+                orderDetail.getQuantity(),
+                orderDetail.getBookpriceAtOrder()
+            ))
+            .toList();
+        
+        // log 확인
+        orderDetailList.forEach(orderDetail ->
+            log.info("OrderDetailDTO - BookId: {}, BookName: {}, Quantity: {}, BookPriceAtOrder: {}",
+                orderDetail.getBookId(),
+                orderDetail.getBookName(),
+                orderDetail.getQuantity(),
+                orderDetail.getBookPriceAtOrder())
+        );
+
+
+        log.info("결제정보를 조회합니다.");
+
+        // 3. 결제 정보 조회
+        Payment payment = paymentRepository.findByOrder(order)
+            .orElseThrow(() -> new EntityNotFoundException("결제 정보를 찾을 수 없습니다: " + orderId));
+        log.info("payment내용: {} / {}", payment.getId(), payment.getPaymentKey());
+        String paymentTypeName = payment.getPaymentType().getPaymentTypeName();
+
+        // 4. 배송 정책 조회
+        DeliveryRule deliveryRule = order.getDeliveryRuleId();
+        int deliveryFee = deliveryRule.getDeliveryFee();
+
+
+        // 5. DTO 매핑
+        OrderDetailResponse orderDetailResponse = new OrderDetailResponse(
+            order.getId(),
+            order.getOrdered_date().toLocalDate(),
+            order.getOrder_number(),
+            order.getDeliveryDate(),
+            "읏짜", // 송장 번호 (별도로 저장되어 있다면 추가 가능)
+            order.getReceiverName(),
+            order.getReceiverPhone(),
+            order.getOrderRequest(),
+            order.getRoadAddress(),
+            order.getDetailAddress(),
+            order.getPostalCode(),
+            order.getTotal_price(),
+            deliveryFee,
+            orderDetailList,
+            payment.getId(),
+            payment.getPaymentCreatedAt(),
+            payment.getPaymentAmount(),
+            payment.getPaymentKey(),
+            convertPaymentStatus(payment),
+            paymentTypeName
+        );
+        return orderDetailResponse;
+    }
+
+
+    public String convertPaymentStatus(Payment payment){
+        log.info("payment상태변환");
+        if(payment.getPaymentStatus().name().equals("DONE")){
+            return "결제 완료";
+        }else{
+            return "결제 취소";
+        }
     }
 }

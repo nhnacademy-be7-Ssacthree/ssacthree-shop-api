@@ -107,7 +107,7 @@ public class OrderServiceImpl implements OrderService {
         // TODO : 포인트 적립, 사용 내역 생성 - 포인트 서비스 - 하나로 묶기 ?
         Optional<Member> optionalMember = memberRepository.findById(orderSaveRequest.getCustomerId());
 
-        if (!Objects.isNull(optionalMember)) {
+        if (optionalMember.isPresent()) {
             Member member = optionalMember.get();
             int pointHistory = 0;
             PointSaveRule pointSaveRule = pointSaveRuleRepository.findPointSaveRuleByPointSaveRuleName("도서구매적립")
