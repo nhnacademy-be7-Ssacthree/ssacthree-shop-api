@@ -99,21 +99,21 @@ public class BookMapper {
                 .bookViewCount(book.getBookViewCount())
                 .bookDiscount(book.getBookDiscount())
                 .bookStatus(book.getBookStatus().toString())
-                .publisher(new PublisherNameResponse(book.getPublisher().getPublisherName()))
+                .publisher(book.getPublisher() != null
+                    ? new PublisherNameResponse(book.getPublisher().getPublisherId(), book.getPublisher().getPublisherName())
+                    : null)
                 .categories(book.getBookCategories().stream()
-                        .map(bookCategory -> new CategoryNameResponse(bookCategory.getCategory().getCategoryName()))
+                        .map(bookCategory -> new CategoryNameResponse(bookCategory.getCategory().getCategoryId(), bookCategory.getCategory().getCategoryName()))
                         .toList()) // CategoryNameResponse 리스트로 변환
                 .authors(book.getBookAuthors().stream()
-                        .map(bookAuthor -> new AuthorNameResponse(bookAuthor.getAuthor().getAuthorName()))
+                        .map(bookAuthor -> new AuthorNameResponse(bookAuthor.getAuthor().getAuthorId(), bookAuthor.getAuthor().getAuthorName()))
                         .toList()) // AuthorNameResponse 리스트로 변환
                 .tags(book.getBookTags().stream()
-                        .map(bookTag -> new TagInfoResponse(bookTag.getTag().getTagName()))
+                        .map(bookTag -> new TagInfoResponse(bookTag.getTag().getTagId(),bookTag.getTag().getTagName()))
                         .toList()) // TagInfoResponse 리스트로 변환
                 .build();
 
         return response;
     }
-
-
 
 }

@@ -23,8 +23,12 @@ import com.nhnacademy.ssacthree_shop_api.memberset.pointhistory.service.PointHis
 import com.nhnacademy.ssacthree_shop_api.memberset.pointsaverule.domain.PointSaveRule;
 import com.nhnacademy.ssacthree_shop_api.memberset.pointsaverule.exception.PointSaveRuleNotFoundException;
 import com.nhnacademy.ssacthree_shop_api.memberset.pointsaverule.repository.PointSaveRuleRepository;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -142,5 +146,40 @@ public class MemberServiceImpl implements MemberService {
 
         assert member != null;
         return member.getId();
+    }
+
+    @Override
+    @Scheduled(cron = "0 0 4 * * *")
+    public void sleepMember() {
+        //액티브 맴버 불러옴
+        List<Member> activeMembers = memberRepository.findAllByMemberStatus(MemberStatus.ACTIVE);
+
+        for (Member member : activeMembers) {
+            LocalDateTime lastLogined = member.getMemberLastLoginAt();
+
+            // 마지막 로그인 날짜가 null 이라면 회원가입 날짜로부터 3개월 ㄱㄱ
+            if (lastLogined == null) {
+                lastLogined = member.getMemberCreatedAt();
+            }
+            int period = (int) ChronoUnit.DAYS.between(lastLogined, LocalDateTime.now());
+            // 90일 이상의 간격이 있으면 휴면으로 변경
+            if (period >= 90) {
+                member.setMemberStatus(MemberStatus.SLEEP);
+                log.info("{}가 휴면처리 되었습니다.", member.getMemberLoginId());
+            }
+
+        }
+
+    }
+
+    @Override
+    public MessageResponse activeMember(String memberLoginId) {
+        Member member = memberRepository.findByMemberLoginId(memberLoginId)
+            .orElseThrow(() -> new MemberNotFoundException("멤버를 찾을 수 없습니다."));
+
+        member.setMemberStatus(MemberStatus.ACTIVE);
+
+        return new MessageResponse("휴면 해제가 완료되었습니다.");
+
     }
 }
