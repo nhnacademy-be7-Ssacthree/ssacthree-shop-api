@@ -21,7 +21,7 @@ public class OrderDetailPackaging {
     private Long orderDetailPackagingId;
 
 
-    @NotNull
+//    @NotNull
     @ManyToOne
     @JoinColumn(name = "packaging_id")
     private Packaging packaging;

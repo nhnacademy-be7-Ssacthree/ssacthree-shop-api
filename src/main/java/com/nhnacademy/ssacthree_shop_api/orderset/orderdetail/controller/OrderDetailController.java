@@ -1,5 +1,6 @@
 package com.nhnacademy.ssacthree_shop_api.orderset.orderdetail.controller;
 
+import com.nhnacademy.ssacthree_shop_api.commons.exception.IllegalArgumentException;
 import com.nhnacademy.ssacthree_shop_api.commons.exception.NotFoundException;
 import com.nhnacademy.ssacthree_shop_api.orderset.orderdetail.dto.OrderDetailResponse;
 import com.nhnacademy.ssacthree_shop_api.orderset.orderdetail.service.OrderDetailService;
@@ -29,6 +30,7 @@ public class OrderDetailController {
   // orderNumber로 조회 (주문 조회 창에서 접근), + 전화번호 일치하는지 검증
   @GetMapping("/orderNumber")
   ResponseEntity<OrderDetailResponse> getOrderId(@RequestParam String orderNumber, @RequestParam String phoneNumber){
+
     log.info("OrderNumber로 주문상세를 조회합니다.");
     // 1. orderNumber 로 orderId 조회
     Long orderId = orderDetailService.getOrderId(orderNumber)

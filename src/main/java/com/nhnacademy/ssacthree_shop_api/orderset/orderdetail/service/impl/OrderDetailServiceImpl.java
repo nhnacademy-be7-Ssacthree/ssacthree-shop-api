@@ -122,7 +122,7 @@ public class OrderDetailServiceImpl implements OrderDetailService {
         // orderId로 주문 -> customer -> customerPhone 접근
         Optional<Order> optionalOrder = orderRepository.findById(orderId);
         Order order;
-        if (optionalOrder.isPresent()) {
+        if (optionalOrder.isPresent()) {    // null 아니면
             order = optionalOrder.get();
         } else {
             throw new NotFoundException("Order not found with id: " + orderId);
