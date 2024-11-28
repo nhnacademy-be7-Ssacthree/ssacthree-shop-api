@@ -1,12 +1,8 @@
 package com.nhnacademy.ssacthree_shop_api.orderset.orderdetail.controller;
 
 import com.nhnacademy.ssacthree_shop_api.commons.exception.NotFoundException;
-import com.nhnacademy.ssacthree_shop_api.orderset.order.domain.Order;
-import com.nhnacademy.ssacthree_shop_api.orderset.order.repository.OrderRepository;
-import com.nhnacademy.ssacthree_shop_api.orderset.order.service.OrderService;
 import com.nhnacademy.ssacthree_shop_api.orderset.orderdetail.dto.OrderDetailResponse;
 import com.nhnacademy.ssacthree_shop_api.orderset.orderdetail.service.OrderDetailService;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
