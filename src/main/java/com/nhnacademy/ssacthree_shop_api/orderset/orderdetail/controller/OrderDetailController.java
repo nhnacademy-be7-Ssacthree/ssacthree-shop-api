@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 @RequestMapping("/api/shop/orderDetail")
 public class OrderDetailController {
+
   private final OrderDetailService orderDetailService;
 
   // orderId로 조회 (마이페이지에서 접근)
@@ -44,7 +45,7 @@ public class OrderDetailController {
     // 3. OrderId로 주문상세 받아옴.
     log.info("주문상세를 가져옵니다.");
     OrderDetailResponse orderDetailResponse = orderDetailService.getOrderDetail(orderId);
-    
+
     return ResponseEntity.ok().body(orderDetailResponse);
   }
 

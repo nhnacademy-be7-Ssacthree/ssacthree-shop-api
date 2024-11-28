@@ -28,7 +28,7 @@ public class OrderDetailResponse {
   private String deliveryAddressDetail;     // 배송 상제 주소
   private String deliveryPostalNumber;      // 우편번호
   private int orderTotalPrice;
-  
+
   // 배송 정책 조회
   private int deliveryFee;                  // 배송비
 
