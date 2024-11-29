@@ -11,7 +11,6 @@ import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Builder
 @Getter
@@ -73,15 +72,15 @@ public class BookInfoResponse {
         // collect를 통해 리스트로 묶어서 반환
         this.categories = book.getBookCategories().stream()
                 .map(bookCategory -> new CategoryNameResponse(bookCategory.getCategory()))
-                .collect(Collectors.toList());
+                .toList();
 
         this.tags = book.getBookTags().stream()
                 .map(bookTag -> new TagInfoResponse(bookTag.getTag()))
-                .collect(Collectors.toList());
+                .toList();
 
         this.authors = book.getBookAuthors().stream()
                 .map(bookAuthor -> new AuthorNameResponse(bookAuthor.getAuthor()))
-                .collect(Collectors.toList());
+                .toList();
     }
 
     public BookInfoResponse(BookBaseResponse bookBaseResponse) {

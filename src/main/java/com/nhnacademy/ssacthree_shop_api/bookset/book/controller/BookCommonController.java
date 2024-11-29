@@ -3,8 +3,6 @@ package com.nhnacademy.ssacthree_shop_api.bookset.book.controller;
 import com.nhnacademy.ssacthree_shop_api.bookset.book.dto.response.BookInfoResponse;
 import com.nhnacademy.ssacthree_shop_api.bookset.book.dto.response.BookListResponse;
 import com.nhnacademy.ssacthree_shop_api.bookset.book.service.BookCommonService;
-import com.nhnacademy.ssacthree_shop_api.bookset.booklike.dto.request.BookLikeRequest;
-import com.nhnacademy.ssacthree_shop_api.bookset.booklike.dto.response.BookLikeResponse;
 import com.nhnacademy.ssacthree_shop_api.bookset.category.dto.response.CategoryNameResponse;
 import com.nhnacademy.ssacthree_shop_api.commons.paging.PageRequestBuilder;
 import com.nhnacademy.ssacthree_shop_api.memberset.member.service.MemberService;
@@ -12,7 +10,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

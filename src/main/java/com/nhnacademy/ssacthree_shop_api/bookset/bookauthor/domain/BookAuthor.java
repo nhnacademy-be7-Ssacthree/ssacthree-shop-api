@@ -5,7 +5,6 @@ import com.nhnacademy.ssacthree_shop_api.bookset.author.domain.Author;
 import com.nhnacademy.ssacthree_shop_api.bookset.book.domain.Book;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
