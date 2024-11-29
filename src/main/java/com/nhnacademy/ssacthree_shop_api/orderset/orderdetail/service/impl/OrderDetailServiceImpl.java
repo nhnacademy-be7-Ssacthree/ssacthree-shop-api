@@ -15,6 +15,7 @@ import com.nhnacademy.ssacthree_shop_api.orderset.order.repository.OrderReposito
 import com.nhnacademy.ssacthree_shop_api.orderset.orderdetail.domain.OrderDetail;
 import com.nhnacademy.ssacthree_shop_api.orderset.orderdetail.dto.OrderDetailDTO;
 import com.nhnacademy.ssacthree_shop_api.orderset.orderdetail.dto.OrderDetailResponse;
+import com.nhnacademy.ssacthree_shop_api.orderset.orderdetail.exception.PaymentNotFoundException;
 import com.nhnacademy.ssacthree_shop_api.orderset.orderdetail.repo.OrderDetailRepository;
 import com.nhnacademy.ssacthree_shop_api.orderset.orderdetail.service.OrderDetailService;
 import com.nhnacademy.ssacthree_shop_api.orderset.orderdetailpackaging.domain.OrderDetailPackaging;
@@ -178,7 +179,7 @@ public class OrderDetailServiceImpl implements OrderDetailService {
 
         // 3. 결제 정보 조회
         Payment payment = paymentRepository.findByOrder(order)
-                .orElseThrow(() -> new EntityNotFoundException("결제 정보를 찾을 수 없습니다: " + orderId));
+                .orElseThrow(() -> new PaymentNotFoundException("결제 정보를 찾을 수 없습니다: " + orderId));
         log.info("payment내용: {} / {}", payment.getId(), payment.getPaymentKey());
         String paymentTypeName = payment.getPaymentType().getPaymentTypeName();
 
