@@ -91,7 +91,8 @@ public class OrderRepositoryImpl implements OrderRepositoryCustom {
                         order.total_price,
                         orderToStatusMapping.orderStatus.orderStatusEnum.stringValue(),
                         order.customer.customerName,
-                        order.order_number
+                        order.order_number,
+                        order.invoice_number
                 )
                 .from(order)
                 .leftJoin(orderToStatusMapping)
@@ -117,7 +118,8 @@ public class OrderRepositoryImpl implements OrderRepositoryCustom {
                         tuple.get(order.total_price),
                         tuple.get(orderToStatusMapping.orderStatus.orderStatusEnum.stringValue()),
                         tuple.get(order.customer.customerName),
-                        tuple.get(order.order_number)
+                        tuple.get(order.order_number),
+                        tuple.get(order.invoice_number)
                 ))
                 .collect(Collectors.toList());
 
