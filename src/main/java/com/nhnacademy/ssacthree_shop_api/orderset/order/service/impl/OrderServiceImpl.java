@@ -94,7 +94,11 @@ public class OrderServiceImpl implements OrderService {
         orderRepository.save(order); // 주문후 줘야하는 정보.. 상세 ; orderKey랑 결제 key랑 결제 금액
 
         // TODO : 주문 상세 생성 - 리스트 돌면서 하나씩 생성 .. 응답값 생각하기, 최대한 db접근 최소화
-        orderDetailService.saveOrderDetails(order, orderSaveRequest.getOrderDetailList());
+        try {
+            orderDetailService.saveOrderDetails(order, orderSaveRequest.getOrderDetailList());
+        } catch (Exception e) {
+            throw new RuntimeException("주문상세 정보 저장에 실패했습니다." + e.getMessage());
+        }
 
         // TODO : 포장 테이블 생성 - 주문 상세쪽에서 처리해야할 듯.
         // 현재는 포장을 받아올 수 없어서 저장 불가함 ...

@@ -26,6 +26,7 @@ import com.nhnacademy.ssacthree_shop_api.orderset.payment.domain.Payment;
 import com.nhnacademy.ssacthree_shop_api.orderset.payment.domain.repository.PaymentRepository;
 import jakarta.persistence.EntityNotFoundException;
 
+import java.util.Objects;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -85,23 +86,26 @@ public class OrderDetailServiceImpl implements OrderDetailService {
 
 
             //TODO : 포장 정보 저장 - 수량은 일단 1로 설정
-            Packaging packaging = packagingRepository.findById(orderDetailSaveRequest.getPackagingId())
-                    .orElseThrow(() -> new RuntimeException("포장 정보가 없습니다."));
+            Long packagingId = orderDetailSaveRequest.getPackagingId();
+            if (Objects.nonNull(packagingId)) {
+                Packaging packaging = packagingRepository.findById(packagingId)
+                        .orElseThrow(() -> new RuntimeException("포장 정보가 없습니다."));
 
-            OrderDetailPackaging orderDetailPackaging = new OrderDetailPackaging(
-                    null,
-                    packaging,
-                    order,
-                    book,
-                    1
-            );
-            orderDetailPackagingList.add(orderDetailPackaging);
+                OrderDetailPackaging orderDetailPackaging = new OrderDetailPackaging(
+                        null,
+                        packaging,
+                        order,
+                        book,
+                        1
+                );
+                orderDetailPackagingList.add(orderDetailPackaging);
+            }
         }
 
         //주문 상세 저장
         orderDetailRepository.saveAll(orderDetails);
 
-        // 포장 정보 저장
+        // 포장 정보 저장 - null이면?
         orderDetailPackagingRepository.saveAll(orderDetailPackagingList);
 
         //주문 상세 저장 후 뭐 반환?
