@@ -4,6 +4,7 @@ import com.nhnacademy.ssacthree_shop_api.memberset.pointsaverule.domain.PointSav
 import com.nhnacademy.ssacthree_shop_api.memberset.pointsaverule.dto.PointSaveRuleCreateRequest;
 import com.nhnacademy.ssacthree_shop_api.memberset.pointsaverule.dto.PointSaveRuleGetResponse;
 import com.nhnacademy.ssacthree_shop_api.memberset.pointsaverule.domain.QPointSaveRule;
+import com.nhnacademy.ssacthree_shop_api.memberset.pointsaverule.dto.PointSaveRuleInfoResponse;
 import com.nhnacademy.ssacthree_shop_api.memberset.pointsaverule.dto.PointSaveRuleUpdateRequest;
 import com.nhnacademy.ssacthree_shop_api.memberset.pointsaverule.exception.PointSaveRuleNotFoundException;
 import com.nhnacademy.ssacthree_shop_api.memberset.pointsaverule.repository.PointSaveRuleRepository;
@@ -12,6 +13,7 @@ import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import jakarta.ws.rs.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -75,5 +77,16 @@ public class PointSaveRuleServiceImpl implements PointSaveRuleService {
         pointSaveRule.setPointSaveRuleIsSelected(!pointSaveRule.isPointSaveRuleIsSelected());
 
         return pointSaveRuleRepository.save(pointSaveRule);
+    }
+
+    @Override
+    public PointSaveRuleInfoResponse getPointSaveRuleByRuleName(String pointSaveRuleName){
+        PointSaveRule pointSaveRule = pointSaveRuleRepository.findByPointSaveRuleNameAndPointSaveRuleIsSelectedTrue(pointSaveRuleName);
+
+        if(pointSaveRule==null){
+            throw new NotFoundException("'"+pointSaveRuleName+"' 정책을 찾을 수 없습니다.");
+        }
+
+        return new PointSaveRuleInfoResponse(pointSaveRule);
     }
 }
