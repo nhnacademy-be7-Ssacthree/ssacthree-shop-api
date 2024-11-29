@@ -8,6 +8,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -29,7 +30,6 @@ public class Order {
     @ManyToOne
     @JoinColumn(name = "customer_id")
     private Customer customer;
-
 
     @OneToOne
     @JoinColumn(name = "member_coupon_id")
@@ -82,4 +82,8 @@ public class Order {
     @NotNull
     @Column(name = "delivery_set_date")
     private LocalDate deliveryDate;
+
+    @Setter
+    @Column(name = "order_invoice_number")
+    private String invoice_number;
 }

@@ -18,12 +18,14 @@ import com.nhnacademy.ssacthree_shop_api.orderset.deliveryrule.domain.DeliveryRu
 import com.nhnacademy.ssacthree_shop_api.orderset.deliveryrule.repository.DeliveryRuleRepository;
 import com.nhnacademy.ssacthree_shop_api.orderset.order.domain.Order;
 import com.nhnacademy.ssacthree_shop_api.orderset.order.dto.*;
+import com.nhnacademy.ssacthree_shop_api.orderset.order.exception.NotFoundOrderException;
 import com.nhnacademy.ssacthree_shop_api.orderset.order.repository.OrderRepository;
 import com.nhnacademy.ssacthree_shop_api.orderset.order.repository.OrderRepositoryCustom;
 import com.nhnacademy.ssacthree_shop_api.orderset.order.service.OrderService;
 import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.UUID;
 
 import com.nhnacademy.ssacthree_shop_api.orderset.orderdetail.service.OrderDetailService;
 import com.nhnacademy.ssacthree_shop_api.orderset.orderstatus.domain.OrderStatus;
@@ -86,12 +88,17 @@ public class OrderServiceImpl implements OrderService {
                 orderSaveRequest.getRoadAddress(),
                 orderSaveRequest.getDetailAddress(),
                 orderSaveRequest.getOrderRequest(),
-                orderSaveRequest.getDeliveryDate()
+                orderSaveRequest.getDeliveryDate(),
+                null
         );
         orderRepository.save(order); // 주문후 줘야하는 정보.. 상세 ; orderKey랑 결제 key랑 결제 금액
 
         // TODO : 주문 상세 생성 - 리스트 돌면서 하나씩 생성 .. 응답값 생각하기, 최대한 db접근 최소화
-        orderDetailService.saveOrderDetails(order, orderSaveRequest.getOrderDetailList());
+        try {
+            orderDetailService.saveOrderDetails(order, orderSaveRequest.getOrderDetailList());
+        } catch (Exception e) {
+            throw new RuntimeException("주문상세 정보 저장에 실패했습니다." + e.getMessage());
+        }
 
         // TODO : 포장 테이블 생성 - 주문 상세쪽에서 처리해야할 듯.
         // 현재는 포장을 받아올 수 없어서 저장 불가함 ...
@@ -187,18 +194,47 @@ public class OrderServiceImpl implements OrderService {
         return new AdminOrderResponseWithCount(orderPage.getContent(), orderPage.getTotalElements());    }
 
     @Override
-    public void changeOrderstatus(String orderId) {
+    public boolean updateOrderStatus(Long orderId, String status) {
+        // 주문의 제일 최신 상태 가져오기
         Optional<OrderToStatusMapping> order = orderToStatusMappingRepository.findByOrderIdOrderByOrderStatusCreatedAtDesc(Long.valueOf(orderId), PageRequest.of(0, 1)).stream().findFirst();
+        if (Objects.isNull(order)) {
+            throw new NotFoundOrderException("주문을 찾을 수 없습니다.");
+        }
 
-        // 제일 최신이 대기중이 맞다면, 배송중으로 하나 더 생성
-        if (order.get().getOrderStatus().getOrderStatusEnum() == OrderStatusEnum.PENDING) {
-            Optional<OrderStatus> orderStatus = orderStatusRepository.findById(Long.valueOf(2));
-            OrderToStatusMapping orderToStatusMapping = new OrderToStatusMapping(
-                    order.get().getOrder(),
-                    orderStatus.get(),
-                    LocalDateTime.now()
-            );
-            orderToStatusMappingRepository.save(orderToStatusMapping);
+        OrderStatusEnum orderStatus = order.get().getOrderStatus().getOrderStatusEnum();
+
+        if (status.equals("start")) {
+            // 제일 최신이 대기중이 맞다면, 배송중으로 하나 더 생성
+            if (orderStatus == OrderStatusEnum.PENDING) {
+                Optional<OrderStatus> newOrderStatus = orderStatusRepository.findById(Long.valueOf(2));
+                OrderToStatusMapping orderToStatusMapping = new OrderToStatusMapping(
+                        order.get().getOrder(),
+                        newOrderStatus.get(),
+                        LocalDateTime.now()
+                );
+
+                // 운송장 번호 발급
+                String uuid = UUID.randomUUID().toString();
+                String randomPart = uuid.replaceAll("[^a-zA-Z0-9]", "").substring(0, 9).toUpperCase();
+                Optional<Order> targetOrder = orderRepository.findById(orderId);
+                targetOrder.get().setInvoice_number("INV" + randomPart);
+
+                orderToStatusMappingRepository.save(orderToStatusMapping);
+                return true;
+            }
+            throw new RuntimeException("이미 배송 중인 주문입니다.");
+        } else {
+            if (orderStatus == OrderStatusEnum.IN_SHOPPING) {
+                Optional<OrderStatus> newOrderStatus = orderStatusRepository.findById(Long.valueOf(3));
+                OrderToStatusMapping orderToStatusMapping = new OrderToStatusMapping(
+                        order.get().getOrder(),
+                        newOrderStatus.get(),
+                        LocalDateTime.now()
+                );
+                orderToStatusMappingRepository.save(orderToStatusMapping);
+                return true;
+            }
+            throw new RuntimeException("이미 배송 완료인 주문입니다.");
         }
     }
 
