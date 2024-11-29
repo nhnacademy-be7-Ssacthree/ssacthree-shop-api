@@ -126,7 +126,8 @@ public class OrderDetailServiceImpl implements OrderDetailService {
         if (optionalOrder.isPresent()) {    // null 아니면
             order = optionalOrder.get();
         } else {
-            throw new NotFoundException("Order not found with id: " + orderId);
+            log.info("comparePhoneNumber, false 반환, Order이 Null 입니다.");
+            return false;
         }
 
         // 구매자의 전화번호와 동일한가?

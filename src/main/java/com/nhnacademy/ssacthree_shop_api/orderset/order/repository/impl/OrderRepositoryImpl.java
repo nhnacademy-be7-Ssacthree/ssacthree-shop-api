@@ -141,7 +141,7 @@ public class OrderRepositoryImpl implements OrderRepositoryCustom {
         .select(order.id)
         .from(order)
         .where(order.order_number.eq(orderNumber))
-        .fetchOne();
+        .fetchFirst();  // 중복 데이터 발생 시 하나만 가져오게 합니다. (NonUniqueResultException 발생 방지)
 
     return Optional.ofNullable(orderId);
   }

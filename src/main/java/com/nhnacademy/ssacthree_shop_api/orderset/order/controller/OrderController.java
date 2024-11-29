@@ -7,6 +7,7 @@ import com.nhnacademy.ssacthree_shop_api.orderset.order.service.OrderService;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/shop/orders")
@@ -37,7 +39,7 @@ public class OrderController {
         @RequestParam(defaultValue = "10") int size,
         @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
         @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
-
+        log.info("멤버의 주문내역을 가져옵니다. (getOrders)");
         // 기본 날짜 설정 (최근 3개월)
         LocalDate now = LocalDate.now();
         if (startDate == null) {

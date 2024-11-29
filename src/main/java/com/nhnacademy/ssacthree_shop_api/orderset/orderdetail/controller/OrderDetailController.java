@@ -36,7 +36,7 @@ public class OrderDetailController {
     // 1. orderNumber 로 orderId 조회
     Long orderId = orderDetailService.getOrderId(orderNumber)
         .orElseThrow(() -> new OrderNumberNotFoundException("존재하지 않는 주문번호입니다.: " + orderNumber));
-
+    log.info("조회된 orderId: {}", orderId);
     // 2. 주문 내역의 전화번호와 일치하는지 확인
     // 주문번호로 조회한 주문의 전화번호와 일치하지 않을 때
     log.info("전화번호를 비교합니다.");
