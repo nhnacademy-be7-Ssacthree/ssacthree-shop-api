@@ -1,8 +1,10 @@
 package com.nhnacademy.ssacthree_shop_api.orderset.order.controller;
 
+import com.nhnacademy.ssacthree_shop_api.commons.dto.MessageResponse;
 import com.nhnacademy.ssacthree_shop_api.orderset.order.dto.OrderResponse;
 import com.nhnacademy.ssacthree_shop_api.orderset.order.dto.OrderResponseWithCount;
 import com.nhnacademy.ssacthree_shop_api.orderset.order.dto.OrderSaveRequest;
+import com.nhnacademy.ssacthree_shop_api.orderset.order.dto.PaymentCancelRequest;
 import com.nhnacademy.ssacthree_shop_api.orderset.order.service.OrderService;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -53,6 +55,21 @@ public class OrderController {
             customerId, page, size, startDateTime, endDateTime);
 
         return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/shop/payment/cancel")
+    ResponseEntity<MessageResponse> cancelPayment(@RequestBody PaymentCancelRequest request) {
+        String orderId = request.getOrderId();
+        String paymentKey = request.getPaymentId();
+
+        // 비즈니스 로직 실행
+        boolean success = orderService.cancelPayment(orderId, paymentKey);
+
+        if (success) {
+            return ResponseEntity.ok(new MessageResponse("결제를 취소했습니다."));
+        } else {
+            return ResponseEntity.badRequest().body(new MessageResponse("결제 취소에 실패했습니다."));
+        }
     }
 
 }

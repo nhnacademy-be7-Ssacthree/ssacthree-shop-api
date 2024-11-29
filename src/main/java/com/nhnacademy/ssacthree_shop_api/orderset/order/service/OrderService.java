@@ -15,4 +15,5 @@ public interface OrderService {
 
    boolean updateOrderStatus(Long orderId, String status);
 
+    boolean cancelPayment(String orderId, String paymentKey);
 }

@@ -1,10 +1,8 @@
 package com.nhnacademy.ssacthree_shop_api.orderset.order.service.impl;
 
-import com.nhnacademy.ssacthree_shop_api.commons.exception.NotFoundException;
 import com.nhnacademy.ssacthree_shop_api.customer.domain.Customer;
 import com.nhnacademy.ssacthree_shop_api.customer.repository.CustomerRepository;
 import com.nhnacademy.ssacthree_shop_api.memberset.member.domain.Member;
-import com.nhnacademy.ssacthree_shop_api.memberset.member.exception.MemberNotFoundException;
 import com.nhnacademy.ssacthree_shop_api.memberset.member.repository.MemberRepository;
 import com.nhnacademy.ssacthree_shop_api.memberset.pointhistory.domain.PointHistory;
 import com.nhnacademy.ssacthree_shop_api.memberset.pointhistory.dto.PointHistorySaveRequest;
@@ -26,13 +24,15 @@ import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
-
 import com.nhnacademy.ssacthree_shop_api.orderset.orderdetail.service.OrderDetailService;
 import com.nhnacademy.ssacthree_shop_api.orderset.orderstatus.domain.OrderStatus;
 import com.nhnacademy.ssacthree_shop_api.orderset.orderstatus.domain.repository.OrderStatusRepository;
 import com.nhnacademy.ssacthree_shop_api.orderset.ordertostatusmapping.OrderStatusEnum;
 import com.nhnacademy.ssacthree_shop_api.orderset.ordertostatusmapping.OrderToStatusMapping;
 import com.nhnacademy.ssacthree_shop_api.orderset.ordertostatusmapping.repository.OrderToStatusMappingRepository;
+import com.nhnacademy.ssacthree_shop_api.orderset.payment.domain.TossPaymentsClient;
+import com.nhnacademy.ssacthree_shop_api.orderset.payment.domain.dto.CancelRequest;
+import com.nhnacademy.ssacthree_shop_api.orderset.payment.domain.dto.PaymentCancelResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -57,6 +57,8 @@ public class OrderServiceImpl implements OrderService {
     private final PointSaveRuleRepository pointSaveRuleRepository;
     private final MemberRepository memberRepository;
     private final PointOrderRepository pointOrderRepository;
+    private final TossPaymentsClient tossPaymentsClient;
+
 
     @Override
     @Transactional //하나라도 안되면 롤백필요ㅣ.
@@ -119,7 +121,7 @@ public class OrderServiceImpl implements OrderService {
         if (optionalMember.isPresent()) {
             Member member = optionalMember.get();
             int pointHistory = 0;
-            PointSaveRule pointSaveRule = pointSaveRuleRepository.findPointSaveRuleByPointSaveRuleName("도서구매적립")
+            PointSaveRule pointSaveRule = pointSaveRuleRepository.findPointSaveRuleByPointSaveRuleName("도서 구매 적립")
                     .orElseThrow(() -> new PointSaveRuleNotFoundException("정책이 존재하지 않습니다."));
 
             PointHistory savePointHistory = pointHistoryService.savePointHistory(
@@ -238,6 +240,51 @@ public class OrderServiceImpl implements OrderService {
         }
     }
 
+    @Override
+    @Transactional
+    public boolean cancelPayment(String orderId, String paymentKey) {
+        Optional<OrderToStatusMapping> order = orderToStatusMappingRepository.findByOrderIdOrderByOrderStatusCreatedAtDesc(Long.valueOf(orderId), PageRequest.of(0, 1)).stream().findFirst();
+        OrderStatusEnum orderStatus = order.get().getOrderStatus().getOrderStatusEnum();
+
+        if (orderStatus == OrderStatusEnum.PENDING) {
+            String cancelReason = "고객 요청에 의한 취소";
+            String authorizationHeader = generateAuthorizationHeader();
+            String idempotencyKey = UUID.randomUUID().toString();
+
+            CancelRequest cancelRequest = new CancelRequest(cancelReason);
+
+                try {
+                    PaymentCancelResponse response = tossPaymentsClient.cancelPayment(
+                            paymentKey,
+                            cancelRequest,
+                            authorizationHeader,
+                            idempotencyKey
+                    );
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    return false;
+                }
+
+                // 주문 상태 취소로  변경
+                Optional<OrderStatus> newOrderStatus = orderStatusRepository.findById(Long.valueOf(5));
+                OrderToStatusMapping orderToStatusMapping = new OrderToStatusMapping(
+                    order.get().getOrder(),
+                    newOrderStatus.get(),
+                    LocalDateTime.now()
+                );
+                return true;
+            }
+            return false;
+        }
+
+        private String generateAuthorizationHeader() {
+            String secretKey = "test_sk_zXLkKEypNArWmo50nX3lmeaxYG5R"; // 토스페이먼츠 시크릿 키
+            return "Basic " + java.util.Base64.getEncoder().encodeToString((secretKey + ":").getBytes());
+        }
+
+    }
+
+
 
     // OrderId로 order 객체 반환
 //    @Override
@@ -249,4 +296,3 @@ public class OrderServiceImpl implements OrderService {
 //            throw new NotFoundException("Order not found with id: " + orderId);
 //        }
 //    }
-}
