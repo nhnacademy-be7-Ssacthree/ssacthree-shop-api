@@ -15,7 +15,6 @@ public class BookUpdateRequest {
     private String bookIndex; // 목차
     private String bookInfo; // 책 설명
     private String bookIsbn;
-    //    private LocalDateTime publicationDate;
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate publicationDate;
     private int regularPrice; // 판매가

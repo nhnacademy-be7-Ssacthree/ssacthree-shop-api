@@ -22,7 +22,6 @@ import com.nhnacademy.ssacthree_shop_api.bookset.publisher.dto.PublisherNameResp
 import com.nhnacademy.ssacthree_shop_api.bookset.tag.domain.QTag;
 import com.nhnacademy.ssacthree_shop_api.bookset.tag.dto.response.TagInfoResponse;
 import com.nhnacademy.ssacthree_shop_api.commons.util.QueryDslSortUtil;
-import com.nhnacademy.ssacthree_shop_api.memberset.member.domain.Member;
 import com.nhnacademy.ssacthree_shop_api.memberset.member.domain.QMember;
 import com.nhnacademy.ssacthree_shop_api.review.domain.QReview;
 import com.querydsl.core.types.*;

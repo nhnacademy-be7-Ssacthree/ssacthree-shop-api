@@ -1,19 +1,11 @@
 package com.nhnacademy.ssacthree_shop_api.bookset.book.dto.request;
 
-import com.nhnacademy.ssacthree_shop_api.bookset.book.domain.BookStatus;
-import com.nhnacademy.ssacthree_shop_api.bookset.book.domain.converter.BookStatusConverter;
-import com.nhnacademy.ssacthree_shop_api.bookset.publisher.domain.Publisher;
-import jakarta.persistence.Convert;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import lombok.AllArgsConstructor;
+
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
