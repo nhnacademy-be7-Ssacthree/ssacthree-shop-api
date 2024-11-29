@@ -59,13 +59,13 @@ public class OrderDetailServiceImpl implements OrderDetailService {
                 throw new RuntimeException("재고가 부족합니다.");
             }
 
-            // 재고 차감 - 배타락 이용 (읽기, 쓰기 동시 불가하게)
-//            Book book = bookRepository.findOne(orderDetailSaveRequest.getBookId());
-
             // TODO : 도서 상세당 쿠폰 사용 처리
             // 일단은 null로 처리
             Book book = bookRepository.findByBookId(bookInfo.getBookId())
                     .orElseThrow(() -> new RuntimeException("책 없습니다."));
+
+            // 재고 차감 - 배타락 이용 (읽기, 쓰기 동시 불가하게)
+            book.setStock(book.getStock() - orderDetailSaveRequest.getQuantity());
 
             //TODO : 주문 상세 리스트 저장
             OrderDetail orderDetail = new OrderDetail(
