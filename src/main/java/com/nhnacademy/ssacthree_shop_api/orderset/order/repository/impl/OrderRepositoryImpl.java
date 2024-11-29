@@ -45,7 +45,14 @@ public class OrderRepositoryImpl implements OrderRepositoryCustom {
               orderToStatusMapping.orderStatus.orderStatusEnum.stringValue()
           )
           .from(order)
-          .leftJoin(orderToStatusMapping).on(order.id.eq(orderToStatusMapping.order.id))
+          .leftJoin(orderToStatusMapping).on(
+              order.id.eq(orderToStatusMapping.order.id)
+                  .and(orderToStatusMapping.orderStatusCreatedAt.eq(
+                      JPAExpressions.select(orderToStatusMapping.orderStatusCreatedAt.max())
+                          .from(orderToStatusMapping)
+                          .where(orderToStatusMapping.order.id.eq(order.id))
+                  ))
+          )
           .leftJoin(orderStatus).on(orderToStatusMapping.orderStatus.id.eq(orderStatus.id))
           .where(
               order.customer.customerId.eq(customerId)
