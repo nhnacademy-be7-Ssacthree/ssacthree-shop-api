@@ -13,6 +13,7 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -131,4 +132,17 @@ public class OrderRepositoryImpl implements OrderRepositoryCustom {
         return new PageImpl<>(results, pageable, total);
     }
 
+
+  @Override
+  public Optional<Long> findOrderIdByOrderNumber(String orderNumber) {
+    QOrder order = QOrder.order;
+
+    Long orderId = queryFactory
+        .select(order.id)
+        .from(order)
+        .where(order.order_number.eq(orderNumber))
+        .fetchOne();
+
+    return Optional.ofNullable(orderId);
+  }
 }
