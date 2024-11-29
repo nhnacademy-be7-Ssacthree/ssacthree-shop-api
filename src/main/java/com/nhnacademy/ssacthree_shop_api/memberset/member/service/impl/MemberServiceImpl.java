@@ -1,6 +1,11 @@
 package com.nhnacademy.ssacthree_shop_api.memberset.member.service.impl;
 
 import com.nhnacademy.ssacthree_shop_api.commons.dto.MessageResponse;
+import com.nhnacademy.ssacthree_shop_api.couponset.coupon.repository.CouponRepository;
+import com.nhnacademy.ssacthree_shop_api.couponset.coupon.service.CouponService;
+import com.nhnacademy.ssacthree_shop_api.couponset.couponrule.repository.CouponRuleRepository;
+import com.nhnacademy.ssacthree_shop_api.couponset.couponrule.service.CouponRuleService;
+import com.nhnacademy.ssacthree_shop_api.couponset.membercoupon.service.MemberCouponService;
 import com.nhnacademy.ssacthree_shop_api.customer.domain.Customer;
 import com.nhnacademy.ssacthree_shop_api.customer.dto.CustomerCreateRequest;
 import com.nhnacademy.ssacthree_shop_api.customer.service.CustomerService;
@@ -9,6 +14,7 @@ import com.nhnacademy.ssacthree_shop_api.memberset.member.domain.MemberStatus;
 import com.nhnacademy.ssacthree_shop_api.memberset.member.dto.MemberInfoGetResponse;
 import com.nhnacademy.ssacthree_shop_api.memberset.member.dto.MemberInfoUpdateRequest;
 import com.nhnacademy.ssacthree_shop_api.memberset.member.dto.MemberRegisterRequest;
+import com.nhnacademy.ssacthree_shop_api.memberset.member.event.MemberRegisteredEvent;
 import com.nhnacademy.ssacthree_shop_api.memberset.member.exception.AlreadyMemberException;
 import com.nhnacademy.ssacthree_shop_api.memberset.member.exception.MemberNotFoundException;
 import com.nhnacademy.ssacthree_shop_api.memberset.member.repository.MemberCustomRepository;
@@ -28,6 +34,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -46,6 +53,13 @@ public class MemberServiceImpl implements MemberService {
     private final MemberCustomRepository memberCustomRepository;
     private final PointHistoryService pointHistoryService;
     private final PointSaveRuleRepository pointSaveRuleRepository;
+    private final MemberCouponService memberCouponService;
+    private final CouponRepository couponRepository;
+    private final CouponService couponService;
+    private final CouponRuleRepository couponRuleRepository;
+    private final CouponRuleService couponRuleService;
+
+    private final ApplicationEventPublisher applicationEventPublisher;
 
     /**
      * 회원 가입 및 회원가입 포인트 적립
@@ -54,6 +68,7 @@ public class MemberServiceImpl implements MemberService {
      * @return
      */
     @Override
+    @Transactional
     public MessageResponse registerMember(MemberRegisterRequest memberRegisterRequest) {
 
         if (memberRepository.existsByMemberLoginId(memberRegisterRequest.getLoginId())) {
@@ -87,6 +102,8 @@ public class MemberServiceImpl implements MemberService {
             member,
             new PointHistorySaveRequest(pointSaveRule.getPointSaveAmount(), "회원 가입 포인트 적립"));
         member.setMemberPoint(member.getMemberPoint() + savedPointHistory.getPointAmount());
+
+        applicationEventPublisher.publishEvent(new MemberRegisteredEvent((member)));
 
         return new MessageResponse("생성 성공");
     }
