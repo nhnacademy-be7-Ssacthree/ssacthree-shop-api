@@ -8,6 +8,7 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.apache.commons.lang3.builder.ToStringExclude;
 
 
@@ -19,6 +20,7 @@ public class BookTag {
     @EmbeddedId
     private BookTagId bookTagId;
 
+    @Setter
     @ManyToOne(fetch = FetchType.LAZY)
     @MapsId("bookId")
     @JoinColumn(name = "book_id")

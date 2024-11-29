@@ -12,5 +12,7 @@ public interface OrderService {
     OrderResponseWithCount getOrdersByCustomerAndDate(Long customerId, int page, int size, LocalDateTime startDate, LocalDateTime endDate);
 
     AdminOrderResponseWithCount adminGetAllOrders(int page, int size, LocalDateTime startDateTime, LocalDateTime endDateTime);
-    boolean updateOrderStatus(Long orderId, String status);
+
+   boolean updateOrderStatus(Long orderId, String status);
+
 }

@@ -29,6 +29,7 @@ public class MemberCoupon {
     private LocalDateTime memberCouponCreatedAt = LocalDateTime.now();
 
     @NotNull
+    @Setter
     private LocalDateTime memberCouponExpiredAt;
 
     @Setter

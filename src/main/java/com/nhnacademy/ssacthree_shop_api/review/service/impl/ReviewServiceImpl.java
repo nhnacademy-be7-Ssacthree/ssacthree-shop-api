@@ -25,7 +25,6 @@ import com.nhnacademy.ssacthree_shop_api.review.exception.ReviewNotFoundExceptio
 import com.nhnacademy.ssacthree_shop_api.review.repository.ReviewCustomRepository;
 import com.nhnacademy.ssacthree_shop_api.review.repository.ReviewRepository;
 import com.nhnacademy.ssacthree_shop_api.review.service.ReviewService;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
