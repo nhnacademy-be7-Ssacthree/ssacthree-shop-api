@@ -6,6 +6,11 @@ import org.springframework.data.domain.Sort;
 
 public class PageRequestBuilder {
 
+    // 기본 생성자 숨김
+    private PageRequestBuilder() {
+        throw new UnsupportedOperationException("This is a utility class and cannot be instantiated");
+    }
+
     public static Pageable createPageable(int page, int size, String[] sortParams) {
         Sort sort = Sort.unsorted();
 

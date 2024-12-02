@@ -38,12 +38,6 @@ public interface BookCustomRepository {
 
     List<AuthorNameResponse> findAuthorsByBookId(Long bookId);
 
-    List<BookCategoryDto> findCategoriesByBookIds(List<Long> bookIds);
-
-    List<BookTagDto> findTagsByBookIds(List<Long> bookIds);
-
-    List<BookAuthorDto> findAuthorsByBookIds(List<Long> bookIds);
-
     // 카테고리 책 검색(해당 카테고리에 속해있는 책 검색, 하위 카테고리까지 검색해야함)
     Page<BookListBaseResponse> findBooksByCategoryId(Long categoryId, Pageable pageable);
 
