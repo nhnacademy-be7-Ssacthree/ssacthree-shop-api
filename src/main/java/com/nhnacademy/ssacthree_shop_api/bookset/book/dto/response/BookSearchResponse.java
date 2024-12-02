@@ -1,13 +1,11 @@
 package com.nhnacademy.ssacthree_shop_api.bookset.book.dto.response;
 
 import com.nhnacademy.ssacthree_shop_api.bookset.author.dto.AuthorNameResponse;
-import com.nhnacademy.ssacthree_shop_api.bookset.book.domain.BookStatus;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @AllArgsConstructor
