@@ -73,4 +73,11 @@ public class CategoryCustomRepositoryImpl implements CategoryCustomRepository {
                 .where(qCategory.categoryId.eq(categoryId).and(isUsedCategory()))
                 .fetchOne();
     }
+
+    @Override
+    public List<Category> findBySuperCategoryIsNullAndCategoryIsUsed(){
+        return queryFactory.selectFrom(qCategory)
+                .where(qCategory.superCategory.isNull().and(isUsedCategory()))
+                .fetch();
+    }
 }
