@@ -16,9 +16,10 @@ public class MemberCustomerRepositoryImpl implements MemberCustomRepository {
 
 
     private final JPAQueryFactory queryFactory;
-    private final QMember qMember = QMember.member;
-    private final QCustomer qCustomer = QCustomer.customer;
-    private final QMemberGrade qMemberGrade = QMemberGrade.memberGrade;
+    private static final QMember qMember = QMember.member;
+    private static final QCustomer qCustomer = QCustomer.customer;
+    private static final QMemberGrade qMemberGrade = QMemberGrade.memberGrade;
+
 
     @Override
     public MemberInfoGetResponse getMemberWithCustomer(String memberLoginId) {
@@ -31,14 +32,14 @@ public class MemberCustomerRepositoryImpl implements MemberCustomRepository {
             .select(Projections.fields(MemberInfoGetResponse.class,
                 qMember.customer.customerId,
                 qMember.memberLoginId,
-                        qCustomer.customerName,
-                        qCustomer.customerPhoneNumber,
-                        qCustomer.customerEmail,
-                        qMember.memberBirthdate,
-                        qMember.memberPoint,
-                        qMemberGrade.memberGradeName,
-                        qMemberGrade.memberGradePointSave
-                ))
+                qCustomer.customerName,
+                qCustomer.customerPhoneNumber,
+                qCustomer.customerEmail,
+                qMember.memberBirthdate,
+                qMember.memberPoint,
+                qMemberGrade.memberGradeName,
+                qMemberGrade.memberGradePointSave
+            ))
             .where(qMember.memberLoginId.eq(memberLoginId)).fetchOne();
     }
 }
