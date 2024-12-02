@@ -8,6 +8,7 @@ import com.nhnacademy.ssacthree_shop_api.bookset.category.repository.CategoryCus
 import java.util.ArrayList;
 import java.util.List;
 
+import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -19,11 +20,15 @@ public class CategoryCustomRepositoryImpl implements CategoryCustomRepository {
 
     private static final QCategory qCategory = QCategory.category;
 
+    private BooleanExpression isUsedCategory(){
+        return qCategory.categoryIsUsed.eq(true);
+    }
+
     @Override
     public List<Category> findCategoriesByName(String name) {
         // 주어진 이름을 포함하는 카테고리를 검색
         return queryFactory.selectFrom(qCategory)
-                .where(qCategory.categoryName.containsIgnoreCase(name))
+                .where(qCategory.categoryName.containsIgnoreCase(name).and(isUsedCategory()))
                 .fetch();
     }
 
@@ -31,7 +36,7 @@ public class CategoryCustomRepositoryImpl implements CategoryCustomRepository {
     public List<Category> findCategoryPath(Long categoryId) {
         // 주어진 카테고리부터 최상위 카테고리까지의 경로를 조회
         Category current = queryFactory.selectFrom(qCategory)
-                .where(qCategory.categoryId.eq(categoryId))
+                .where(qCategory.categoryId.eq(categoryId).and(isUsedCategory()))
                 .fetchOne();
 
         List<Category> path = new ArrayList<>();
@@ -52,7 +57,7 @@ public class CategoryCustomRepositoryImpl implements CategoryCustomRepository {
 
     private void addDescendants(Long categoryId, List<Category> descendants) {
         List<Category> children = queryFactory.selectFrom(qCategory)
-                .where(qCategory.superCategory.categoryId.eq(categoryId))
+                .where(qCategory.superCategory.categoryId.eq(categoryId).and(isUsedCategory()))
                 .fetch();
 
         descendants.addAll(children);
@@ -65,7 +70,7 @@ public class CategoryCustomRepositoryImpl implements CategoryCustomRepository {
     public String findCategoryNameByCategoryId(Long categoryId) {
         return queryFactory.select(qCategory.categoryName)
                 .from(qCategory)
-                .where(qCategory.categoryId.eq(categoryId))
+                .where(qCategory.categoryId.eq(categoryId).and(isUsedCategory()))
                 .fetchOne();
     }
 }
