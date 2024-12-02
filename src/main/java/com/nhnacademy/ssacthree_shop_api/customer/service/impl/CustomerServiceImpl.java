@@ -1,6 +1,5 @@
 package com.nhnacademy.ssacthree_shop_api.customer.service.impl;
 
-import com.nhnacademy.ssacthree_shop_api.commons.dto.MessageResponse;
 import com.nhnacademy.ssacthree_shop_api.customer.domain.Customer;
 import com.nhnacademy.ssacthree_shop_api.customer.dto.CustomerCreateRequest;
 import com.nhnacademy.ssacthree_shop_api.customer.dto.CustomerGetResponse;
@@ -9,8 +8,6 @@ import com.nhnacademy.ssacthree_shop_api.customer.exception.CustomerNotFoundExce
 import com.nhnacademy.ssacthree_shop_api.customer.repository.CustomerRepository;
 import com.nhnacademy.ssacthree_shop_api.customer.service.CustomerService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class CustomerServiceImpl implements CustomerService {
 
     private final CustomerRepository customerRepository;
+    private static final String NOT_FOUND = "를 찾을 수 없습니다";
 
 
     @Override
@@ -42,7 +40,7 @@ public class CustomerServiceImpl implements CustomerService {
             throw new IllegalArgumentException("customerId는 0이하일 수 없습니다.");
         }
         if (!customerRepository.existsById(customerId)) {
-            throw new CustomerNotFoundException(customerId + "를 찾을 수 없습니다.");
+            throw new CustomerNotFoundException(customerId + NOT_FOUND);
         }
 
         Customer customer = customerRepository.findById(customerId).orElse(null);
@@ -59,7 +57,7 @@ public class CustomerServiceImpl implements CustomerService {
             throw new IllegalArgumentException("memberGradeId는 0 이하일 수 없습니다.");
         }
         if(!customerRepository.existsById(customerId)) {
-            throw new CustomerNotFoundException(customerId + "를 찾을 수 없습니다.");
+            throw new CustomerNotFoundException(customerId + NOT_FOUND);
         }
         customerRepository.deleteById(customerId);
     }
@@ -71,7 +69,7 @@ public class CustomerServiceImpl implements CustomerService {
             throw new IllegalArgumentException("memberGradeId는 0 이하일 수 없습니다.");
         }
         if(!customerRepository.existsById(customerId)) {
-            throw new CustomerNotFoundException(customerId + "를 찾을 수 없습니다.");
+            throw new CustomerNotFoundException(customerId + NOT_FOUND);
         }
         Customer foundCustomer = customerRepository.findById(customerId).orElse(null);
         return new CustomerGetResponse(

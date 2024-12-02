@@ -16,9 +16,9 @@ public class MemberCustomerRepositoryImpl implements MemberCustomRepository {
 
 
     private final JPAQueryFactory queryFactory;
-    private final QMember qMember = QMember.member;
-    private final QCustomer qCustomer = QCustomer.customer;
-    private final QMemberGrade qMemberGrade = QMemberGrade.memberGrade;
+    private static final QMember qMember = QMember.member;
+    private static final QCustomer qCustomer = QCustomer.customer;
+    private static final QMemberGrade qMemberGrade = QMemberGrade.memberGrade;
 
     @Override
     public MemberInfoGetResponse getMemberWithCustomer(String memberLoginId) {
