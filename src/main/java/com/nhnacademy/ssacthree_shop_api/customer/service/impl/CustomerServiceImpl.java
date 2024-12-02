@@ -44,6 +44,7 @@ public class CustomerServiceImpl implements CustomerService {
         }
 
         Customer customer = customerRepository.findById(customerId).orElse(null);
+        assert customer != null;
         customer.setCustomerName(customerUpdateRequest.getCustomerName());
         customer.setCustomerEmail(customerUpdateRequest.getCustomerEmail());
         customer.setCustomerPhoneNumber(customerUpdateRequest.getCustomerPhoneNumber());
@@ -65,13 +66,14 @@ public class CustomerServiceImpl implements CustomerService {
     @Transactional(readOnly = true)
     @Override
     public CustomerGetResponse getCustomerById(Long customerId) {
-        if(customerId <= 0) {
-            throw new IllegalArgumentException("memberGradeId는 0 이하일 수 없습니다.");
+        if (customerId <= 0) {
+            throw new IllegalArgumentException("customerId는 0 이하일 수 없습니다.");
         }
-        if(!customerRepository.existsById(customerId)) {
-            throw new CustomerNotFoundException(customerId + NOT_FOUND);
-        }
-        Customer foundCustomer = customerRepository.findById(customerId).orElse(null);
+
+        // Optional의 orElseThrow를 사용하여 null 가능성을 제거
+        Customer foundCustomer = customerRepository.findById(customerId)
+            .orElseThrow(() -> new CustomerNotFoundException(customerId + NOT_FOUND));
+
         return new CustomerGetResponse(
             foundCustomer.getCustomerId(),
             foundCustomer.getCustomerName(),
