@@ -7,6 +7,7 @@ import com.nhnacademy.ssacthree_shop_api.review.dto.BookReviewResponse;
 import com.nhnacademy.ssacthree_shop_api.review.dto.ReviewResponse;
 import com.nhnacademy.ssacthree_shop_api.review.service.ReviewService;
 import java.util.List;
+import javax.annotation.Nullable;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -27,7 +28,7 @@ public class ReviewController {
     private final ReviewService reviewService;
 
     @GetMapping("/books/reviews/{book-id}")
-    public ResponseEntity<Page<BookReviewResponse>> getReviewsByBookId(@PathVariable("book-id") Long bookId,
+    public ResponseEntity<Page<BookReviewResponse>> getReviewsByBookId(@Nullable @PathVariable("book-id") Long bookId,
                                                                        @RequestParam int page,
                                                                        @RequestParam int size,
                                                                        @RequestParam("sort") String[] sort) {
