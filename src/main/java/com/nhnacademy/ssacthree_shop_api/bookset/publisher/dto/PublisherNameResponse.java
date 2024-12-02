@@ -4,7 +4,6 @@ import com.nhnacademy.ssacthree_shop_api.bookset.publisher.domain.Publisher;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @Getter
 @AllArgsConstructor
