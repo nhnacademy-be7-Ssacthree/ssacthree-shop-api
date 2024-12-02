@@ -4,8 +4,6 @@ import com.nhnacademy.ssacthree_shop_api.bookset.author.domain.QAuthor;
 import com.nhnacademy.ssacthree_shop_api.bookset.author.dto.AuthorNameResponse;
 import com.nhnacademy.ssacthree_shop_api.bookset.book.domain.BookStatus;
 import com.nhnacademy.ssacthree_shop_api.bookset.book.domain.QBook;
-import com.nhnacademy.ssacthree_shop_api.bookset.book.dto.response.BookBaseResponse;
-import com.nhnacademy.ssacthree_shop_api.bookset.book.dto.response.BookInfoResponse;
 import com.nhnacademy.ssacthree_shop_api.bookset.book.dto.response.BookSearchResponse;
 import com.nhnacademy.ssacthree_shop_api.bookset.book.repository.BookMgmtRepository;
 import com.nhnacademy.ssacthree_shop_api.bookset.book.repository.BookRepository;
@@ -13,11 +11,8 @@ import com.nhnacademy.ssacthree_shop_api.bookset.bookauthor.domain.QBookAuthor;
 import com.nhnacademy.ssacthree_shop_api.bookset.bookcategory.domain.QBookCategory;
 import com.nhnacademy.ssacthree_shop_api.bookset.booktag.domain.QBookTag;
 import com.nhnacademy.ssacthree_shop_api.bookset.category.domain.QCategory;
-import com.nhnacademy.ssacthree_shop_api.bookset.category.dto.response.CategoryNameResponse;
 import com.nhnacademy.ssacthree_shop_api.bookset.publisher.domain.QPublisher;
-import com.nhnacademy.ssacthree_shop_api.bookset.publisher.dto.PublisherNameResponse;
 import com.nhnacademy.ssacthree_shop_api.bookset.tag.domain.QTag;
-import com.nhnacademy.ssacthree_shop_api.bookset.tag.dto.response.TagInfoResponse;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.PathBuilder;
@@ -28,12 +23,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.expression.spel.ast.Projection;
 import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 @Slf4j
 @Repository
@@ -54,22 +47,21 @@ public class BookMgmtRepositoryImpl implements BookMgmtRepository {
 
     @Override
     public Page<BookSearchResponse> findAllBooks(Pageable pageable) {
-        // Modify the query to filter out books with status "삭제 도서"
         List<BookSearchResponse> books = queryFactory
                 .select(Projections.constructor(BookSearchResponse.class,
                         book.bookId,
                         book.bookName,
                         book.bookInfo,
-                        book.bookStatus.stringValue() // Get the status as a string
+                        book.bookStatus.stringValue()
                 ))
                 .from(book)
-                .where(book.bookStatus.ne(BookStatus.DELETE_BOOK)) // Filter out books with status "삭제 도서"
+                .where(book.bookStatus.ne(BookStatus.DELETE_BOOK))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .orderBy(getOrderSpecifier(pageable))
                 .fetch();
 
-        books.forEach(book -> log.info("bookStatus 확인용: {}", book.getBookStatus())); // 확인용
+        books.forEach(book -> log.info("bookStatus 확인용: {}", book.getBookStatus()));
 
         // Fetch authors for each book
         books.forEach(b -> {
@@ -82,11 +74,10 @@ public class BookMgmtRepositoryImpl implements BookMgmtRepository {
             b.setAuthors(authors);
         });
 
-        // Fetch the total count of books, excluding the "삭제 도서"
         long total = queryFactory
                 .select(book.bookId)
                 .from(book)
-                .where(book.bookStatus.ne(BookStatus.DELETE_BOOK)) // Filter out books with status "삭제 도서"
+                .where(book.bookStatus.ne(BookStatus.DELETE_BOOK))
                 .fetchCount();
 
         return new PageImpl<>(books, pageable, total);
@@ -95,14 +86,13 @@ public class BookMgmtRepositoryImpl implements BookMgmtRepository {
     private OrderSpecifier<?>[] getOrderSpecifier(Pageable pageable) {
         Sort sort = pageable.getSort(); // pageable에서 Sort 객체 가져오기
 
-        // Sort.Order를 OrderSpecifier로 변환
         List<OrderSpecifier<?>> orders = new ArrayList<>();
         for (Sort.Order order : sort) {
             PathBuilder<Object> pathBuilder = new PathBuilder<>(book.getType(), "book"); // book의 타입과 엔티티를 사용
             OrderSpecifier<?> orderSpecifier = getOrderSpecifierForField(order, pathBuilder);
             orders.add(orderSpecifier);
         }
-        return orders.toArray(new OrderSpecifier[0]); // List를 배열로 변환
+        return orders.toArray(new OrderSpecifier[0]);
     }
 
     private OrderSpecifier<?> getOrderSpecifierForField(Sort.Order order, PathBuilder<Object> pathBuilder) {
@@ -113,7 +103,7 @@ public class BookMgmtRepositoryImpl implements BookMgmtRepository {
         } else if (order.getProperty().equals("bookIsbn")) {
             return order.isDescending() ? pathBuilder.getNumber("bookIsbn", Integer.class).desc() : pathBuilder.getNumber("bookIsbn", Integer.class).asc();
         }else{
-            return null; //기본 값 반환
+            return null;
         }
     }
 

@@ -1,10 +1,7 @@
 package com.nhnacademy.ssacthree_shop_api.orderset.order.controller;
 
 import com.nhnacademy.ssacthree_shop_api.commons.dto.MessageResponse;
-import com.nhnacademy.ssacthree_shop_api.orderset.order.dto.AdminOrderResponseWithCount;
-import com.nhnacademy.ssacthree_shop_api.orderset.order.dto.OrderResponse;
-import com.nhnacademy.ssacthree_shop_api.orderset.order.dto.OrderResponseWithCount;
-import com.nhnacademy.ssacthree_shop_api.orderset.order.dto.OrderSaveRequest;
+import com.nhnacademy.ssacthree_shop_api.orderset.order.dto.*;
 import com.nhnacademy.ssacthree_shop_api.orderset.order.service.OrderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -46,10 +43,17 @@ public class AdminOrderController {
     }
 
     @PostMapping("/change")
-    ResponseEntity<MessageResponse> changeOrderStatus(@RequestBody String orderId) {
-        orderService.changeOrderstatus(orderId);
-        MessageResponse messageResponse = new MessageResponse("주문 상태 변경 성공");
-        return ResponseEntity.ok().body(messageResponse);
-    }
+    public ResponseEntity<MessageResponse> changeOrderStatus(@RequestBody ChangeOrderStatusRequest request) {
+        Long orderId = request.getOrderId();
+        String status = request.getStatus();
 
+        // 비즈니스 로직 실행
+        boolean success = orderService.updateOrderStatus(orderId, status);
+
+        if (success) {
+            return ResponseEntity.ok(new MessageResponse("Order status updated successfully."));
+        } else {
+            return ResponseEntity.badRequest().body(new MessageResponse("Failed to update order status."));
+        }
+    }
 }

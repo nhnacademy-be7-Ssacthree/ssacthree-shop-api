@@ -13,6 +13,6 @@ public interface OrderService {
 
     AdminOrderResponseWithCount adminGetAllOrders(int page, int size, LocalDateTime startDateTime, LocalDateTime endDateTime);
 
-    void changeOrderstatus(String orderId);
+   boolean updateOrderStatus(Long orderId, String status);
 
 }

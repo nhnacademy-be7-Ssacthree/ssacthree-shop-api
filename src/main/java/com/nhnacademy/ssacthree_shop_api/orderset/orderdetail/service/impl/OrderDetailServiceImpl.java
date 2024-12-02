@@ -4,9 +4,13 @@ import com.nhnacademy.ssacthree_shop_api.bookset.book.domain.Book;
 import com.nhnacademy.ssacthree_shop_api.bookset.book.dto.response.BookInfoResponse;
 import com.nhnacademy.ssacthree_shop_api.bookset.book.repository.BookRepository;
 import com.nhnacademy.ssacthree_shop_api.bookset.book.service.BookCommonService;
+import com.nhnacademy.ssacthree_shop_api.commons.exception.NotFoundException;
+import com.nhnacademy.ssacthree_shop_api.orderset.deliveryrule.domain.DeliveryRule;
 import com.nhnacademy.ssacthree_shop_api.orderset.deliveryrule.domain.DeliveryRule;
 import com.nhnacademy.ssacthree_shop_api.orderset.order.domain.Order;
 import com.nhnacademy.ssacthree_shop_api.orderset.order.dto.OrderDetailSaveRequest;
+import com.nhnacademy.ssacthree_shop_api.orderset.order.repository.OrderRepository;
+import com.nhnacademy.ssacthree_shop_api.orderset.order.repository.OrderRepositoryCustom;
 import com.nhnacademy.ssacthree_shop_api.orderset.order.repository.OrderRepository;
 import com.nhnacademy.ssacthree_shop_api.orderset.orderdetail.domain.OrderDetail;
 import com.nhnacademy.ssacthree_shop_api.orderset.orderdetail.dto.OrderDetailDTO;
@@ -22,6 +26,8 @@ import com.nhnacademy.ssacthree_shop_api.orderset.payment.domain.Payment;
 import com.nhnacademy.ssacthree_shop_api.orderset.payment.domain.repository.PaymentRepository;
 import jakarta.persistence.EntityNotFoundException;
 
+import java.util.Objects;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -42,8 +48,8 @@ public class OrderDetailServiceImpl implements OrderDetailService {
     private final BookRepository bookRepository;
     private final PackagingRepository packagingRepository;
     private final OrderDetailPackagingRepository orderDetailPackagingRepository;
+    private final OrderRepositoryCustom orderRepositoryCustom;
     private final PaymentRepository paymentRepository;
-
 
 
     @Override
@@ -60,13 +66,13 @@ public class OrderDetailServiceImpl implements OrderDetailService {
                 throw new RuntimeException("재고가 부족합니다.");
             }
 
-            // 재고 차감 - 배타락 이용 (읽기, 쓰기 동시 불가하게)
-//            Book book = bookRepository.findOne(orderDetailSaveRequest.getBookId());
-
             // TODO : 도서 상세당 쿠폰 사용 처리
             // 일단은 null로 처리
             Book book = bookRepository.findByBookId(bookInfo.getBookId())
                     .orElseThrow(() -> new RuntimeException("책 없습니다."));
+
+            // 재고 차감 - 배타락 이용 (읽기, 쓰기 동시 불가하게)
+            book.setStock(book.getStock() - orderDetailSaveRequest.getQuantity());
 
             //TODO : 주문 상세 리스트 저장
             OrderDetail orderDetail = new OrderDetail(
@@ -100,12 +106,39 @@ public class OrderDetailServiceImpl implements OrderDetailService {
         //주문 상세 저장
         orderDetailRepository.saveAll(orderDetails);
 
-        // 포장 정보 저장
+        // 포장 정보 저장 - null이면?
         orderDetailPackagingRepository.saveAll(orderDetailPackagingList);
 
         //주문 상세 저장 후 뭐 반환?
 
     }
+
+    // orderNumber로 orderId 조회
+    @Override
+    public Optional<Long> getOrderId(String orderNumber) {
+        Optional<Long> orderId = orderRepositoryCustom.findOrderIdByOrderNumber(orderNumber);
+        return orderId;
+    }
+
+
+    // 주문 내역의 구매자 전화번호와 입력 된 전화번호가 일치하는지 확인
+    @Override
+    public Boolean comparePhoneNumber(Long orderId,String phoneNumber){
+        // orderId로 주문 -> customer -> customerPhone 접근
+        Optional<Order> optionalOrder = orderRepository.findById(orderId);
+        Order order;
+        if (optionalOrder.isPresent()) {    // null 아니면
+            order = optionalOrder.get();
+        } else {
+            throw new NotFoundException("Order not found with id: " + orderId);
+        }
+
+        // 구매자의 전화번호와 동일한가?
+        String buyerPhoneNumber = order.getCustomer().getCustomerPhoneNumber();
+        log.info("구매자의 전화번호입니다: {} , 입력 된 전화번호: {}", buyerPhoneNumber, phoneNumber);
+        return buyerPhoneNumber.equals(phoneNumber);
+    }
+
 
 
     // 주문 상세 조회 (주문+주문상세+결제내역)
@@ -128,6 +161,7 @@ public class OrderDetailServiceImpl implements OrderDetailService {
                 .map(orderDetail -> new OrderDetailDTO(
                         orderDetail.getBook().getBookId(),
                         orderDetail.getBook().getBookName(),
+                        orderDetail.getBook().getBookThumbnailImageUrl(),
                         orderDetail.getQuantity(),
                         orderDetail.getBookpriceAtOrder()
                 ))
@@ -135,15 +169,17 @@ public class OrderDetailServiceImpl implements OrderDetailService {
 
         // log 확인
         orderDetailList.forEach(orderDetail ->
-                log.info("OrderDetailDTO - BookId: {}, BookName: {}, Quantity: {}, BookPriceAtOrder: {}",
+                log.info("OrderDetailDTO - BookId: {}, BookName: {}, bookThumbnailIMG: {}, Quantity: {}, BookPriceAtOrder: {}",
                         orderDetail.getBookId(),
                         orderDetail.getBookName(),
+                        orderDetail.getBookThumbnailImageUrl(),
                         orderDetail.getQuantity(),
                         orderDetail.getBookPriceAtOrder())
         );
 
 
         log.info("결제정보를 조회합니다.");
+
 
         // 3. 결제 정보 조회
         Payment payment = paymentRepository.findByOrder(order)
@@ -188,4 +224,6 @@ public class OrderDetailServiceImpl implements OrderDetailService {
             return "결제 취소";
         }
     }
+
+
 }

@@ -8,6 +8,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+// orderDetail 에 사용되는 DTO
+
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter

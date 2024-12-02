@@ -13,6 +13,7 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -90,7 +91,8 @@ public class OrderRepositoryImpl implements OrderRepositoryCustom {
                         order.total_price,
                         orderToStatusMapping.orderStatus.orderStatusEnum.stringValue(),
                         order.customer.customerName,
-                        order.order_number
+                        order.order_number,
+                        order.invoice_number
                 )
                 .from(order)
                 .leftJoin(orderToStatusMapping)
@@ -116,7 +118,8 @@ public class OrderRepositoryImpl implements OrderRepositoryCustom {
                         tuple.get(order.total_price),
                         tuple.get(orderToStatusMapping.orderStatus.orderStatusEnum.stringValue()),
                         tuple.get(order.customer.customerName),
-                        tuple.get(order.order_number)
+                        tuple.get(order.order_number),
+                        tuple.get(order.invoice_number)
                 ))
                 .collect(Collectors.toList());
 
@@ -131,4 +134,17 @@ public class OrderRepositoryImpl implements OrderRepositoryCustom {
         return new PageImpl<>(results, pageable, total);
     }
 
+
+  @Override
+  public Optional<Long> findOrderIdByOrderNumber(String orderNumber) {
+    QOrder order = QOrder.order;
+
+    Long orderId = queryFactory
+        .select(order.id)
+        .from(order)
+        .where(order.order_number.eq(orderNumber))
+        .fetchOne();
+
+    return Optional.ofNullable(orderId);
+  }
 }

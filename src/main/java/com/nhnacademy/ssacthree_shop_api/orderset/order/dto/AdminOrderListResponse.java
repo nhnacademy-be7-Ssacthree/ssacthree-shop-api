@@ -18,4 +18,6 @@ public class AdminOrderListResponse {
     private String orderStatus;
     private String customerName;
     private String orderNumber;
+    private String invoiceNumber;
+
 }
