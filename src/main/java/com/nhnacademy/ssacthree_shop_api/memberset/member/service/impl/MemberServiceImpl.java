@@ -52,7 +52,7 @@ public class MemberServiceImpl implements MemberService {
     private final PointSaveRuleRepository pointSaveRuleRepository;
 
     private final ApplicationEventPublisher applicationEventPublisher;
-    
+
 
     /**
      * 회원 가입 및 회원가입 포인트 적립
