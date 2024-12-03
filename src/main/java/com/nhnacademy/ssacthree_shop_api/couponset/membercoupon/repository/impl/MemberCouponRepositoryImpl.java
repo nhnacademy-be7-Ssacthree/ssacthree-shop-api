@@ -18,7 +18,7 @@ import java.util.List;
 public class MemberCouponRepositoryImpl implements MemberCouponCustomRepository {
 
     private final JPAQueryFactory queryFactory;
-    private final QMemberCoupon qMemberCoupon = QMemberCoupon.memberCoupon;
+    private static final QMemberCoupon qMemberCoupon = QMemberCoupon.memberCoupon;
 
     @Override
     public Page<MemberCouponGetResponse> findAllNotUsedMemberCouponByCustomerId(Long customerId, Pageable pageable) {

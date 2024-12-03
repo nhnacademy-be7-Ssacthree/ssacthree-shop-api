@@ -29,6 +29,8 @@ public class MemberCouponServiceImpl implements MemberCouponService {
     private final MemberRepository memberRepository;
     private final CouponRepository couponRepository;
 
+    private static final String NOT_EXIST_COUPON = "존재하지 않는 쿠폰입니다";
+
     @Override
     @Transactional
     public MemberCoupon createMemberCoupon(MemberCouponCreateRequest memberCouponCreateRequest) {
@@ -36,7 +38,7 @@ public class MemberCouponServiceImpl implements MemberCouponService {
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다."));
 
         Coupon coupon = couponRepository.findById(memberCouponCreateRequest.getCouponId())
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 쿠폰입니다."));
+                .orElseThrow(() -> new IllegalArgumentException(NOT_EXIST_COUPON));
 
         LocalDateTime now = LocalDateTime.now();
 
@@ -67,11 +69,11 @@ public class MemberCouponServiceImpl implements MemberCouponService {
     public MemberCoupon updateMemberCoupon(MemberCouponUpdateRequest memberCouponUpdateRequest) {
         Long memberCouponId = memberCouponUpdateRequest.getMemberCouponId();
         if (memberCouponId <= 0) {
-            throw new IllegalArgumentException("존재하지 않는 쿠폰입니다.");
+            throw new IllegalArgumentException(NOT_EXIST_COUPON);
         }
 
         MemberCoupon memberCoupon = memberCouponRepository.findById(memberCouponId)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 쿠폰입니다."));
+                .orElseThrow(() -> new IllegalArgumentException(NOT_EXIST_COUPON));
 
         memberCoupon.setMemberCouponUsedAt(LocalDateTime.now());
 

@@ -6,12 +6,16 @@ import com.nhnacademy.ssacthree_shop_api.memberset.pointsaverule.dto.PointSaveRu
 import com.nhnacademy.ssacthree_shop_api.memberset.pointsaverule.dto.PointSaveRuleUpdateRequest;
 import com.nhnacademy.ssacthree_shop_api.memberset.pointsaverule.service.PointSaveRuleService;
 import jakarta.validation.Valid;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/shop/admin/point-save-rules")
@@ -27,7 +31,7 @@ public class PointSaveRuleController {
 
     @PostMapping
     public ResponseEntity<MessageResponse> createPointSaveRule(
-            @Valid @RequestBody PointSaveRuleCreateRequest request) {
+        @Valid @RequestBody PointSaveRuleCreateRequest request) {
 
         pointSaveRuleService.createPointSaveRule(request);
         MessageResponse messageResponse = new MessageResponse("생성 성공");
@@ -37,11 +41,11 @@ public class PointSaveRuleController {
 
     @PutMapping
     public ResponseEntity<MessageResponse> updatePointSaveRule(
-            @Valid @RequestBody PointSaveRuleUpdateRequest pointSaveRuleUpdateRequest) {
+        @Valid @RequestBody PointSaveRuleUpdateRequest pointSaveRuleUpdateRequest) {
 
         pointSaveRuleService.updatePointSaveRule(pointSaveRuleUpdateRequest);
         MessageResponse messageResponse = new MessageResponse("수정 성공");
-
+    
         return ResponseEntity.status(HttpStatus.OK).body(messageResponse);
     }
 }

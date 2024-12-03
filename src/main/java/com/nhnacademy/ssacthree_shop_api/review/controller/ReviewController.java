@@ -7,6 +7,8 @@ import com.nhnacademy.ssacthree_shop_api.review.dto.BookReviewResponse;
 import com.nhnacademy.ssacthree_shop_api.review.dto.ReviewResponse;
 import com.nhnacademy.ssacthree_shop_api.review.service.ReviewService;
 import java.util.List;
+import java.util.Optional;
+import javax.annotation.Nullable;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -27,7 +29,7 @@ public class ReviewController {
     private final ReviewService reviewService;
 
     @GetMapping("/books/reviews/{book-id}")
-    public ResponseEntity<Page<BookReviewResponse>> getReviewsByBookId(@PathVariable("book-id") Long bookId,
+    public ResponseEntity<Page<BookReviewResponse>> getReviewsByBookId(@Nullable @PathVariable("book-id") Long bookId,
                                                                        @RequestParam int page,
                                                                        @RequestParam int size,
                                                                        @RequestParam("sort") String[] sort) {
@@ -44,16 +46,18 @@ public class ReviewController {
             @RequestBody ReviewRequestWithUrl reviewRequest) {
         return reviewService.postReviewBook(header,bookId,orderId,reviewRequest);
     }
+
     @GetMapping("/members/reviews/{book-id}")
-    public ResponseEntity<Long> authToWriteReview(
-            @RequestHeader(name = "X-USER-ID") String header,
-            @PathVariable("book-id") Long bookId) {
-        Long orderId = reviewService.authToWriteReview(header,bookId);
-        if(orderId != null) {
-            return new ResponseEntity<>(orderId,HttpStatus.OK);
+    public ResponseEntity<Optional<Long>> authToWriteReview(
+        @RequestHeader(name = "X-USER-ID") String header,
+        @PathVariable("book-id") Long bookId) {
+        Long orderId = reviewService.authToWriteReview(header, bookId);
+        if (orderId != null) {
+            return new ResponseEntity<>(Optional.of(orderId), HttpStatus.OK);
         }
-        return new ResponseEntity<>(null,HttpStatus.FORBIDDEN);
+        return new ResponseEntity<>(Optional.empty(), HttpStatus.FORBIDDEN);
     }
+
     @GetMapping("/members/reviews")
     public ResponseEntity<List<MemberReviewResponse>> getReviewsByMemberId(
             @RequestHeader(name = "X-USER-ID") String header){

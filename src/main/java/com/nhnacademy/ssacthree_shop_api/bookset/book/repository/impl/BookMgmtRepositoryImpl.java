@@ -4,8 +4,6 @@ import com.nhnacademy.ssacthree_shop_api.bookset.author.domain.QAuthor;
 import com.nhnacademy.ssacthree_shop_api.bookset.author.dto.AuthorNameResponse;
 import com.nhnacademy.ssacthree_shop_api.bookset.book.domain.BookStatus;
 import com.nhnacademy.ssacthree_shop_api.bookset.book.domain.QBook;
-import com.nhnacademy.ssacthree_shop_api.bookset.book.dto.response.BookBaseResponse;
-import com.nhnacademy.ssacthree_shop_api.bookset.book.dto.response.BookInfoResponse;
 import com.nhnacademy.ssacthree_shop_api.bookset.book.dto.response.BookSearchResponse;
 import com.nhnacademy.ssacthree_shop_api.bookset.book.repository.BookMgmtRepository;
 import com.nhnacademy.ssacthree_shop_api.bookset.book.repository.BookRepository;
@@ -13,11 +11,8 @@ import com.nhnacademy.ssacthree_shop_api.bookset.bookauthor.domain.QBookAuthor;
 import com.nhnacademy.ssacthree_shop_api.bookset.bookcategory.domain.QBookCategory;
 import com.nhnacademy.ssacthree_shop_api.bookset.booktag.domain.QBookTag;
 import com.nhnacademy.ssacthree_shop_api.bookset.category.domain.QCategory;
-import com.nhnacademy.ssacthree_shop_api.bookset.category.dto.response.CategoryNameResponse;
 import com.nhnacademy.ssacthree_shop_api.bookset.publisher.domain.QPublisher;
-import com.nhnacademy.ssacthree_shop_api.bookset.publisher.dto.PublisherNameResponse;
 import com.nhnacademy.ssacthree_shop_api.bookset.tag.domain.QTag;
-import com.nhnacademy.ssacthree_shop_api.bookset.tag.dto.response.TagInfoResponse;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.PathBuilder;
@@ -28,12 +23,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.expression.spel.ast.Projection;
 import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 @Slf4j
 @Repository
@@ -49,6 +42,9 @@ public class BookMgmtRepositoryImpl implements BookMgmtRepository {
     private static final QCategory category = QCategory.category;
     private static final QTag tag = QTag.tag;
     private static final QAuthor author = QAuthor.author;
+    private static final String BOOK_ID = "bookId";
+    private static final String BOOK_NAME = "bookName";
+    private static final String BOOK_ISBN = "bookIsbn";
 
     private BookRepository bookRepository;
 
@@ -68,7 +64,7 @@ public class BookMgmtRepositoryImpl implements BookMgmtRepository {
                 .orderBy(getOrderSpecifier(pageable))
                 .fetch();
 
-        books.forEach(book -> log.info("bookStatus 확인용: {}", book.getBookStatus()));
+        books.forEach(b -> log.info("bookStatus 확인용: {}", b.getBookStatus()));
 
         // Fetch authors for each book
         books.forEach(b -> {
@@ -82,10 +78,10 @@ public class BookMgmtRepositoryImpl implements BookMgmtRepository {
         });
 
         long total = queryFactory
-                .select(book.bookId)
-                .from(book)
-                .where(book.bookStatus.ne(BookStatus.DELETE_BOOK))
-                .fetchCount();
+            .select(book.bookId.count())
+            .from(book)
+            .where(book.bookStatus.ne(BookStatus.DELETE_BOOK))
+            .fetchOne();
 
         return new PageImpl<>(books, pageable, total);
     }
@@ -102,14 +98,24 @@ public class BookMgmtRepositoryImpl implements BookMgmtRepository {
         return orders.toArray(new OrderSpecifier[0]);
     }
 
+
+
     private OrderSpecifier<?> getOrderSpecifierForField(Sort.Order order, PathBuilder<Object> pathBuilder) {
-        if (order.getProperty().equals("bookId")) {
-            return order.isDescending() ? pathBuilder.getNumber("bookId", Long.class).desc() : pathBuilder.getNumber("bookId", Long.class).asc();
-        } else if (order.getProperty().equals("bookName")) {
-            return order.isDescending() ? pathBuilder.getString("bookName").desc() : pathBuilder.getString("bookName").asc();
-        } else if (order.getProperty().equals("bookIsbn")) {
-            return order.isDescending() ? pathBuilder.getNumber("bookIsbn", Integer.class).desc() : pathBuilder.getNumber("bookIsbn", Integer.class).asc();
-        }else{
+        String property = order.getProperty();
+
+        if (property.equals(BOOK_ID)) {
+            return order.isDescending()
+                ? pathBuilder.getNumber(BOOK_ID, Long.class).desc()
+                : pathBuilder.getNumber(BOOK_ID, Long.class).asc();
+        } else if (property.equals(BOOK_NAME)) {
+            return order.isDescending()
+                ? pathBuilder.getString(BOOK_NAME).desc()
+                : pathBuilder.getString(BOOK_NAME).asc();
+        } else if (property.equals(BOOK_ISBN)) {
+            return order.isDescending()
+                ? pathBuilder.getNumber(BOOK_ISBN, Integer.class).desc()
+                : pathBuilder.getNumber(BOOK_ISBN, Integer.class).asc();
+        } else {
             return null;
         }
     }

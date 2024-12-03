@@ -1,7 +1,6 @@
 package com.nhnacademy.ssacthree_shop_api.shoppingcart.service;
 
 import com.nhnacademy.ssacthree_shop_api.shoppingcart.dto.ShoppingCartItemResponse;
-import com.nhnacademy.ssacthree_shop_api.shoppingcart.dto.ShoppingCartItemResponseWithCustomerId;
 import com.nhnacademy.ssacthree_shop_api.shoppingcart.dto.ShoppingCartRequest;
 import java.util.List;
 

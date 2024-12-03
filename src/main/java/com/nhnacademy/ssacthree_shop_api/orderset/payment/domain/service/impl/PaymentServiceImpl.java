@@ -1,4 +1,4 @@
-package com.nhnacademy.ssacthree_shop_api.orderset.payment.domain.service.Impl;
+package com.nhnacademy.ssacthree_shop_api.orderset.payment.domain.service.impl;
 
 import com.nhnacademy.ssacthree_shop_api.commons.dto.MessageResponse;
 import com.nhnacademy.ssacthree_shop_api.orderset.order.domain.Order;
@@ -26,7 +26,6 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     public MessageResponse savePayment(PaymentRequest paymentRequest) {
-        // TODO : 적절한 예외 만들기.
         Order order = orderRepository.findById(paymentRequest.getOrderId())
                 .orElseThrow(() -> new IllegalArgumentException("주문 정보를 찾을 수 없습니다. ID: " + paymentRequest.getOrderId()));
 

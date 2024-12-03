@@ -26,6 +26,7 @@ public class BookDeleteResponse {
         this.bookId = bookId;
         this.bookName = bookName;
         this.bookInfo = bookInfo;
+        this.bookStatus = bookStatus;
         this.bookStatus = BookStatus.ON_SALE;
         this.stock = stock;
     }

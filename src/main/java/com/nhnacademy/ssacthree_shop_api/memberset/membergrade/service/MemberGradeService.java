@@ -20,6 +20,9 @@ public class MemberGradeService {
     private final MemberGradeRepository memberGradeRepository;
     private final MemberGradeCustomRepository memberGradeCustomRepository;
 
+    private static final String MEMBER_GRADE_ID_NOT_0 = "memberGradeId는 0이하일 수 없습니다.";
+    private static final String NOT_FOUND = "를 찾을 수 없습니다.";
+
     public void createMemberGrade(MemberGradeCreateRequest memberGradeCreateRequest) {
 
         MemberGrade memberGrade = new MemberGrade(memberGradeCreateRequest.getMemberGradeName(),
@@ -33,12 +36,12 @@ public class MemberGradeService {
     public void updateMemberGrade(Long memberGradeId,
         MemberGradeUpdateResponse memberGradeUpdateResponse) {
         if (memberGradeId <= 0) {
-            throw new IllegalArgumentException("memberGradeId는 0이하일 수 없습니다.");
+            throw new IllegalArgumentException(MEMBER_GRADE_ID_NOT_0);
         }
 
         // 찾은 엔티티의 값을 변경해줌
         MemberGrade memberGrade = memberGradeRepository.findById(memberGradeId)
-            .orElseThrow(() -> new MemberGradeNotFoundException(memberGradeId + "를 찾을 수 없습니다."));
+            .orElseThrow(() -> new MemberGradeNotFoundException(memberGradeId + NOT_FOUND));
         memberGrade.setMemberGradeIsUsed(memberGradeUpdateResponse.isMemberGradeIsUsed());
         memberGrade.setMemberGradeName(memberGradeUpdateResponse.getMemberGradeName());
         memberGrade.setMemberGradePointSave(memberGradeUpdateResponse.getMemberGradePointSave());
@@ -49,10 +52,10 @@ public class MemberGradeService {
     @Transactional(readOnly = true)
     public MemberGradeGetResponse getMemberGradeById(Long memberGradeId) {
         if (memberGradeId <= 0) {
-            throw new IllegalArgumentException("memberGradeId는 0이하일 수 없습니다.");
+            throw new IllegalArgumentException(MEMBER_GRADE_ID_NOT_0);
         }
         MemberGrade foundMemberGrade = memberGradeRepository.findById(memberGradeId)
-            .orElseThrow(() -> new MemberGradeNotFoundException(memberGradeId + "를 찾을 수 없습니다."));
+            .orElseThrow(() -> new MemberGradeNotFoundException(memberGradeId + NOT_FOUND));
         return new MemberGradeGetResponse(
             foundMemberGrade.getMemberGradeId(),
             foundMemberGrade.getMemberGradeName(),
@@ -64,10 +67,10 @@ public class MemberGradeService {
 
     public void deleteMemberGradeById(Long memberGradeId) {
         if (memberGradeId <= 0) {
-            throw new IllegalArgumentException("memberGradeId는 0이하일 수 없습니다.");
+            throw new IllegalArgumentException(MEMBER_GRADE_ID_NOT_0);
         }
         MemberGrade foundMemberGrade = memberGradeRepository.findById(memberGradeId)
-            .orElseThrow(() -> new MemberGradeNotFoundException(memberGradeId + "를 찾을 수 없습니다."));
+            .orElseThrow(() -> new MemberGradeNotFoundException(memberGradeId + NOT_FOUND));
         foundMemberGrade.setMemberGradeIsUsed(false);
     }
 

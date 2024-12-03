@@ -5,11 +5,9 @@ import com.nhnacademy.ssacthree_shop_api.bookset.author.dto.AuthorNameResponse;
 import com.nhnacademy.ssacthree_shop_api.bookset.author.repository.AuthorRepository;
 import com.nhnacademy.ssacthree_shop_api.bookset.book.domain.Book;
 import com.nhnacademy.ssacthree_shop_api.bookset.book.domain.BookStatus;
-import com.nhnacademy.ssacthree_shop_api.bookset.book.domain.converter.BookStatusConverter;
 import com.nhnacademy.ssacthree_shop_api.bookset.book.dto.request.BookSaveRequest;
 import com.nhnacademy.ssacthree_shop_api.bookset.book.dto.response.BookInfoResponse;
 import com.nhnacademy.ssacthree_shop_api.bookset.bookauthor.domain.BookAuthor;
-import com.nhnacademy.ssacthree_shop_api.bookset.bookauthor.repository.BookAuthorRepository;
 import com.nhnacademy.ssacthree_shop_api.bookset.bookcategory.domain.BookCategory;
 import com.nhnacademy.ssacthree_shop_api.bookset.booktag.domain.BookTag;
 import com.nhnacademy.ssacthree_shop_api.bookset.category.domain.Category;
@@ -22,7 +20,6 @@ import com.nhnacademy.ssacthree_shop_api.bookset.publisher.repository.PublisherR
 import com.nhnacademy.ssacthree_shop_api.bookset.tag.domain.Tag;
 import com.nhnacademy.ssacthree_shop_api.bookset.tag.dto.response.TagInfoResponse;
 import com.nhnacademy.ssacthree_shop_api.bookset.tag.repository.TagRepository;
-import jakarta.ws.rs.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -41,7 +38,6 @@ public class BookMapper {
     private final TagRepository tagRepository;
 
     public Book bookSaveRequestToBook(BookSaveRequest bookSaveRequest) {
-        BookStatusConverter converter = new BookStatusConverter();
 
         Book book = new Book();
         book.setBookName(bookSaveRequest.getBookName());
@@ -60,7 +56,6 @@ public class BookMapper {
         book.setBookThumbnailImageUrl(bookSaveRequest.getBookThumbnailImageUrl());
         book.setBookViewCount(bookSaveRequest.getBookViewCount());
         book.setBookDiscount(bookSaveRequest.getBookDiscount());
-        //todo: book 등록할 때 상태를 직접 설정할지, 아니면 무조건 "판매 중"으로 할지 정해야함. 현재는 무조건 "판매 중"
         book.setBookStatus(BookStatus.ON_SALE);
 
         Publisher publisher = publisherRepository.findById(bookSaveRequest.getPublisherId())
@@ -84,7 +79,12 @@ public class BookMapper {
 
     public BookInfoResponse bookToBookInfoResponse(Book book) {
         // Book 엔티티의 기본 정보 설정
-        BookInfoResponse response = BookInfoResponse.builder()
+        // LocalDateTime -> LocalDate 변환
+        // CategoryNameResponse 리스트로 변환
+        // AuthorNameResponse 리스트로 변환
+        // TagInfoResponse 리스트로 변환
+
+        return BookInfoResponse.builder()
                 .bookId(book.getBookId())
                 .bookName(book.getBookName())
                 .bookIndex(book.getBookIndex())
@@ -112,8 +112,6 @@ public class BookMapper {
                         .map(bookTag -> new TagInfoResponse(bookTag.getTag().getTagId(),bookTag.getTag().getTagName()))
                         .toList()) // TagInfoResponse 리스트로 변환
                 .build();
-
-        return response;
     }
 
 }

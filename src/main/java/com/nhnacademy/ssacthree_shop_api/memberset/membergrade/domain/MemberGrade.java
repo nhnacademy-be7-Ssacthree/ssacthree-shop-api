@@ -1,8 +1,6 @@
 package com.nhnacademy.ssacthree_shop_api.memberset.membergrade.domain;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
