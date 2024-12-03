@@ -8,8 +8,10 @@ public class PageRequestBuilder {
 
     // Private constructor to prevent instantiation
     private PageRequestBuilder() {
-        throw new UnsupportedOperationException("This is a utility class and cannot be instantiated");
+        throw new UnsupportedOperationException(
+            "This is a utility class and cannot be instantiated");
     }
+
 
     public static Pageable createPageable(int page, int size, String[] sortParams) {
         Sort sort = Sort.unsorted();
@@ -30,7 +32,8 @@ public class PageRequestBuilder {
                 }
             }
         } else {
-            throw new IllegalStateException("잘못된 정렬 설정: 올바른 형식은 '필드명' 또는 '필드명,정렬방향'입니다. (예: bookName 또는 bookName,asc)");
+            throw new IllegalStateException(
+                "잘못된 정렬 설정: 올바른 형식은 '필드명' 또는 '필드명,정렬방향'입니다. (예: bookName 또는 bookName,asc)");
         }
 
         return PageRequest.of(page, size, sort);
