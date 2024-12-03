@@ -1,6 +1,5 @@
 package com.nhnacademy.ssacthree_shop_api.memberset.member.dto;
 
-import static com.nhnacademy.ssacthree_shop_api.memberset.membergrade.domain.QMemberGrade.memberGrade;
 
 import com.nhnacademy.ssacthree_shop_api.memberset.member.domain.Member;
 import lombok.AllArgsConstructor;

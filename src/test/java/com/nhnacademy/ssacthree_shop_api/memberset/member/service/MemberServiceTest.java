@@ -30,6 +30,7 @@ import com.nhnacademy.ssacthree_shop_api.memberset.pointsaverule.domain.PointSav
 import com.nhnacademy.ssacthree_shop_api.memberset.pointsaverule.domain.PointSaveType;
 import com.nhnacademy.ssacthree_shop_api.memberset.pointsaverule.repository.PointSaveRuleRepository;
 import java.lang.reflect.Field;
+import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -248,6 +249,64 @@ class MemberServiceTest {
         // Then
         assertEquals(expectedCustomerId, actualCustomerId);
         verify(memberRepository).findByMemberLoginId(memberLoginId);
+    }
+
+    @Test
+    void sleepMember_shouldMarkMembersAsSleep() {
+        // Given
+        Member activeMember1 = new Member();
+
+        Member activeMember2 = new Member();
+        activeMember1.setMemberStatus(MemberStatus.SLEEP);
+        activeMember2.setMemberStatus(MemberStatus.SLEEP);
+        List<Member> activeMembers = List.of(activeMember1, activeMember2);
+
+        when(memberRepository.findAllByMemberStatus(MemberStatus.ACTIVE)).thenReturn(activeMembers);
+
+        // When
+        memberService.sleepMember();
+
+        // Then
+        assertEquals(MemberStatus.SLEEP, activeMember1.getMemberStatus());
+        assertEquals(MemberStatus.SLEEP, activeMember2.getMemberStatus());
+        verify(memberRepository).findAllByMemberStatus(MemberStatus.ACTIVE);
+
+    }
+
+    @Test
+    void activeMember_shouldActivateSleepingMember() {
+        // Given
+        String memberLoginId = "member1";
+        Member member = new Member();
+
+        member.setMemberStatus(MemberStatus.SLEEP);
+
+        when(memberRepository.findByMemberLoginId(memberLoginId)).thenReturn(Optional.of(member));
+
+        // When
+        MessageResponse response = memberService.activeMember(memberLoginId);
+
+        // Then
+        assertEquals("휴면 해제가 완료되었습니다.", response.getMessage());
+        assertEquals(MemberStatus.ACTIVE, member.getMemberStatus());
+        verify(memberRepository).findByMemberLoginId(memberLoginId);
+    }
+
+    @Test
+    void activeMember_shouldThrowExceptionIfMemberNotFound() {
+        // Given
+        String memberLoginId = "nonExistingMember";
+        when(memberRepository.findByMemberLoginId(memberLoginId)).thenReturn(Optional.empty());
+
+        // When & Then
+        MemberNotFoundException exception = assertThrows(
+            MemberNotFoundException.class,
+            () -> memberService.activeMember(memberLoginId)
+        );
+
+        assertEquals("멤버를 찾을 수 없습니다.", exception.getMessage());
+        verify(memberRepository).findByMemberLoginId(memberLoginId);
+        verify(memberRepository, never()).save(any());
     }
 
 }
