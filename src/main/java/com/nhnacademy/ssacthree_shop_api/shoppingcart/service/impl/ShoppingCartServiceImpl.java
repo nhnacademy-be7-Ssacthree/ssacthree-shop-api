@@ -15,7 +15,6 @@ import com.nhnacademy.ssacthree_shop_api.shoppingcart.dto.ShoppingCartRequest;
 import com.nhnacademy.ssacthree_shop_api.shoppingcart.repository.ShoppingCartRepository;
 import com.nhnacademy.ssacthree_shop_api.shoppingcart.service.ShoppingCartService;
 import java.util.List;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -47,7 +46,7 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
                 cart.getBook().getSalePrice(),            // 도서 가격
                 cart.getBook().getBookThumbnailImageUrl()  // 도서 이미지
             ))
-            .collect(Collectors.toList());
+            .toList();
     }
 
     @Override
@@ -63,55 +62,67 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
     public void saveCart(List<ShoppingCartRequest> cartList, Long customerId) {
         Customer customer = customerRepository.findById(customerId).orElse(null);
 
-        if (cartList == null || cartList.isEmpty()) {
-            // 고객의 모든 쇼핑 카트 삭제
-            List<ShoppingCart> existingCarts = shoppingCartRepository.findAllByCustomer(customer);
-            if (!existingCarts.isEmpty()) {
-                shoppingCartRepository.deleteAll(existingCarts);
-            }
+        // 1. 쇼핑 카트를 삭제해야 하는지 확인
+        if (shouldDeleteAllCarts(cartList)) {
+            deleteAllCartsForCustomer(customer);
             return;
         }
 
-        List<ShoppingCart> existingCartList = shoppingCartRepository.findAllByCustomer(customer);
-        for (ShoppingCart shoppingCart : existingCartList) {
-            boolean same = false;
-            for (ShoppingCartRequest shoppingCartRequest : cartList) {
-                ShoppingCartId existShoppingCartId = shoppingCart.getShoppingCartId();
-                ShoppingCartId newShoppingCartId = new ShoppingCartId(customerId,
-                    shoppingCartRequest.getBookId());
-                if (existShoppingCartId.equals(newShoppingCartId)) {
-                    same = true;
-                }
-            }
-            if (!same) {
-                shoppingCartRepository.delete(shoppingCart);
+        // 2. 기존 카트와 요청된 카트를 비교해 삭제
+        List<ShoppingCart> existingCarts = shoppingCartRepository.findAllByCustomer(customer);
+        deleteUnmatchedCarts(existingCarts, cartList, customerId);
+
+        // 3. 요청된 카트를 저장
+        saveOrUpdateCarts(cartList, customerId, customer);
+    }
+
+    private boolean shouldDeleteAllCarts(List<ShoppingCartRequest> cartList) {
+        return cartList == null || cartList.isEmpty();
+    }
+
+    private void deleteAllCartsForCustomer(Customer customer) {
+        List<ShoppingCart> existingCarts = shoppingCartRepository.findAllByCustomer(customer);
+        if (!existingCarts.isEmpty()) {
+            shoppingCartRepository.deleteAll(existingCarts);
+        }
+    }
+
+    private void deleteUnmatchedCarts(List<ShoppingCart> existingCarts, List<ShoppingCartRequest> cartList, Long customerId) {
+        for (ShoppingCart existingCart : existingCarts) {
+            if (isCartUnmatched(existingCart, cartList, customerId)) {
+                shoppingCartRepository.delete(existingCart);
             }
         }
+    }
 
+    private boolean isCartUnmatched(ShoppingCart existingCart, List<ShoppingCartRequest> cartList, Long customerId) {
+        for (ShoppingCartRequest cartRequest : cartList) {
+            ShoppingCartId existingCartId = existingCart.getShoppingCartId();
+            ShoppingCartId newCartId = new ShoppingCartId(customerId, cartRequest.getBookId());
+            if (existingCartId.equals(newCartId)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private void saveOrUpdateCarts(List<ShoppingCartRequest> cartList, Long customerId, Customer customer) {
         for (ShoppingCartRequest cartItem : cartList) {
-            // 필요한 개수와 항목 정보 추출
-            int quantity = cartItem.getQuantity();
             Long bookId = cartItem.getBookId();
             Book book = bookRepository.findByBookId(bookId)
                 .orElseThrow(() -> new BookNotFoundException("book not found"));
-            ShoppingCartId shoppingCartId = new ShoppingCartId(customerId, bookId);
+            ShoppingCartId cartId = new ShoppingCartId(customerId, bookId);
 
-            // ShoppingCartRepository에서 해당 ID로 조회
-            ShoppingCart existingCart = shoppingCartRepository.findById(shoppingCartId)
-                .orElse(null);
+            ShoppingCart existingCart = shoppingCartRepository.findById(cartId).orElse(null);
 
             if (existingCart != null) {
-                // 존재할 경우 수량 업데이트
-                existingCart.addBookQuantity(quantity);
+                existingCart.addBookQuantity(cartItem.getQuantity());
                 shoppingCartRepository.save(existingCart);
             } else {
-                // 존재하지 않을 경우 새로 생성
-                ShoppingCart newCart = new ShoppingCart(shoppingCartId, customer, book,
-                    quantity);
+                ShoppingCart newCart = new ShoppingCart(cartId, customer, book, cartItem.getQuantity());
                 shoppingCartRepository.save(newCart);
             }
         }
-
     }
 
     @Override

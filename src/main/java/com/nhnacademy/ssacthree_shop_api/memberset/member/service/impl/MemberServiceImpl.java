@@ -61,6 +61,8 @@ public class MemberServiceImpl implements MemberService {
 
     private final ApplicationEventPublisher applicationEventPublisher;
 
+    private static final String MEMBER_NOT_FOUND = "멤버를 찾을 수 없습니다.";
+
     /**
      * 회원 가입 및 회원가입 포인트 적립
      *
@@ -127,7 +129,7 @@ public class MemberServiceImpl implements MemberService {
         MemberInfoUpdateRequest memberInfoUpdateRequest) {
         // Hibernate --> 기본키를 Set 하는 경우 에러를 발생 시킴, 그래서 멤버를 빼와서 변경시키는 방향으로 수정 함 ㅠ
         Member member = memberRepository.findByMemberLoginId(memberLoginId)
-            .orElseThrow(() -> new MemberNotFoundException("멤버를 찾을 수 없습니다."));
+            .orElseThrow(() -> new MemberNotFoundException(MEMBER_NOT_FOUND));
 
         Customer customer = member.getCustomer();
         customer.setCustomerName(memberInfoUpdateRequest.getCustomerName());
@@ -148,7 +150,7 @@ public class MemberServiceImpl implements MemberService {
     @Override
     public MessageResponse deleteMember(String memberLoginId) {
         Member member = memberRepository.findByMemberLoginId(memberLoginId)
-            .orElseThrow(() -> new MemberNotFoundException("멤버를 찾을 수 없습니다."));
+            .orElseThrow(() -> new MemberNotFoundException(MEMBER_NOT_FOUND));
 
         member.setMemberStatus(MemberStatus.WITHDRAW);
         member.setPaycoIdNumber(null);
@@ -192,7 +194,7 @@ public class MemberServiceImpl implements MemberService {
     @Override
     public MessageResponse activeMember(String memberLoginId) {
         Member member = memberRepository.findByMemberLoginId(memberLoginId)
-            .orElseThrow(() -> new MemberNotFoundException("멤버를 찾을 수 없습니다."));
+            .orElseThrow(() -> new MemberNotFoundException(MEMBER_NOT_FOUND));
 
         member.setMemberStatus(MemberStatus.ACTIVE);
 

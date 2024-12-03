@@ -76,8 +76,6 @@ public class CouponServiceImpl implements CouponService {
             throw new IllegalArgumentException("존재하지 않는 쿠폰입니다.");
         }
 
-        Coupon coupon = couponRepository.findById(couponId)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 쿠폰입니다."));
 
         // 어떻게 변경할지 고민
 

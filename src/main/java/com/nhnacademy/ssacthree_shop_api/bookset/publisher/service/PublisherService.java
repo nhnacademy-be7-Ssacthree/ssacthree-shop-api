@@ -2,7 +2,6 @@ package com.nhnacademy.ssacthree_shop_api.bookset.publisher.service;
 
 import com.nhnacademy.ssacthree_shop_api.bookset.book.exception.CsvProcessingException;
 import com.nhnacademy.ssacthree_shop_api.bookset.publisher.domain.Publisher;
-import com.nhnacademy.ssacthree_shop_api.bookset.publisher.domain.QPublisher;
 import com.nhnacademy.ssacthree_shop_api.bookset.publisher.dto.PublisherCreateRequest;
 import com.nhnacademy.ssacthree_shop_api.bookset.publisher.dto.PublisherGetResponse;
 import com.nhnacademy.ssacthree_shop_api.bookset.publisher.dto.PublisherUpdateRequest;
@@ -17,12 +16,10 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
-import com.querydsl.core.types.Projections;
-import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -112,7 +109,7 @@ public class PublisherService {
             if (!publishersToSave.isEmpty()) {
                 List<Publisher> publishers = publishersToSave.stream()
                         .map(this::convertToPublisherEntity)
-                        .collect(Collectors.toList());
+                        .toList();
                 publisherRepository.saveAll(publishers);
                 log.info("출판사 저장에 성공했습니다.:" + publishersToSave);
             } else {

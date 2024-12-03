@@ -18,7 +18,7 @@ public class PointHistoryCustomRepositoryImpl implements PointHistoryCustomRepos
 
 
     private final JPAQueryFactory queryFactory;
-    private final QPointHistory qPointHistory = QPointHistory.pointHistory;
+    private static final QPointHistory qPointHistory = QPointHistory.pointHistory;
 
 
     @Override

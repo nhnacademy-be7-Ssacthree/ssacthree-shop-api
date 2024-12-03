@@ -1,6 +1,5 @@
 package com.nhnacademy.ssacthree_shop_api.orderset.ordertostatusmapping.repository;
 
-import com.nhnacademy.ssacthree_shop_api.orderset.order.domain.Order;
 import com.nhnacademy.ssacthree_shop_api.orderset.ordertostatusmapping.OrderToStatusMapping;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
