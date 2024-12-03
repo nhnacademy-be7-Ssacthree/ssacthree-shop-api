@@ -1,7 +1,6 @@
 package com.nhnacademy.ssacthree_shop_api.shoppingcart.controller;
 
 import com.nhnacademy.ssacthree_shop_api.shoppingcart.dto.ShoppingCartItemResponse;
-import com.nhnacademy.ssacthree_shop_api.shoppingcart.dto.ShoppingCartItemResponseWithCustomerId;
 import com.nhnacademy.ssacthree_shop_api.shoppingcart.dto.ShoppingCartRequest;
 import com.nhnacademy.ssacthree_shop_api.shoppingcart.service.ShoppingCartService;
 import java.util.List;
@@ -44,6 +43,9 @@ public class ShoppingCartController {
 
     @GetMapping("/add")
     public ResponseEntity<ShoppingCartItemResponse> getBook(@RequestParam Long bookId) {
+        if (bookId == null || bookId <= 0) {
+            throw new IllegalArgumentException("유효하지 않은 bookId입니다. bookId는 0보다 커야 합니다.");
+        }
         ShoppingCartItemResponse cartItem = shoppingCartService.getBookByBookId(bookId);
         return ResponseEntity.ok(cartItem);
     }

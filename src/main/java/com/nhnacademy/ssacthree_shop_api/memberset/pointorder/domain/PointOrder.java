@@ -3,7 +3,6 @@ package com.nhnacademy.ssacthree_shop_api.memberset.pointorder.domain;
 import com.nhnacademy.ssacthree_shop_api.memberset.pointhistory.domain.PointHistory;
 import com.nhnacademy.ssacthree_shop_api.orderset.order.domain.Order;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

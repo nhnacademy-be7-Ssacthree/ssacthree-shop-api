@@ -32,6 +32,8 @@ public class MemberEventListener {
     private final CouponRepository couponRepository;
     private final CouponRuleRepository couponRuleRepository;
 
+    private static final String WELCOME_COUPON = "Welcome 쿠폰";
+
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handleMemberRegisteredEvent(MemberRegisteredEvent event) {
@@ -45,12 +47,12 @@ public class MemberEventListener {
     }
 
     public void issueWelcomeCoupon(Member member) {
-        Coupon coupon = couponRepository.findByCouponName("Welcome 쿠폰")
+        Coupon coupon = couponRepository.findByCouponName(WELCOME_COUPON)
                 .orElseGet(() -> {
-                    CouponRule couponRule = couponRuleRepository.findByCouponRuleName("Welcome 쿠폰")
+                    CouponRule couponRule = couponRuleRepository.findByCouponRuleName(WELCOME_COUPON)
                             .orElseGet(() -> {
                                 CouponRuleCreateRequest crcr = new CouponRuleCreateRequest();
-                                crcr.setCouponRuleName("Welcome 쿠폰");
+                                crcr.setCouponRuleName(WELCOME_COUPON);
                                 crcr.setCouponType(CouponType.CASH);
                                 crcr.setCouponMinOrderPrice(50000);
                                 crcr.setMaxDiscountPrice(10000);
@@ -60,7 +62,7 @@ public class MemberEventListener {
                             });
 
                     CouponCreateRequest ccr = new CouponCreateRequest();
-                    ccr.setCouponName("Welcome 쿠폰");
+                    ccr.setCouponName(WELCOME_COUPON);
                     ccr.setCouponDescription("회원가입 시 지급되는 쿠폰");
                     ccr.setCouponEffectivePeriod(30);
                     ccr.setCouponEffectivePeriodUnit(CouponEffectivePeriodUnit.DAY);

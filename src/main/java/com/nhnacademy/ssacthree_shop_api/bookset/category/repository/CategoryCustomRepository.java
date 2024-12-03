@@ -3,7 +3,6 @@ package com.nhnacademy.ssacthree_shop_api.bookset.category.repository;
 import com.nhnacademy.ssacthree_shop_api.bookset.category.domain.Category;
 
 import java.util.List;
-import org.springframework.data.jpa.repository.Query;
 
 /**
  * 복잡한 쿼리문을 위한
@@ -40,4 +39,11 @@ public interface CategoryCustomRepository {
      * @return 카테고리 이름
      */
     String findCategoryNameByCategoryId(Long categoryId);
+
+    /**
+     * 최상위 카테고리(부모가 없는 카테고리) 목록을 조회합니다.
+     *
+     * @return 최상위 카테고리 목록
+     */
+    List<Category> findBySuperCategoryIsNullAndCategoryIsUsed();
 }

@@ -1,11 +1,6 @@
 package com.nhnacademy.ssacthree_shop_api.memberset.member.service.impl;
 
 import com.nhnacademy.ssacthree_shop_api.commons.dto.MessageResponse;
-import com.nhnacademy.ssacthree_shop_api.couponset.coupon.repository.CouponRepository;
-import com.nhnacademy.ssacthree_shop_api.couponset.coupon.service.CouponService;
-import com.nhnacademy.ssacthree_shop_api.couponset.couponrule.repository.CouponRuleRepository;
-import com.nhnacademy.ssacthree_shop_api.couponset.couponrule.service.CouponRuleService;
-import com.nhnacademy.ssacthree_shop_api.couponset.membercoupon.service.MemberCouponService;
 import com.nhnacademy.ssacthree_shop_api.customer.domain.Customer;
 import com.nhnacademy.ssacthree_shop_api.customer.dto.CustomerCreateRequest;
 import com.nhnacademy.ssacthree_shop_api.customer.service.CustomerService;
@@ -46,6 +41,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 public class MemberServiceImpl implements MemberService {
 
+
+    private static final String MEMBER_NOT_FOUND = "멤버를 찾을 수 없습니다.";
     private final MemberRepository memberRepository;
     private final CustomerService customerService;
     private final MemberGradeRepository memberGradeRepository;
@@ -53,13 +50,9 @@ public class MemberServiceImpl implements MemberService {
     private final MemberCustomRepository memberCustomRepository;
     private final PointHistoryService pointHistoryService;
     private final PointSaveRuleRepository pointSaveRuleRepository;
-    private final MemberCouponService memberCouponService;
-    private final CouponRepository couponRepository;
-    private final CouponService couponService;
-    private final CouponRuleRepository couponRuleRepository;
-    private final CouponRuleService couponRuleService;
 
     private final ApplicationEventPublisher applicationEventPublisher;
+
 
     /**
      * 회원 가입 및 회원가입 포인트 적립
@@ -127,7 +120,7 @@ public class MemberServiceImpl implements MemberService {
         MemberInfoUpdateRequest memberInfoUpdateRequest) {
         // Hibernate --> 기본키를 Set 하는 경우 에러를 발생 시킴, 그래서 멤버를 빼와서 변경시키는 방향으로 수정 함 ㅠ
         Member member = memberRepository.findByMemberLoginId(memberLoginId)
-            .orElseThrow(() -> new MemberNotFoundException("멤버를 찾을 수 없습니다."));
+            .orElseThrow(() -> new MemberNotFoundException(MEMBER_NOT_FOUND));
 
         Customer customer = member.getCustomer();
         customer.setCustomerName(memberInfoUpdateRequest.getCustomerName());
@@ -148,7 +141,7 @@ public class MemberServiceImpl implements MemberService {
     @Override
     public MessageResponse deleteMember(String memberLoginId) {
         Member member = memberRepository.findByMemberLoginId(memberLoginId)
-            .orElseThrow(() -> new MemberNotFoundException("멤버를 찾을 수 없습니다."));
+            .orElseThrow(() -> new MemberNotFoundException(MEMBER_NOT_FOUND));
 
         member.setMemberStatus(MemberStatus.WITHDRAW);
         member.setPaycoIdNumber(null);
@@ -192,7 +185,7 @@ public class MemberServiceImpl implements MemberService {
     @Override
     public MessageResponse activeMember(String memberLoginId) {
         Member member = memberRepository.findByMemberLoginId(memberLoginId)
-            .orElseThrow(() -> new MemberNotFoundException("멤버를 찾을 수 없습니다."));
+            .orElseThrow(() -> new MemberNotFoundException(MEMBER_NOT_FOUND));
 
         member.setMemberStatus(MemberStatus.ACTIVE);
 
