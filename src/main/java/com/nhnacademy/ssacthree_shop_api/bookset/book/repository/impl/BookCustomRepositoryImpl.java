@@ -6,7 +6,9 @@ import com.nhnacademy.ssacthree_shop_api.bookset.book.domain.Book;
 import com.nhnacademy.ssacthree_shop_api.bookset.book.domain.BookStatus;
 import com.nhnacademy.ssacthree_shop_api.bookset.book.domain.QBook;
 import com.nhnacademy.ssacthree_shop_api.bookset.book.dto.response.BookBaseResponse;
+import com.nhnacademy.ssacthree_shop_api.bookset.book.dto.response.BookInfoResponse;
 import com.nhnacademy.ssacthree_shop_api.bookset.book.dto.response.BookListBaseResponse;
+import com.nhnacademy.ssacthree_shop_api.bookset.book.dto.response.BookListResponse;
 import com.nhnacademy.ssacthree_shop_api.bookset.book.repository.BookCustomRepository;
 import com.nhnacademy.ssacthree_shop_api.bookset.bookauthor.domain.QBookAuthor;
 import com.nhnacademy.ssacthree_shop_api.bookset.bookcategory.domain.QBookCategory;
@@ -19,6 +21,7 @@ import com.nhnacademy.ssacthree_shop_api.bookset.publisher.domain.QPublisher;
 import com.nhnacademy.ssacthree_shop_api.bookset.publisher.dto.PublisherNameResponse;
 import com.nhnacademy.ssacthree_shop_api.bookset.tag.domain.QTag;
 import com.nhnacademy.ssacthree_shop_api.bookset.tag.dto.response.TagInfoResponse;
+import com.nhnacademy.ssacthree_shop_api.commons.exception.NotFoundException;
 import com.nhnacademy.ssacthree_shop_api.commons.util.QueryDslSortUtil;
 import com.nhnacademy.ssacthree_shop_api.memberset.member.domain.QMember;
 import com.nhnacademy.ssacthree_shop_api.review.domain.QReview;
@@ -35,7 +38,10 @@ import org.springframework.stereotype.Repository;
 import com.nhnacademy.ssacthree_shop_api.bookset.category.domain.Category;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
+
+import static com.querydsl.core.types.Projections.list;
 
 @Repository
 @RequiredArgsConstructor
@@ -76,6 +82,133 @@ public class BookCustomRepositoryImpl implements BookCustomRepository {
     }
 
     /**
+     * 각 도서의 좋아요 수를 가져옵니다.
+     * @param bookIds 도서 아이디 리스트
+     * @return 도서아이디 마다의 좋아요 수를 map 형태로 저장함
+     */
+    private Map<Long, Long> fetchLikeCountsForBooks(List<Long> bookIds) {
+        return queryFactory
+                .select(bookLike.book.bookId, bookLike.count())
+                .from(bookLike)
+                .where(bookLike.book.bookId.in(bookIds))
+                .groupBy(bookLike.book.bookId)
+                .fetch()
+                .stream()
+                .collect(Collectors.toMap(
+                        tuple -> tuple.get(bookLike.book.bookId),
+                        tuple -> {
+                            Long count = tuple.get(bookLike.count());
+                            return count != null ? count : 0L;
+                        }
+                ));
+    }
+
+    /**
+     * 각 도서의 리뷰 수를 가져옵니다
+     * @param bookIds 도서 아이디 리스트
+     * @return 도서 아이디 마다의 리뷰 수를 map 형태로 저장함
+     */
+    private Map<Long, Long> fetchReviewCountsForBooks(List<Long> bookIds) {
+        return queryFactory
+                .select(review.book.bookId, review.count())
+                .from(review)
+                .where(review.book.bookId.in(bookIds))
+                .groupBy(review.book.bookId)
+                .fetch()
+                .stream()
+                .collect(Collectors.toMap(
+                        tuple -> tuple.get(review.book.bookId),
+                        tuple -> {
+                            Long count = tuple.get(review.count());
+                            return count != null ? count : 0L;
+                        }
+                ));
+    }
+
+    /**
+     * 각 도서의 리뷰 평점 점수를 가져옵니다.
+     * @param bookIds 도서 아이디 리스트
+     * @return 도서 아이디 마다의 리뷰 평점 점수를 가져옵니다.
+     */
+    private Map<Long, Double> fetchReviewRateAveragesForBooks(List<Long> bookIds) {
+        return queryFactory
+                .select(review.book.bookId, review.reviewRate.avg())
+                .from(review)
+                .where(review.book.bookId.in(bookIds))
+                .groupBy(review.book.bookId)
+                .fetch()
+                .stream()
+                .collect(Collectors.toMap(
+                        tuple -> tuple.get(review.book.bookId),
+                        tuple -> {
+                            Double avg = tuple.get(review.reviewRate.avg());
+                            return avg != null ? avg : 0.0;
+                        }
+                ));
+    }
+
+    private Map<Long, List<CategoryNameResponse>> fetchCategoriesByBookIds(List<Long> bookIds) {
+        return queryFactory
+                .select(bookCategory.book.bookId, category.categoryId, category.categoryName)
+                .from(bookCategory)
+                .leftJoin(bookCategory.category, category)
+                .where(bookCategory.book.bookId.in(bookIds))
+                .fetch()
+                .stream()
+                .collect(Collectors.groupingBy(
+                        tuple -> tuple.get(bookCategory.book.bookId),
+                        Collectors.mapping(
+                                tuple -> new CategoryNameResponse(
+                                        tuple.get(category.categoryId),
+                                        tuple.get(category.categoryName)
+                                ),
+                                Collectors.toList()
+                        )
+                ));
+    }
+
+    private Map<Long, List<TagInfoResponse>> fetchTagsByBookIds(List<Long> bookIds) {
+        return queryFactory
+                .select(bookTag.book.bookId, tag.tagId, tag.tagName)
+                .from(bookTag)
+                .leftJoin(bookTag.tag, tag)
+                .where(bookTag.book.bookId.in(bookIds))
+                .fetch()
+                .stream()
+                .collect(Collectors.groupingBy(
+                        tuple -> tuple.get(bookTag.book.bookId),
+                        Collectors.mapping(
+                                tuple -> new TagInfoResponse(
+                                        tuple.get(tag.tagId),
+                                        tuple.get(tag.tagName)
+                                ),
+                                Collectors.toList()
+                        )
+                ));
+    }
+
+    private Map<Long, List<AuthorNameResponse>> fetchAuthorsByBookIds(List<Long> bookIds) {
+        return queryFactory
+                .select(bookAuthor.book.bookId, author.authorId, author.authorName)
+                .from(bookAuthor)
+                .leftJoin(bookAuthor.author, author)
+                .where(bookAuthor.book.bookId.in(bookIds))
+                .fetch()
+                .stream()
+                .collect(Collectors.groupingBy(
+                        tuple -> tuple.get(bookAuthor.book.bookId),
+                        Collectors.mapping(
+                                tuple -> new AuthorNameResponse(
+                                        tuple.get(author.authorId),
+                                        tuple.get(author.authorName)
+                                ),
+                                Collectors.toList()
+                        )
+                ));
+    }
+
+
+    /**
      * 공통 메소드 처리
      * @param pageable 페이징 처리
      * @param condition where 조건절
@@ -83,11 +216,12 @@ public class BookCustomRepositoryImpl implements BookCustomRepository {
      * @return 도서 기본 정보 페이지
      */
     @SuppressWarnings("squid:S3740")
-    private Page<BookListBaseResponse> findBooksByCondition(
+    private Page<BookListResponse> findBooksByCondition(
             Pageable pageable,
             Predicate condition,
             List<JoinClause> joinConditions
     ) {
+
         JPAQuery<BookListBaseResponse> query = queryFactory
                 .select(Projections.constructor(BookListBaseResponse.class,
                         book.bookId,
@@ -138,8 +272,35 @@ public class BookCustomRepositoryImpl implements BookCustomRepository {
 
         count = count != null ? count : 0L; // Null 체크 후 기본값 설정
 
+        // 책 ID 목록 추출
+        List<Long> bookIds = books.stream()
+                .map(BookListBaseResponse::getBookId)
+                .toList();
 
-        return new PageImpl<>(books, pageable, count);
+        // 4. 연관 데이터 한 번에 가져오기
+        Map<Long, List<CategoryNameResponse>> categoriesMap = fetchCategoriesByBookIds(bookIds);
+        Map<Long, List<TagInfoResponse>> tagsMap = fetchTagsByBookIds(bookIds);
+        Map<Long, List<AuthorNameResponse>> authorsMap = fetchAuthorsByBookIds(bookIds);
+
+        // 집계 데이터 가져오기
+        Map<Long, Long> likeCounts = fetchLikeCountsForBooks(bookIds);
+        Map<Long, Long> reviewCounts = fetchReviewCountsForBooks(bookIds);
+        Map<Long, Double> reviewRateAverages = fetchReviewRateAveragesForBooks(bookIds);
+
+        List<BookListResponse> content = books.stream()
+                .map(b ->{
+                    BookListResponse bookListResponse= new BookListResponse(b);
+                    bookListResponse.setCategories(categoriesMap.get(b.getBookId()));
+                    bookListResponse.setTags(tagsMap.get(b.getBookId()));
+                    bookListResponse.setAuthors(authorsMap.get(b.getBookId()));
+                    bookListResponse.setLikeCount(likeCounts.get(b.getBookId()));
+                    bookListResponse.setReviewCount(reviewCounts.get(b.getBookId()));
+                    bookListResponse.setReviewRateAverage(reviewRateAverages.get(b.getBookId()));
+                    return bookListResponse;
+                }).toList();
+
+
+        return new PageImpl<>(content, pageable, count);
     }
 
 
@@ -150,7 +311,7 @@ public class BookCustomRepositoryImpl implements BookCustomRepository {
      * @return Page<BookBaseResponse>
      */
     @Override
-    public Page<BookListBaseResponse> findBooksByBookName(Pageable pageable, String bookName) {
+    public Page<BookListResponse> findBooksByBookName(Pageable pageable, String bookName) {
         Predicate condition = isOnSaleOrNoStock().and(book.bookName.containsIgnoreCase(bookName));
         return findBooksByCondition(pageable, condition, List.of());
     }
@@ -161,7 +322,7 @@ public class BookCustomRepositoryImpl implements BookCustomRepository {
      * @return Page<BookInfoResponse>
      */
     @Override
-    public Page<BookListBaseResponse> findAllAvailableBooks(Pageable pageable) {
+    public Page<BookListResponse> findAllAvailableBooks(Pageable pageable) {
         Predicate condition = isOnSaleOrNoStock();
         return findBooksByCondition(pageable, condition, List.of());
     }
@@ -172,7 +333,7 @@ public class BookCustomRepositoryImpl implements BookCustomRepository {
      * @return Page<BookBaseResponse>
      */
     @Override
-    public Page<BookListBaseResponse> findAllBooksByStatusNoStock(Pageable pageable) {
+    public Page<BookListResponse> findAllBooksByStatusNoStock(Pageable pageable) {
         Predicate condition = book.bookStatus.eq(BookStatus.NO_STOCK);
         return findBooksByCondition(pageable, condition, List.of());
     }
@@ -183,7 +344,7 @@ public class BookCustomRepositoryImpl implements BookCustomRepository {
      * @return Page<BookBaseResponse>
      */
     @Override
-    public Page<BookListBaseResponse> findStatusDiscontinued(Pageable pageable) {
+    public Page<BookListResponse> findStatusDiscontinued(Pageable pageable) {
         Predicate condition = book.bookStatus.eq(BookStatus.DISCONTINUED);
         return findBooksByCondition(pageable, condition, List.of());
     }
@@ -195,7 +356,7 @@ public class BookCustomRepositoryImpl implements BookCustomRepository {
      * @return Page<BookBaseResponse>
      */
     @Override
-    public Page<BookListBaseResponse> findBooksByAuthorId(Long authorId, Pageable pageable) {
+    public Page<BookListResponse> findBooksByAuthorId(Long authorId, Pageable pageable) {
         List<JoinClause> joinConditions = List.of(
                 query -> query.leftJoin(book.bookAuthors, bookAuthor).leftJoin(bookAuthor.author, author)
         );
@@ -210,7 +371,7 @@ public class BookCustomRepositoryImpl implements BookCustomRepository {
      * @return Page<BookBaseResponse>
      */
     @Override
-    public Page<BookListBaseResponse> findBooksByTagId(Long tagId, Pageable pageable) {
+    public Page<BookListResponse> findBooksByTagId(Long tagId, Pageable pageable) {
         List<JoinClause> joinConditions = List.of(
                 query -> query.leftJoin(book.bookTags, bookTag).leftJoin(bookTag.tag, tag)
         );
@@ -225,7 +386,7 @@ public class BookCustomRepositoryImpl implements BookCustomRepository {
      * @return Page<BookBaseResponse>
      */
     @Override
-    public Page<BookListBaseResponse> findBooksByCategoryId(Long categoryId, Pageable pageable) {
+    public Page<BookListResponse> findBooksByCategoryId(Long categoryId, Pageable pageable) {
         // 현재 카테고리와 모든 하위 카테고리 ID 조회
         List<Long> allCategoryIds = categoryRepository.findAllDescendants(categoryId).stream()
                 .map(Category::getCategoryId) // 하위 카테고리의 ID 리스트 추출
@@ -252,7 +413,7 @@ public class BookCustomRepositoryImpl implements BookCustomRepository {
      */
     @SuppressWarnings("squid:S3740")
     @Override
-    public Page<BookListBaseResponse> findBookLikesByCustomerId(Long customerId, Pageable pageable) {
+    public Page<BookListResponse> findBookLikesByCustomerId(Long customerId, Pageable pageable) {
 
         JPAQuery<BookListBaseResponse> query = queryFactory
                 .select(Projections.constructor(BookListBaseResponse.class,
@@ -296,7 +457,34 @@ public class BookCustomRepositoryImpl implements BookCustomRepository {
 
         totalCount = totalCount != null ? totalCount : 0L; // Null 방지
 
-        return new PageImpl<>(books, pageable, totalCount);
+        // 책 ID 목록 추출
+        List<Long> bookIds = books.stream()
+                .map(BookListBaseResponse::getBookId)
+                .toList();
+
+        // 4. 연관 데이터 한 번에 가져오기
+        Map<Long, List<CategoryNameResponse>> categoriesMap = fetchCategoriesByBookIds(bookIds);
+        Map<Long, List<TagInfoResponse>> tagsMap = fetchTagsByBookIds(bookIds);
+        Map<Long, List<AuthorNameResponse>> authorsMap = fetchAuthorsByBookIds(bookIds);
+
+        // 집계 데이터 가져오기
+        Map<Long, Long> likeCounts = fetchLikeCountsForBooks(bookIds);
+        Map<Long, Long> reviewCounts = fetchReviewCountsForBooks(bookIds);
+        Map<Long, Double> reviewRateAverages = fetchReviewRateAveragesForBooks(bookIds);
+
+        List<BookListResponse> content = books.stream()
+                .map(b ->{
+                    BookListResponse bookListResponse= new BookListResponse(b);
+                    bookListResponse.setCategories(categoriesMap.get(b.getBookId()));
+                    bookListResponse.setTags(tagsMap.get(b.getBookId()));
+                    bookListResponse.setAuthors(authorsMap.get(b.getBookId()));
+                    bookListResponse.setLikeCount(likeCounts.get(b.getBookId()));
+                    bookListResponse.setReviewCount(reviewCounts.get(b.getBookId()));
+                    bookListResponse.setReviewRateAverage(reviewRateAverages.get(b.getBookId()));
+                    return bookListResponse;
+                }).toList();
+
+        return new PageImpl<>(content, pageable, totalCount);
     }
 
 
@@ -354,8 +542,8 @@ public class BookCustomRepositoryImpl implements BookCustomRepository {
      * @return 도서 기본 정보
      */
     @Override
-    public BookBaseResponse findByBookIsbn(String isbn) {
-        return queryFactory.select(Projections.constructor(BookBaseResponse.class,
+    public BookInfoResponse findByBookIsbn(String isbn) {
+        BookBaseResponse base = queryFactory.select(Projections.constructor(BookBaseResponse.class,
                         book.bookId,
                         book.bookName,
                         book.bookIndex,
@@ -378,11 +566,30 @@ public class BookCustomRepositoryImpl implements BookCustomRepository {
                 .leftJoin(book.publisher, publisher)
                 .where(book.bookIsbn.eq(isbn))
                 .fetchOne();
+
+        if(base == null) {
+            throw new NotFoundException("도서를 찾을 수 없습니다.");
+        }
+
+        List<Long> bookIds = List.of(base.getBookId());
+
+        // 4. 연관 데이터 한 번에 가져오기
+        Map<Long, List<CategoryNameResponse>> categoriesMap = fetchCategoriesByBookIds(bookIds);
+        Map<Long, List<TagInfoResponse>> tagsMap = fetchTagsByBookIds(bookIds);
+        Map<Long, List<AuthorNameResponse>> authorsMap = fetchAuthorsByBookIds(bookIds);
+
+
+        BookInfoResponse content = new BookInfoResponse(base);
+        content.setCategories(categoriesMap.get(base.getBookId()));
+        content.setTags(tagsMap.get(base.getBookId()));
+        content.setAuthors(authorsMap.get(base.getBookId()));
+
+        return content;
     }
 
-    private synchronized void addViewCount(QBook book, Long bookId){
-        queryFactory.update(book).set(book.bookViewCount, book.bookViewCount.add(1))
-                .where(book.bookId.eq(bookId)).execute();
+    private synchronized void addViewCount(QBook qBook, Long bookId){
+        queryFactory.update(qBook).set(qBook.bookViewCount, qBook.bookViewCount.add(1))
+                .where(qBook.bookId.eq(bookId)).execute();
     }
 
     /**
@@ -391,9 +598,9 @@ public class BookCustomRepositoryImpl implements BookCustomRepository {
      * @return 도서 기본 정보
      */
     @Override
-    public BookBaseResponse findBookById(Long bookId) {
+    public BookInfoResponse findBookById(Long bookId) {
         addViewCount(book, bookId); // 조회수 증가
-        return queryFactory.select(Projections.constructor(BookBaseResponse.class,
+        BookBaseResponse base =  queryFactory.select(Projections.constructor(BookBaseResponse.class,
                         book.bookId,
                         book.bookName,
                         book.bookIndex,
@@ -416,6 +623,25 @@ public class BookCustomRepositoryImpl implements BookCustomRepository {
                 .leftJoin(book.publisher, publisher)
                 .where(book.bookId.eq(bookId))
                 .fetchOne();
+
+        if(base==null) {
+            throw new NotFoundException("도서를 찾을 수 없습니다.");
+        }
+
+        List<Long> bookIds = List.of(base.getBookId());
+
+        // 4. 연관 데이터 한 번에 가져오기
+        Map<Long, List<CategoryNameResponse>> categoriesMap = fetchCategoriesByBookIds(bookIds);
+        Map<Long, List<TagInfoResponse>> tagsMap = fetchTagsByBookIds(bookIds);
+        Map<Long, List<AuthorNameResponse>> authorsMap = fetchAuthorsByBookIds(bookIds);
+
+
+        BookInfoResponse content = new BookInfoResponse(base);
+        content.setCategories(categoriesMap.get(base.getBookId()));
+        content.setTags(tagsMap.get(base.getBookId()));
+        content.setAuthors(authorsMap.get(base.getBookId()));
+
+        return content;
     }
 
     /**
