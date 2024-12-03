@@ -41,8 +41,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static com.querydsl.core.types.Projections.list;
-
 @Repository
 @RequiredArgsConstructor
 public class BookCustomRepositoryImpl implements BookCustomRepository {
@@ -82,9 +80,9 @@ public class BookCustomRepositoryImpl implements BookCustomRepository {
     }
 
     /**
-     * 각 도서의 좋아요 수를 가져옵니다.
+     * 각 도서의 좋아요 수를 맵으로 저장합니다.
      * @param bookIds 도서 아이디 리스트
-     * @return 도서아이디 마다의 좋아요 수를 map 형태로 저장함
+     * @return 도서아이디 마다의 좋아요 수를 저장한 맵
      */
     private Map<Long, Long> fetchLikeCountsForBooks(List<Long> bookIds) {
         return queryFactory
@@ -104,9 +102,9 @@ public class BookCustomRepositoryImpl implements BookCustomRepository {
     }
 
     /**
-     * 각 도서의 리뷰 수를 가져옵니다
+     * 각 도서의 리뷰 수를 맵으로 저장합니다.
      * @param bookIds 도서 아이디 리스트
-     * @return 도서 아이디 마다의 리뷰 수를 map 형태로 저장함
+     * @return 도서 아이디 마다의 리뷰 수를 저장한 맵
      */
     private Map<Long, Long> fetchReviewCountsForBooks(List<Long> bookIds) {
         return queryFactory
@@ -126,9 +124,9 @@ public class BookCustomRepositoryImpl implements BookCustomRepository {
     }
 
     /**
-     * 각 도서의 리뷰 평점 점수를 가져옵니다.
+     * 각 도서의 리뷰 평점 점수를 맵으로 저장합니다.
      * @param bookIds 도서 아이디 리스트
-     * @return 도서 아이디 마다의 리뷰 평점 점수를 가져옵니다.
+     * @return 도서 아이디 마다의 리뷰 평점 점수를 저장한 맵
      */
     private Map<Long, Double> fetchReviewRateAveragesForBooks(List<Long> bookIds) {
         return queryFactory
@@ -147,6 +145,11 @@ public class BookCustomRepositoryImpl implements BookCustomRepository {
                 ));
     }
 
+    /**
+     * 각 도서 아이디의 카테고리 리스트들을 맵으로 저장합니다.
+     * @param bookIds 도서 아이디 리스트
+     * @return 도서 아이디 마다의 카테고리 리스트를 저장한 맵
+     */
     private Map<Long, List<CategoryNameResponse>> fetchCategoriesByBookIds(List<Long> bookIds) {
         return queryFactory
                 .select(bookCategory.book.bookId, category.categoryId, category.categoryName)
@@ -167,6 +170,11 @@ public class BookCustomRepositoryImpl implements BookCustomRepository {
                 ));
     }
 
+    /**
+     * 각 도서 아이디의 태그 리스트들을 맵으로 저장합니다.
+     * @param bookIds 도서 아이디 리스트
+     * @return 도서 아이디 마다의 태그 리스트를 저장한 맵
+     */
     private Map<Long, List<TagInfoResponse>> fetchTagsByBookIds(List<Long> bookIds) {
         return queryFactory
                 .select(bookTag.book.bookId, tag.tagId, tag.tagName)
@@ -187,6 +195,11 @@ public class BookCustomRepositoryImpl implements BookCustomRepository {
                 ));
     }
 
+    /**
+     * 각 도서 아이디의 작가 리스트들을 맵으로 저장합니다.
+     * @param bookIds 도서 아이디 리스트
+     * @return 도서 아이디 마다의 작가 리스트를 저장한 맵
+     */
     private Map<Long, List<AuthorNameResponse>> fetchAuthorsByBookIds(List<Long> bookIds) {
         return queryFactory
                 .select(bookAuthor.book.bookId, author.authorId, author.authorName)

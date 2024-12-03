@@ -150,6 +150,12 @@ public class BookCommonServiceImpl implements BookCommonService {
         return bookRepository.findCategoriesByBookId(bookId);
     }
 
+    /**
+     * 좋아요 정보를 저장합니다.
+     * @param bookLikeRequest 좋아요 요청
+     * @param customerId 좋아요한 멤버의 customerId
+     * @return 좋아요 정보
+     */
     @Override
     public BookLikeResponse saveBookLike(BookLikeRequest bookLikeRequest, Long customerId) {
         Book book = bookRepository.findById(bookLikeRequest.getBookId()).orElseThrow(() -> new BookNotFoundException("해당 도서를 찾을 수 없습니다."));
@@ -163,6 +169,12 @@ public class BookCommonServiceImpl implements BookCommonService {
         return new BookLikeResponse(bookLikeRequest, bookRepository.findBookLikeByBookId(book.getBookId()));
     }
 
+    /**
+     * 좋아요 정보를 삭제합니다.
+     * @param bookId 좋아요를 취소할 책 아이디
+     * @param customerId 좋아요를 취소하는 멤버의 customerId
+     * @return 좋아요 삭제 성공 여부
+     */
     @Override
     public Boolean deleteBookLike(Long bookId, Long customerId) {
 
