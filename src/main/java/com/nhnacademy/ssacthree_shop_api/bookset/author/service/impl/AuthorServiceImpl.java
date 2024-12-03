@@ -70,7 +70,11 @@ public class AuthorServiceImpl implements AuthorService {
 
     @Override
     public AuthorGetResponse getAuthorById(Long authorId) {
-        return authorRepository.findAuthorById(authorId);
+        AuthorGetResponse response = authorRepository.findAuthorById(authorId);
+        if(Objects.isNull(response)){
+            throw new AuthorNotFoundException(AUTHOR_NOT_FOUND_MESSAGE + authorId);
+        }
+        return response;
     }
 
     @Override
