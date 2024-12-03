@@ -1,6 +1,5 @@
 package com.nhnacademy.ssacthree_shop_api.bookset.category.service;
 
-import com.nhnacademy.ssacthree_shop_api.bookset.category.domain.Category;
 import com.nhnacademy.ssacthree_shop_api.bookset.category.dto.request.CategorySaveRequest;
 import com.nhnacademy.ssacthree_shop_api.bookset.category.dto.request.CategoryUpdateRequest;
 import com.nhnacademy.ssacthree_shop_api.bookset.category.dto.response.CategoryInfoResponse;

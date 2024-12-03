@@ -32,14 +32,14 @@ public class MemberCustomerRepositoryImpl implements MemberCustomRepository {
             .select(Projections.fields(MemberInfoGetResponse.class,
                 qMember.customer.customerId,
                 qMember.memberLoginId,
-                qCustomer.customerName,
-                qCustomer.customerPhoneNumber,
-                qCustomer.customerEmail,
-                qMember.memberBirthdate,
-                qMember.memberPoint,
-                qMemberGrade.memberGradeName,
-                qMemberGrade.memberGradePointSave
-            ))
+                        qCustomer.customerName,
+                        qCustomer.customerPhoneNumber,
+                        qCustomer.customerEmail,
+                        qMember.memberBirthdate,
+                        qMember.memberPoint,
+                        qMemberGrade.memberGradeName,
+                        qMemberGrade.memberGradePointSave
+                ))
             .where(qMember.memberLoginId.eq(memberLoginId)).fetchOne();
     }
 }
