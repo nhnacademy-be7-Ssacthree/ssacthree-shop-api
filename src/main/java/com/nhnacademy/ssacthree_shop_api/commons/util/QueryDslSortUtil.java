@@ -10,6 +10,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class QueryDslSortUtil {
+
+    // 기본 생성자 숨김
+    private QueryDslSortUtil() {
+        throw new UnsupportedOperationException("This is a utility class and cannot be instantiated");
+    }
+
+    @SuppressWarnings({"squid:S1452", "squid:S3740"})
     public static List<OrderSpecifier<?>> parseSort(Sort sort, PathBuilder entityPathBuilder) {
         List<OrderSpecifier<?>> orders = new ArrayList<>();
 
@@ -26,6 +33,7 @@ public class QueryDslSortUtil {
         return orders;
     }
 
+    @SuppressWarnings("squid:S3740")
     public static void applyOrderBy(JPAQuery<?> query, Sort sort, PathBuilder entityPathBuilder) {
         List<OrderSpecifier<?>> orderSpecifiers = parseSort(sort, entityPathBuilder);
         if (!orderSpecifiers.isEmpty()) {

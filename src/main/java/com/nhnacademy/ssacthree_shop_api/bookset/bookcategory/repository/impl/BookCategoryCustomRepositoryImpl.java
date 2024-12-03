@@ -25,7 +25,7 @@ public class BookCategoryCustomRepositoryImpl implements BookCategoryCustomRepos
     public List<Category> findBookCategoriesByBookId(Long bookId) {
         return queryFactory.select(category)
                 .from(bookCategory)
-                .where(bookCategory.book.bookId.eq(bookId))
+                .where(bookCategory.book.bookId.eq(bookId).and(bookCategory.category.categoryIsUsed.eq(true)))
                 .fetch();
     }
 }

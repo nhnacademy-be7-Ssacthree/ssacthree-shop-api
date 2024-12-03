@@ -9,12 +9,9 @@ import com.nhnacademy.ssacthree_shop_api.bookset.book.dto.response.BookBaseRespo
 import com.nhnacademy.ssacthree_shop_api.bookset.book.dto.response.BookListBaseResponse;
 import com.nhnacademy.ssacthree_shop_api.bookset.book.repository.BookCustomRepository;
 import com.nhnacademy.ssacthree_shop_api.bookset.bookauthor.domain.QBookAuthor;
-import com.nhnacademy.ssacthree_shop_api.bookset.bookauthor.dto.BookAuthorDto;
 import com.nhnacademy.ssacthree_shop_api.bookset.bookcategory.domain.QBookCategory;
-import com.nhnacademy.ssacthree_shop_api.bookset.bookcategory.dto.BookCategoryDto;
 import com.nhnacademy.ssacthree_shop_api.bookset.booklike.domain.QBookLike;
 import com.nhnacademy.ssacthree_shop_api.bookset.booktag.domain.QBookTag;
-import com.nhnacademy.ssacthree_shop_api.bookset.booktag.dto.BookTagDto;
 import com.nhnacademy.ssacthree_shop_api.bookset.category.domain.QCategory;
 import com.nhnacademy.ssacthree_shop_api.bookset.category.dto.response.CategoryNameResponse;
 import com.nhnacademy.ssacthree_shop_api.bookset.category.repository.CategoryRepository;
@@ -73,6 +70,7 @@ public class BookCustomRepositoryImpl implements BookCustomRepository {
      * 조인 조건을 동적으로 처리하기 위한 인터페이스
      */
     @FunctionalInterface
+    @SuppressWarnings("squid:S3740")
     private interface JoinClause {
         void apply(JPAQuery<?> query);
     }
@@ -84,6 +82,7 @@ public class BookCustomRepositoryImpl implements BookCustomRepository {
      * @param joinConditions 조인 리스트
      * @return 도서 기본 정보 페이지
      */
+    @SuppressWarnings("squid:S3740")
     private Page<BookListBaseResponse> findBooksByCondition(
             Pageable pageable,
             Predicate condition,
@@ -251,6 +250,7 @@ public class BookCustomRepositoryImpl implements BookCustomRepository {
      * @param pageable 페이징 처리
      * @return 도서 기본 정보
      */
+    @SuppressWarnings("squid:S3740")
     @Override
     public Page<BookListBaseResponse> findBookLikesByCustomerId(Long customerId, Pageable pageable) {
 
@@ -480,16 +480,13 @@ public class BookCustomRepositoryImpl implements BookCustomRepository {
      */
     @Override
     public List<String> findAuthorNamesByBookId(Long bookId) {
-        QBook qBook = QBook.book; // 클래스 필드와 혼동을 피하기 위해 qBook으로 변경
-        QAuthor qAuthor = QAuthor.author; // qAuthor로 변경
-        QBookAuthor qBookAuthor = QBookAuthor.bookAuthor; // qBookAuthor로 변경
 
         return queryFactory
-            .select(qAuthor.authorName)
-            .from(qBook)
-            .join(qBookAuthor).on(qBook.bookId.eq(qBookAuthor.book.bookId))
-            .join(qAuthor).on(qAuthor.authorId.eq(qBookAuthor.author.authorId))
-            .where(qBook.bookId.eq(bookId))
+            .select(author.authorName)
+            .from(book)
+            .join(bookAuthor).on(book.bookId.eq(bookAuthor.book.bookId))
+            .join(author).on(author.authorId.eq(bookAuthor.author.authorId))
+            .where(book.bookId.eq(bookId))
             .fetch();
     }
 
@@ -501,11 +498,11 @@ public class BookCustomRepositoryImpl implements BookCustomRepository {
      */
     @Override
     public String findPublisherNameByBookId(Long bookId) {
-        QBook qBook = QBook.book; // 클래스 필드와 혼동을 피하기 위해 qBook으로 변경
+
         return queryFactory
-            .select(qBook.publisher.publisherName)
-            .from(qBook)
-            .where(qBook.bookId.eq(bookId))
+            .select(book.publisher.publisherName)
+            .from(book)
+            .where(book.bookId.eq(bookId))
             .fetchOne();
     }
 
@@ -516,15 +513,14 @@ public class BookCustomRepositoryImpl implements BookCustomRepository {
      * @return 태그명 반환 (없다면 null을 그대로 저장)
      */
     @Override
-    public List<String> findTagNamesByBookId(Long bookId) {
-        QTag qTag = QTag.tag; // 로컬 변수명 변경으로 중복 방지
-        QBookTag qBookTag = QBookTag.bookTag; // bookTag 변수명 명확히 변경
+
+    public List<String> findTagNamesByBookId(Long bookId){
 
         return queryFactory
-            .select(qTag.tagName)
-            .from(qBookTag)
-            .join(qBookTag.tag, qTag)
-            .where(qBookTag.book.bookId.eq(bookId))
+            .select(tag.tagName)
+            .from(bookTag)
+            .join(bookTag.tag, tag)
+            .where(bookTag.book.bookId.eq(bookId))
             .fetch();
     }
 
@@ -535,59 +531,18 @@ public class BookCustomRepositoryImpl implements BookCustomRepository {
      * @return
      */
     @Override
-    public List<String> findCategoryNamesByBookId(Long bookId) {
-        QBookCategory qBookCategory = QBookCategory.bookCategory; // 로컬 변수명 변경
-        QCategory qCategory = QCategory.category; // 로컬 변수명 변경
+
+    public List<String> findCategoryNamesByBookId(Long bookId){
+
 
         return queryFactory
-            .select(qCategory.categoryName)
-            .from(qBookCategory)
-            .join(qBookCategory.category, qCategory)
-            .where(qBookCategory.book.bookId.eq(bookId))
+            .select(category.categoryName)
+            .from(bookCategory)
+            .join(bookCategory.category, category)
+            .where(bookCategory.book.bookId.eq(bookId))
             .fetch();
     }
 
-    // 다른 방식 구현 중
-    @Override
-    public List<BookCategoryDto> findCategoriesByBookIds(List<Long> bookIds) {
-        return queryFactory
-                .select(Projections.constructor(BookCategoryDto.class,
-                        bookCategory.book.bookId,
-                        Projections.constructor(CategoryNameResponse.class,
-                                category.categoryId,
-                                category.categoryName)))
-                .from(bookCategory)
-                .leftJoin(bookCategory.category, category)
-                .where(bookCategory.book.bookId.in(bookIds))
-                .fetch();
-    }
 
-    @Override
-    public List<BookTagDto> findTagsByBookIds(List<Long> bookIds) {
-        return queryFactory
-                .select(Projections.constructor(BookTagDto.class,
-                        bookTag.book.bookId,
-                        Projections.constructor(TagInfoResponse.class,
-                                tag.tagId,
-                                tag.tagName)))
-                .from(bookTag)
-                .leftJoin(bookTag.tag, tag)
-                .where(bookTag.book.bookId.in(bookIds))
-                .fetch();
-    }
-
-    @Override
-    public List<BookAuthorDto> findAuthorsByBookIds(List<Long> bookIds) {
-        return queryFactory
-                .select(Projections.constructor(BookAuthorDto.class,
-                        bookAuthor.book.bookId,
-                        Projections.constructor(AuthorNameResponse.class,
-                                author.authorId,
-                                author.authorName)))
-                .from(bookAuthor)
-                .leftJoin(bookAuthor.author, author)
-                .where(bookAuthor.book.bookId.in(bookIds))
-                .fetch();
-    }
 }
 
