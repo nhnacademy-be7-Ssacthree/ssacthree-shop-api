@@ -12,7 +12,6 @@ import com.nhnacademy.ssacthree_shop_api.memberset.member.exception.MemberNotFou
 import com.nhnacademy.ssacthree_shop_api.memberset.member.repository.MemberRepository;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -70,7 +69,7 @@ public class AddressServiceImpl implements AddressService {
                 address.getAddressDetail(),
                 address.getAddressPostalNumber()
             ))
-            .collect(Collectors.toList());
+            .toList();
     }
 
     @Override

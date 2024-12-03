@@ -1,7 +1,6 @@
 package com.nhnacademy.ssacthree_shop_api.bookset.booklike.domain;
 
 import com.nhnacademy.ssacthree_shop_api.bookset.book.domain.Book;
-import com.nhnacademy.ssacthree_shop_api.customer.domain.Customer;
 import com.nhnacademy.ssacthree_shop_api.memberset.member.domain.Member;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

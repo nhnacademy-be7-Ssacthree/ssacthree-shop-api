@@ -2,6 +2,7 @@ package com.nhnacademy.ssacthree_shop_api.bookset.book.repository.impl;
 
 import com.nhnacademy.ssacthree_shop_api.bookset.author.domain.QAuthor;
 import com.nhnacademy.ssacthree_shop_api.bookset.author.dto.AuthorNameResponse;
+import com.nhnacademy.ssacthree_shop_api.bookset.book.domain.Book;
 import com.nhnacademy.ssacthree_shop_api.bookset.book.domain.BookStatus;
 import com.nhnacademy.ssacthree_shop_api.bookset.book.domain.QBook;
 import com.nhnacademy.ssacthree_shop_api.bookset.book.dto.response.BookBaseResponse;
@@ -111,7 +112,7 @@ public class BookCustomRepositoryImpl implements BookCustomRepository {
         }
 
         // 정렬 조건 적용
-        PathBuilder pathBuilder = new PathBuilder<>(QBook.book.getType(), QBook.book.getMetadata());
+        PathBuilder<Book> pathBuilder = new PathBuilder<>(QBook.book.getType(), QBook.book.getMetadata());
         QueryDslSortUtil.applyOrderBy(query, pageable.getSort(), pathBuilder);
 
         // 페이징 처리 및 결과 조회
@@ -278,7 +279,7 @@ public class BookCustomRepositoryImpl implements BookCustomRepository {
                 .limit(pageable.getPageSize());
 
         // 정렬 추가
-        PathBuilder pathBuilder = new PathBuilder<>(QBook.book.getType(), QBook.book.getMetadata());
+        PathBuilder<Book> pathBuilder = new PathBuilder<>(QBook.book.getType(), QBook.book.getMetadata());
         QueryDslSortUtil.applyOrderBy(query, pageable.getSort(), pathBuilder);
 
         // 데이터 조회
@@ -481,11 +482,11 @@ public class BookCustomRepositoryImpl implements BookCustomRepository {
     public List<String> findAuthorNamesByBookId(Long bookId) {
 
         return queryFactory
-            .select(author.authorName)
-            .from(book)
-            .join(bookAuthor).on(book.bookId.eq(bookAuthor.book.bookId))
-            .join(author).on(author.authorId.eq(bookAuthor.author.authorId))
-            .where(book.bookId.eq(bookId))
+            .select(qAuthor.authorName)
+            .from(qBook)
+            .join(qBookAuthor).on(qBook.bookId.eq(qBookAuthor.book.bookId))
+            .join(qAuthor).on(qAuthor.authorId.eq(qBookAuthor.author.authorId))
+            .where(qBook.bookId.eq(bookId))
             .fetch();
     }
 
@@ -498,9 +499,9 @@ public class BookCustomRepositoryImpl implements BookCustomRepository {
     @Override
     public String findPublisherNameByBookId(Long bookId) {
         return queryFactory
-            .select(book.publisher.publisherName)
-            .from(book)
-            .where(book.bookId.eq(bookId))
+            .select(qBook.publisher.publisherName)
+            .from(qBook)
+            .where(qBook.bookId.eq(bookId))
             .fetchOne();
     }
 
@@ -511,13 +512,14 @@ public class BookCustomRepositoryImpl implements BookCustomRepository {
      * @return 태그명 반환 (없다면 null을 그대로 저장)
      */
     @Override
+
     public List<String> findTagNamesByBookId(Long bookId){
 
         return queryFactory
-            .select(tag.tagName)
-            .from(bookTag)
-            .join(bookTag.tag, tag)
-            .where(bookTag.book.bookId.eq(bookId))
+            .select(qTag.tagName)
+            .from(qBookTag)
+            .join(qBookTag.tag, qTag)
+            .where(qBookTag.book.bookId.eq(bookId))
             .fetch();
     }
 
@@ -528,15 +530,17 @@ public class BookCustomRepositoryImpl implements BookCustomRepository {
      * @return
      */
     @Override
+
     public List<String> findCategoryNamesByBookId(Long bookId){
 
         return queryFactory
-            .select(category.categoryName)
-            .from(bookCategory)
-            .join(bookCategory.category, category)
-            .where(bookCategory.book.bookId.eq(bookId))
+            .select(qCategory.categoryName)
+            .from(qBookCategory)
+            .join(qBookCategory.category, qCategory)
+            .where(qBookCategory.book.bookId.eq(bookId))
             .fetch();
     }
+
 
 
 }

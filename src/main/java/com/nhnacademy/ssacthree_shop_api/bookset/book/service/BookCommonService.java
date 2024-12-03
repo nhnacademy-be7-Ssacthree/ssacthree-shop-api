@@ -1,12 +1,10 @@
 package com.nhnacademy.ssacthree_shop_api.bookset.book.service;
 
-import com.nhnacademy.ssacthree_shop_api.bookset.author.dto.AuthorNameResponse;
 import com.nhnacademy.ssacthree_shop_api.bookset.book.dto.response.BookInfoResponse;
 import com.nhnacademy.ssacthree_shop_api.bookset.book.dto.response.BookListResponse;
 import com.nhnacademy.ssacthree_shop_api.bookset.booklike.dto.request.BookLikeRequest;
 import com.nhnacademy.ssacthree_shop_api.bookset.booklike.dto.response.BookLikeResponse;
 import com.nhnacademy.ssacthree_shop_api.bookset.category.dto.response.CategoryNameResponse;
-import com.nhnacademy.ssacthree_shop_api.bookset.tag.dto.response.TagInfoResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 

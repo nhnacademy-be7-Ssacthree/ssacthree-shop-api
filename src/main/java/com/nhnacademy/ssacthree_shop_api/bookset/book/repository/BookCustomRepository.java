@@ -1,6 +1,5 @@
 package com.nhnacademy.ssacthree_shop_api.bookset.book.repository;
 
-import com.nhnacademy.ssacthree_shop_api.bookset.author.domain.Author;
 import com.nhnacademy.ssacthree_shop_api.bookset.author.dto.AuthorNameResponse;
 import com.nhnacademy.ssacthree_shop_api.bookset.book.dto.response.BookBaseResponse;
 import com.nhnacademy.ssacthree_shop_api.bookset.book.dto.response.BookListBaseResponse;
@@ -9,7 +8,6 @@ import com.nhnacademy.ssacthree_shop_api.bookset.bookcategory.dto.BookCategoryDt
 import com.nhnacademy.ssacthree_shop_api.bookset.booktag.dto.BookTagDto;
 import com.nhnacademy.ssacthree_shop_api.bookset.category.dto.response.CategoryNameResponse;
 import com.nhnacademy.ssacthree_shop_api.bookset.tag.dto.response.TagInfoResponse;
-import com.nhnacademy.ssacthree_shop_api.memberset.member.domain.Member;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 

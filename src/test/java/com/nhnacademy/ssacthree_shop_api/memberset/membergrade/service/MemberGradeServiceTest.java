@@ -24,7 +24,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 
 @ExtendWith(MockitoExtension.class)
-public class MemberGradeServiceTest {
+class MemberGradeServiceTest {
 
     @Mock
     private MemberGradeRepository memberGradeRepository;

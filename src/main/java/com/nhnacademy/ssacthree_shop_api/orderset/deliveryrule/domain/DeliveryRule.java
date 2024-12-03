@@ -13,10 +13,10 @@ import java.time.LocalDateTime;
 @Table(name = "delivery_rule")
 public class DeliveryRule {
 
-    public DeliveryRule(String name, int fee, int discount_cost) {
+    public DeliveryRule(String name, int fee, int discountCost) {
         this.deliveryRuleName = name;
         this.deliveryFee = fee;
-        this.deliveryDiscountCost = discount_cost;
+        this.deliveryDiscountCost = discountCost;
     }
 
     @Id

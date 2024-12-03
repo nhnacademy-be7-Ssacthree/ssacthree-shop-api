@@ -3,12 +3,8 @@ package com.nhnacademy.ssacthree_shop_api.orderset.orderdetailpackaging.domain.s
 import com.nhnacademy.ssacthree_shop_api.bookset.book.domain.Book;
 import com.nhnacademy.ssacthree_shop_api.orderset.order.domain.Order;
 import com.nhnacademy.ssacthree_shop_api.orderset.order.dto.OrderDetailSaveRequest;
-import com.nhnacademy.ssacthree_shop_api.orderset.orderdetailpackaging.domain.OrderDetailPackaging;
 import com.nhnacademy.ssacthree_shop_api.orderset.orderdetailpackaging.domain.service.OrderDetailPackagingService;
 import com.nhnacademy.ssacthree_shop_api.orderset.packaging.domain.Packaging;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

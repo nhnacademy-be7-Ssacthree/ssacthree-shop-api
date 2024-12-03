@@ -1,6 +1,5 @@
 package com.nhnacademy.ssacthree_shop_api.memberset.address.service;
 
-import com.nhnacademy.ssacthree_shop_api.memberset.address.domain.Address;
 import com.nhnacademy.ssacthree_shop_api.memberset.address.dto.AddressCreateRequest;
 import com.nhnacademy.ssacthree_shop_api.memberset.address.dto.AddressResponse;
 import java.util.List;
