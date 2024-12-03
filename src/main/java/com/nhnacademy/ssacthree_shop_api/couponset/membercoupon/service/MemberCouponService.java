@@ -13,5 +13,7 @@ public interface MemberCouponService {
 
     MemberCoupon updateMemberCoupon(MemberCouponUpdateRequest memberCouponUpdateRequest);
 
-    Page<MemberCouponGetResponse> getMemberCoupons(Long customerId, Pageable pageable);
+    Page<MemberCouponGetResponse> getNotUsedMemberCoupons(Pageable pageable, Long memberId);
+
+    Page<MemberCouponGetResponse> getUsedMemberCoupons(Pageable pageable, Long memberId);
 }

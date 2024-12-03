@@ -5,5 +5,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 public interface MemberCouponCustomRepository {
-    Page<MemberCouponGetResponse> findAllMemberCouponByCustomerId(Long customerId, Pageable pageable);
+    Page<MemberCouponGetResponse> findAllNotUsedMemberCouponByCustomerId(Long customerId, Pageable pageable);
+
+    Page<MemberCouponGetResponse> findAllUsedMemberCouponByCustomerId(Long customerId, Pageable pageable);
 }

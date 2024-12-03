@@ -1,13 +1,12 @@
 package com.nhnacademy.ssacthree_shop_api.couponset.membercoupon.controller;
 
+import com.nhnacademy.ssacthree_shop_api.commons.paging.PageRequestBuilder;
 import com.nhnacademy.ssacthree_shop_api.couponset.membercoupon.dto.MemberCouponGetResponse;
 import com.nhnacademy.ssacthree_shop_api.couponset.membercoupon.service.MemberCouponService;
-import com.nhnacademy.ssacthree_shop_api.memberset.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,26 +16,30 @@ import org.springframework.web.bind.annotation.*;
 public class MemberCouponController {
 
     private final MemberCouponService memberCouponService;
-    private final MemberService memberService;
 
-    @GetMapping
-    public ResponseEntity<Page<MemberCouponGetResponse>> getMemberCoupons(
+    @GetMapping("/not-used")
+    public ResponseEntity<Page<MemberCouponGetResponse>> getNotUsedMemberCoupons(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "5") int size,
-            @RequestParam(defaultValue = "couponIssueDate") String sort,
-            @RequestParam(defaultValue = "DESC") String direction,
-            @RequestHeader(name = "X-USER-ID") String memberLoginId) {
+            @RequestParam(defaultValue = "memberCouponCreatedAt:asc") String[] sort,
+            @RequestHeader(name = "X-USER-ID") Long memberId) {
 
-        Sort.Direction sortDirection = Sort.Direction.fromString(direction);
+        Pageable pageable = PageRequestBuilder.createPageable(page, size, sort);
+        Page<MemberCouponGetResponse> coupons = memberCouponService.getNotUsedMemberCoupons(pageable, memberId);
 
-        Sort sortOption = Sort.by(sortDirection, sort);
+        return new ResponseEntity<>(coupons, HttpStatus.OK);
+    }
 
-        Pageable pageable = PageRequest.of(page, size, sortOption);
+    @GetMapping("/used")
+    public ResponseEntity<Page<MemberCouponGetResponse>> getUsedMemberCoupons(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int size,
+            @RequestParam(defaultValue = "memberCouponCreatedAt:asc") String[] sort,
+            @RequestHeader(name = "X-USER-ID") Long memberId) {
 
-        Long customerId = memberService.getCustomerIdByMemberLoginId(memberLoginId);
+        Pageable pageable = PageRequestBuilder.createPageable(page, size, sort);
+        Page<MemberCouponGetResponse> coupons = memberCouponService.getUsedMemberCoupons(pageable, memberId);
 
-        Page<MemberCouponGetResponse> memberCouponGetResponsePage = memberCouponService.getMemberCoupons(customerId, pageable);
-
-        return ResponseEntity.ok(memberCouponGetResponsePage);
+        return new ResponseEntity<>(coupons, HttpStatus.OK);
     }
 }

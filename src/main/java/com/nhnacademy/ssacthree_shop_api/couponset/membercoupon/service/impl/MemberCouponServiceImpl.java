@@ -11,8 +11,6 @@ import com.nhnacademy.ssacthree_shop_api.couponset.membercoupon.repository.Membe
 import com.nhnacademy.ssacthree_shop_api.couponset.membercoupon.service.MemberCouponService;
 import com.nhnacademy.ssacthree_shop_api.memberset.member.domain.Member;
 import com.nhnacademy.ssacthree_shop_api.memberset.member.repository.MemberRepository;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -81,7 +79,12 @@ public class MemberCouponServiceImpl implements MemberCouponService {
     }
 
     @Override
-    public Page<MemberCouponGetResponse> getMemberCoupons(Long customerId, Pageable pageable) {
-        return memberCouponCustomRepository.findAllMemberCouponByCustomerId(customerId, pageable);
+    public Page<MemberCouponGetResponse> getNotUsedMemberCoupons(Pageable pageable, Long memberId) {
+        return memberCouponCustomRepository.findAllNotUsedMemberCouponByCustomerId(memberId, pageable);
+    }
+
+    @Override
+    public Page<MemberCouponGetResponse> getUsedMemberCoupons(Pageable pageable, Long memberId) {
+        return memberCouponCustomRepository.findAllUsedMemberCouponByCustomerId(memberId, pageable);
     }
 }

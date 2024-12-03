@@ -21,7 +21,7 @@ public class MemberCouponRepositoryImpl implements MemberCouponCustomRepository 
     private final QMemberCoupon qMemberCoupon = QMemberCoupon.memberCoupon;
 
     @Override
-    public Page<MemberCouponGetResponse> findAllMemberCouponByCustomerId(Long customerId, Pageable pageable) {
+    public Page<MemberCouponGetResponse> findAllNotUsedMemberCouponByCustomerId(Long customerId, Pageable pageable) {
         List<MemberCouponGetResponse> memberCouponGetResponseList = queryFactory.select(
                 Projections.fields(MemberCouponGetResponse.class,
                     qMemberCoupon.coupon.couponName,
@@ -30,7 +30,28 @@ public class MemberCouponRepositoryImpl implements MemberCouponCustomRepository 
                     qMemberCoupon.memberCouponExpiredAt,
                     qMemberCoupon.memberCouponUsedAt))
             .from(qMemberCoupon)
-            .where(qMemberCoupon.customer.customer.customerId.eq(customerId))
+            .where(qMemberCoupon.customer.customer.customerId.eq(customerId)
+                .and(qMemberCoupon.memberCouponUsedAt.isNull()))
+            .offset(pageable.getOffset())
+            .limit(pageable.getPageSize())
+            .fetch();
+
+        return new PageImpl<>(memberCouponGetResponseList, pageable,
+                memberCouponGetResponseList.size());
+    }
+
+    @Override
+    public Page<MemberCouponGetResponse> findAllUsedMemberCouponByCustomerId(Long customerId, Pageable pageable) {
+        List<MemberCouponGetResponse> memberCouponGetResponseList = queryFactory.select(
+                Projections.fields(MemberCouponGetResponse.class,
+                    qMemberCoupon.coupon.couponName,
+                    qMemberCoupon.coupon.couponDescription,
+                    qMemberCoupon.memberCouponCreatedAt,
+                    qMemberCoupon.memberCouponExpiredAt,
+                    qMemberCoupon.memberCouponUsedAt))
+            .from(qMemberCoupon)
+            .where(qMemberCoupon.customer.customer.customerId.eq(customerId)
+                .and(qMemberCoupon.memberCouponUsedAt.isNotNull()))
             .offset(pageable.getOffset())
             .limit(pageable.getPageSize())
             .fetch();
