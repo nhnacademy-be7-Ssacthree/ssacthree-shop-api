@@ -516,7 +516,6 @@ public class BookCustomRepositoryImpl implements BookCustomRepository {
 
     public List<String> findTagNamesByBookId(Long bookId){
 
-
         return queryFactory
             .select(tag.tagName)
             .from(bookTag)
@@ -543,8 +542,6 @@ public class BookCustomRepositoryImpl implements BookCustomRepository {
             .where(bookCategory.book.bookId.eq(bookId))
             .fetch();
     }
-
-
 
 
 }
