@@ -1,7 +1,6 @@
 package com.nhnacademy.ssacthree_shop_api.memberset.pointsaverule.dto;
 
 import com.nhnacademy.ssacthree_shop_api.memberset.pointsaverule.domain.PointSaveRule;
-import com.nhnacademy.ssacthree_shop_api.memberset.pointsaverule.domain.PointSaveType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

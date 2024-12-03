@@ -28,7 +28,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -82,7 +81,7 @@ public class BookCommonServiceImpl implements BookCommonService {
 
                     return response;
                 })
-                .collect(Collectors.toList());
+                .toList();
 
         return new PageImpl<>(bookListResponse, booksPage.getPageable(), booksPage.getTotalElements());
     }
@@ -209,7 +208,6 @@ public class BookCommonServiceImpl implements BookCommonService {
 
         bookLikeRepository.save(bookLike);
 
-        //todo: 좋아요 수 잘 올라갔는지 확인하기
         return new BookLikeResponse(bookLikeRequest, bookRepository.findBookLikeByBookId(book.getBookId()));
     }
 

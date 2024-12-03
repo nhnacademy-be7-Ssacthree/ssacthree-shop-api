@@ -1,7 +1,5 @@
 package com.nhnacademy.ssacthree_shop_api.bookset.tag.service.impl;
 
-import static com.nhnacademy.ssacthree_shop_api.memberset.membergrade.domain.QMemberGrade.memberGrade;
-
 import com.nhnacademy.ssacthree_shop_api.bookset.booktag.repository.BookTagRepository;
 import com.nhnacademy.ssacthree_shop_api.bookset.tag.domain.Tag;
 import com.nhnacademy.ssacthree_shop_api.bookset.tag.dto.request.TagCreateRequest;
@@ -13,7 +11,6 @@ import com.nhnacademy.ssacthree_shop_api.bookset.tag.repository.TagRepository;
 import com.nhnacademy.ssacthree_shop_api.bookset.tag.service.TagService;
 import com.nhnacademy.ssacthree_shop_api.commons.dto.MessageResponse;
 import java.util.List;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -36,8 +33,7 @@ public class TagServiceImpl implements TagService {
 
         Tag tag = new Tag(tagCreateRequest.getTagName());
         tagRepository.save(tag);
-        MessageResponse messageResponse = new MessageResponse("생성 성공");
-        return messageResponse;
+        return new MessageResponse("생성 성공");
     }
 
     @Override

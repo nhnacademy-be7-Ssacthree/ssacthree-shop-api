@@ -27,14 +27,11 @@ import com.nhnacademy.ssacthree_shop_api.bookset.bookcategory.repository.BookCat
 import com.nhnacademy.ssacthree_shop_api.bookset.booktag.domain.BookTag;
 import com.nhnacademy.ssacthree_shop_api.bookset.booktag.repository.BookTagRepository;
 import com.nhnacademy.ssacthree_shop_api.bookset.category.domain.Category;
-import com.nhnacademy.ssacthree_shop_api.bookset.category.dto.response.CategoryNameResponse;
 import com.nhnacademy.ssacthree_shop_api.bookset.category.exception.CategoryNotFoundException;
 import com.nhnacademy.ssacthree_shop_api.bookset.category.repository.CategoryRepository;
 import com.nhnacademy.ssacthree_shop_api.bookset.publisher.domain.Publisher;
-import com.nhnacademy.ssacthree_shop_api.bookset.publisher.dto.PublisherNameResponse;
 import com.nhnacademy.ssacthree_shop_api.bookset.publisher.repository.PublisherRepository;
 import com.nhnacademy.ssacthree_shop_api.bookset.tag.domain.Tag;
-import com.nhnacademy.ssacthree_shop_api.bookset.tag.dto.response.TagInfoResponse;
 import com.nhnacademy.ssacthree_shop_api.bookset.tag.exception.TagNotFoundException;
 import com.nhnacademy.ssacthree_shop_api.bookset.tag.repository.TagRepository;
 import jakarta.ws.rs.NotFoundException;
@@ -147,12 +144,41 @@ public class BookMgmtServiceImpl implements BookMgmtService {
     @Override
     public BookUpdateResponse updateBook(BookUpdateRequest bookUpdateRequest) {
         // ISBN으로 책을 찾는다
-        Book book = bookRepository.findBookByBookIsbn(bookUpdateRequest.getBookIsbn())
-                .orElseThrow(() -> new BookNotFoundException(BOOK_ISBN_NOT_FOUND_MESSAGE));
+        Book book = findBookByIsbn(bookUpdateRequest.getBookIsbn());
 
+        // 기본 정보 업데이트
+        updateBasicInfo(book, bookUpdateRequest);
+
+        // 상태 업데이트
+        updateBookStatus(book, bookUpdateRequest.getBookStatus());
+
+        // 출판사 업데이트
+        updatePublisher(book, bookUpdateRequest.getPublisherId());
+
+        // 카테고리 업데이트
+        updateCategories(book, bookUpdateRequest.getCategoryIdList());
+
+        // 태그 업데이트
+        updateTags(book, bookUpdateRequest.getTagIdList());
+
+        // 작가 업데이트
+        updateAuthors(book, bookUpdateRequest.getAuthorIdList());
+
+        // 변경된 책 저장
+        bookRepository.save(book);
+
+        // 응답 반환
+        return new BookUpdateResponse(book);
+    }
+
+    private Book findBookByIsbn(String bookIsbn) {
+        return bookRepository.findBookByBookIsbn(bookIsbn)
+            .orElseThrow(() -> new BookNotFoundException(BOOK_ISBN_NOT_FOUND_MESSAGE));
+    }
+
+    private void updateBasicInfo(Book book, BookUpdateRequest bookUpdateRequest) {
         book.setBookId(bookUpdateRequest.getBookId());
 
-        // bookSaveRequest와 비교하여 값이 다를 경우 book 엔티티를 업데이트
         if (!book.getBookName().equals(bookUpdateRequest.getBookName())) {
             book.setBookName(bookUpdateRequest.getBookName());
         }
@@ -183,71 +209,68 @@ public class BookMgmtServiceImpl implements BookMgmtService {
         if (!book.getBookThumbnailImageUrl().equals(bookUpdateRequest.getBookThumbnailImageUrl())) {
             book.setBookThumbnailImageUrl(bookUpdateRequest.getBookThumbnailImageUrl());
         }
-        if (bookUpdateRequest.getBookStatus() != null && !bookUpdateRequest.getBookStatus().isEmpty()) {
+    }
+
+    private void updateBookStatus(Book book, String bookStatus) {
+        if (bookStatus != null && !bookStatus.isEmpty()) {
             try {
-                BookStatus newStatus = BookStatus.valueOf(bookUpdateRequest.getBookStatus()); // 문자열을 Enum으로 변환
-                if (book.getBookStatus() == null || !book.getBookStatus().equals(newStatus)) {
-                    book.setBookStatus(newStatus);  // 새로운 상태로 업데이트
+                BookStatus newStatus = BookStatus.valueOf(bookStatus);
+                if (!newStatus.equals(book.getBookStatus())) {
+                    book.setBookStatus(newStatus);
                 }
             } catch (IllegalArgumentException e) {
-                // 유효하지 않은 상태 값 처리
-                throw new IllegalArgumentException("유효하지 않은 상태 값입니다: " + bookUpdateRequest.getBookStatus());
+                throw new IllegalArgumentException("유효하지 않은 상태 값입니다: " + bookStatus);
             }
         } else {
-            // 상태 값이 null이거나 빈 문자열일 경우 처리
             throw new IllegalArgumentException("상태 값이 제공되지 않았습니다.");
         }
+    }
 
-        log.info("bookStatus 확인용: {} ", book.getBookStatus());
-
-        // 출판사 설정
-        Publisher publisher = publisherRepository.findById(bookUpdateRequest.getPublisherId())
-                .orElseThrow(() -> new NotFoundException(PUBLISHER_NOT_FOUND_MESSAGE));
+    private void updatePublisher(Book book, Long publisherId) {
+        Publisher publisher = publisherRepository.findById(publisherId)
+            .orElseThrow(() -> new NotFoundException(PUBLISHER_NOT_FOUND_MESSAGE));
         if (!book.getPublisher().equals(publisher)) {
             book.setPublisher(publisher);
         }
+    }
 
-        // 카테고리 업데이트
-        if (bookUpdateRequest.getCategoryIdList() == null || bookUpdateRequest.getCategoryIdList().isEmpty()) {
+    private void updateCategories(Book book, List<Long> categoryIdList) {
+        if (categoryIdList == null || categoryIdList.isEmpty()) {
             book.clearCategories();
-        } else if (hasCategoryChanges(book.getBookCategories(), bookUpdateRequest.getCategoryIdList())) {
+        } else if (hasCategoryChanges(book.getBookCategories(), categoryIdList)) {
             book.clearCategories();
-            for (Long categoryId : bookUpdateRequest.getCategoryIdList()) {
+            for (Long categoryId : categoryIdList) {
                 Category category = categoryRepository.findById(categoryId)
                     .orElseThrow(() -> new CategoryNotFoundException("카테고리가 존재하지 않습니다."));
                 book.addCategory(new BookCategory(book, category));
             }
         }
+    }
 
-        // 태그 업데이트
-        if (bookUpdateRequest.getTagIdList() == null || bookUpdateRequest.getTagIdList().isEmpty()) {
+    private void updateTags(Book book, List<Long> tagIdList) {
+        if (tagIdList == null || tagIdList.isEmpty()) {
             book.clearTags();
-        } else if (hasTagChanges(book.getBookTags(), bookUpdateRequest.getTagIdList())) {
+        } else if (hasTagChanges(book.getBookTags(), tagIdList)) {
             book.clearTags();
-            for (Long tagId : bookUpdateRequest.getTagIdList()) {
+            for (Long tagId : tagIdList) {
                 Tag tag = tagRepository.findById(tagId)
                     .orElseThrow(() -> new TagNotFoundException("태그가 존재하지 않습니다."));
                 book.addTag(new BookTag(book, tag));
             }
         }
+    }
 
-        // 작가 업데이트
-        if (bookUpdateRequest.getAuthorIdList() == null || bookUpdateRequest.getAuthorIdList().isEmpty()) {
+    private void updateAuthors(Book book, List<Long> authorIdList) {
+        if (authorIdList == null || authorIdList.isEmpty()) {
             book.clearAuthors();
-        } else if (hasAuthorChanges(book.getBookAuthors(), bookUpdateRequest.getAuthorIdList())) {
+        } else if (hasAuthorChanges(book.getBookAuthors(), authorIdList)) {
             book.clearAuthors();
-            for (Long authorId : bookUpdateRequest.getAuthorIdList()) {
+            for (Long authorId : authorIdList) {
                 Author author = authorRepository.findById(authorId)
                     .orElseThrow(() -> new AuthorNotFoundException("작가가 존재하지 않습니다."));
                 book.addAuthor(new BookAuthor(book, author));
             }
         }
-
-        // 변경된 책을 저장
-        bookRepository.save(book);
-
-        // BookUpdateResponse로 응답 반환
-        return new BookUpdateResponse(book);
     }
 
     /**
