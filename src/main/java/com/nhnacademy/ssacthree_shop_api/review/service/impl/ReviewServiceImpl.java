@@ -25,6 +25,7 @@ import com.nhnacademy.ssacthree_shop_api.review.exception.ReviewNotFoundExceptio
 import com.nhnacademy.ssacthree_shop_api.review.repository.ReviewCustomRepository;
 import com.nhnacademy.ssacthree_shop_api.review.repository.ReviewRepository;
 import com.nhnacademy.ssacthree_shop_api.review.service.ReviewService;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -49,25 +50,23 @@ public class ReviewServiceImpl implements ReviewService {
     private final PointSaveRuleRepository pointSaveRuleRepository;
     private final ReviewCustomRepository reviewCustomRepository;
 
+    private static final String MEMBER_NOT_FOUND = "member not found";
+
     @Override
     @Transactional(readOnly = true)
     public Page<BookReviewResponse> getReviewsByBookId(Pageable pageable, Long bookId) {
-        // 책 존재 여부 확인
-        bookRepository.findByBookId(bookId)
-                .orElseThrow(() -> new BookNotFoundException("해당 책을 찾을 수 없습니다."));
-
-        // QueryDSL을 이용한 리뷰 조회 및 페이징 처리
         return reviewCustomRepository.findReviewsByBookId(bookId, pageable);
     }
 
     @Override //리뷰 작성 저장
     public ResponseEntity<Void> postReviewBook(String header, Long bookId, Long orderId,
                                                ReviewRequestWithUrl reviewRequest) {
-        Member member = memberRepository.findByMemberLoginId(header).orElseThrow(() -> new MemberNotFoundException("member not found"));
+        Member member = memberRepository.findByMemberLoginId(header).orElseThrow(() -> new MemberNotFoundException(MEMBER_NOT_FOUND));
         Order order = orderRepository.findById(orderId).orElseThrow(() -> new NotFoundOrderException("order not found"));
         Book book = bookRepository.findByBookId(bookId).orElseThrow(() -> new BookNotFoundException("book not found"));
         ReviewId reviewId = new ReviewId(orderId,bookId);
-        Review review = new Review(reviewId,order,book,member.getCustomer(),reviewRequest.getReviewRate(),reviewRequest.getReviewTitle(),reviewRequest.getReviewContent(),reviewRequest.getReviewImageUrl());
+        Review review = new Review(reviewId,order,book,member.getCustomer(),reviewRequest.getReviewRate(),reviewRequest.getReviewTitle(),reviewRequest.getReviewContent(),
+            LocalDateTime.now(),reviewRequest.getReviewImageUrl());
         if(reviewRepository.findByReviewId(reviewId).isEmpty()) {
             PointHistory pointHistory = null;
             int memberPoint = 0;
@@ -88,7 +87,7 @@ public class ReviewServiceImpl implements ReviewService {
     }
     @Override //리뷰를 쓸 권한이 있는지 확인
     public Long authToWriteReview(String header, Long bookId) {
-        Member member = memberRepository.findByMemberLoginId(header).orElseThrow(() -> new MemberNotFoundException("member not found"));
+        Member member = memberRepository.findByMemberLoginId(header).orElseThrow(() -> new MemberNotFoundException(MEMBER_NOT_FOUND));
         List<Order> orderList = orderRepository.findOrderByCustomer(member.getCustomer());
         Book book = bookRepository.findByBookId(bookId).orElseThrow(() -> new BookNotFoundException("book not found"));
         for (Order order : orderList) {
@@ -102,7 +101,7 @@ public class ReviewServiceImpl implements ReviewService {
     }
     @Override
     public List<MemberReviewResponse> getReviewsByMemberId(String header) {
-        Member member = memberRepository.findByMemberLoginId(header).orElseThrow(() -> new MemberNotFoundException("member not found"));
+        Member member = memberRepository.findByMemberLoginId(header).orElseThrow(() -> new MemberNotFoundException(MEMBER_NOT_FOUND));
         List<Review> reviews = reviewRepository.findAllByCustomer(member.getCustomer());
         List<MemberReviewResponse> reviewResponses = new ArrayList<>();
         for (Review review : reviews) {

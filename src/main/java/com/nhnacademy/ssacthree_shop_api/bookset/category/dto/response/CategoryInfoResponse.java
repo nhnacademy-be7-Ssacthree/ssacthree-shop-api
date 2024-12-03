@@ -1,9 +1,5 @@
 package com.nhnacademy.ssacthree_shop_api.bookset.category.dto.response;
 
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.nhnacademy.ssacthree_shop_api.bookset.category.domain.Category;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

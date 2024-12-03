@@ -16,7 +16,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -172,7 +171,7 @@ public class CategoryServiceImpl implements CategoryService {
                 .orElseThrow(() -> new CategoryNotFoundException(parentCategoryId));
         return categoryRepository.findBySuperCategory(parent).stream()
                 .map(CategoryInfoResponse::new) // DTO 변환
-                .collect(Collectors.toList());
+                .toList();
     }
 
     /**
@@ -186,7 +185,7 @@ public class CategoryServiceImpl implements CategoryService {
     public List<CategoryInfoResponse> getRootCategories() {
         return categoryRepository.findBySuperCategoryIsNull().stream()
                 .map(CategoryInfoResponse::new)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     /**
@@ -205,7 +204,7 @@ public class CategoryServiceImpl implements CategoryService {
         }
         return categories.stream()
                 .map(CategoryInfoResponse::new)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     /**
@@ -221,7 +220,7 @@ public class CategoryServiceImpl implements CategoryService {
     public List<CategoryInfoResponse> getCategoryPath(Long categoryId) {
         return categoryRepository.findCategoryPath(categoryId).stream()
                 .map(CategoryInfoResponse::new)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     /**
@@ -262,7 +261,7 @@ public class CategoryServiceImpl implements CategoryService {
 
         return lowerCategories.get(depth).stream()
                 .map(CategoryInfoResponse::new)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     /**
@@ -277,7 +276,7 @@ public class CategoryServiceImpl implements CategoryService {
     public List<CategoryInfoResponse> getAllDescendants(Long categoryId) {
         return categoryRepository.findAllDescendants(categoryId).stream()
                 .map(CategoryInfoResponse::new)
-                .collect(Collectors.toList());
+                .toList();
     }
 
 

@@ -55,8 +55,8 @@ public class CustomerController {
         @RequestBody CustomerUpdateRequest customerUpdateRequest) {
 
         customerService.updateCustomer(customerId, customerUpdateRequest);
-        MessageResponse MessageResponse = new MessageResponse(customerId + "가 수정 되었습니다.");
-        return ResponseEntity.ok().body(MessageResponse);
+        MessageResponse messageResponse = new MessageResponse(customerId + "가 수정 되었습니다.");
+        return ResponseEntity.ok().body(messageResponse);
     }
 
 }

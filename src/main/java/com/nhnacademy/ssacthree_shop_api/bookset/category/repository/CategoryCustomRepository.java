@@ -3,7 +3,6 @@ package com.nhnacademy.ssacthree_shop_api.bookset.category.repository;
 import com.nhnacademy.ssacthree_shop_api.bookset.category.domain.Category;
 
 import java.util.List;
-import org.springframework.data.jpa.repository.Query;
 
 /**
  * 복잡한 쿼리문을 위한

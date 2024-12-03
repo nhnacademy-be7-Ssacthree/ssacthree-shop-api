@@ -53,6 +53,8 @@ public class MemberServiceImpl implements MemberService {
 
     private final ApplicationEventPublisher applicationEventPublisher;
 
+    private static final String MEMBER_NOT_FOUND = "멤버를 찾을 수 없습니다.";
+
     /**
      * 회원 가입 및 회원가입 포인트 적립
      *

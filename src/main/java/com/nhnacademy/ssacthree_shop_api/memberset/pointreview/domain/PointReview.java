@@ -24,9 +24,7 @@ public class PointReview {
 
     @NotNull
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumns({
-            @JoinColumn(name="orders_id"),
-            @JoinColumn(name="book_id")
-    })
+    @JoinColumn(name = "orders_id")
+    @JoinColumn(name = "book_id")
     private Review review;
 }

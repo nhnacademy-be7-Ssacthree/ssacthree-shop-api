@@ -20,7 +20,6 @@ public class MemberCustomerRepositoryImpl implements MemberCustomRepository {
     private static final QCustomer qCustomer = QCustomer.customer;
     private static final QMemberGrade qMemberGrade = QMemberGrade.memberGrade;
 
-
     @Override
     public MemberInfoGetResponse getMemberWithCustomer(String memberLoginId) {
         return queryFactory.from(qMember)
