@@ -15,6 +15,7 @@ import com.nhnacademy.ssacthree_shop_api.bookset.book.exception.BookNotFoundExce
 import com.nhnacademy.ssacthree_shop_api.bookset.book.repository.BookRepository;
 import com.nhnacademy.ssacthree_shop_api.customer.domain.Customer;
 import com.nhnacademy.ssacthree_shop_api.memberset.member.domain.Member;
+import com.nhnacademy.ssacthree_shop_api.memberset.member.exception.MemberNotFoundException;
 import com.nhnacademy.ssacthree_shop_api.memberset.member.repository.MemberRepository;
 import com.nhnacademy.ssacthree_shop_api.memberset.pointhistory.domain.PointHistory;
 import com.nhnacademy.ssacthree_shop_api.memberset.pointhistory.repository.PointHistoryRepository;
@@ -31,6 +32,7 @@ import com.nhnacademy.ssacthree_shop_api.review.dto.BookReviewResponse;
 import com.nhnacademy.ssacthree_shop_api.review.dto.MemberReviewResponse;
 import com.nhnacademy.ssacthree_shop_api.review.dto.ReviewRequestWithUrl;
 import com.nhnacademy.ssacthree_shop_api.review.dto.ReviewResponse;
+import com.nhnacademy.ssacthree_shop_api.review.exception.ReviewNotFoundException;
 import com.nhnacademy.ssacthree_shop_api.review.repository.ReviewCustomRepository;
 import com.nhnacademy.ssacthree_shop_api.review.repository.ReviewRepository;
 import com.nhnacademy.ssacthree_shop_api.review.service.impl.ReviewServiceImpl;
@@ -79,42 +81,105 @@ class ReviewServiceTest {
     @Mock
     private ReviewCustomRepository reviewCustomRepository;
 
-//    @Test
-//    void testGetReviewsByBookId_Success() {
-//        // Given
-//        Long bookId = 1L;
-//        Pageable pageable = PageRequest.of(0, 10);
-//        Page<BookReviewResponse> mockReviews = new PageImpl<>(List.of(
-//            new BookReviewResponse("User123", 5, "Excellent Book", "Loved it!", LocalDateTime.now(), "image_url")
-//        ));
-//
-//        when(bookRepository.findByBookId(bookId)).thenReturn(Optional.of(new Book()));
-//        when(reviewCustomRepository.findReviewsByBookId(bookId, pageable)).thenReturn(mockReviews);
-//
-//        // When
-//        Page<BookReviewResponse> result = reviewService.getReviewsByBookId(pageable, bookId);
-//
-//        // Then
-//        assertNotNull(result);
-//        assertEquals(1, result.getTotalElements());
-//        verify(bookRepository, times(1)).findByBookId(bookId);
-//        verify(reviewCustomRepository, times(1)).findReviewsByBookId(bookId, pageable);
-//    }
-//
-//    @Test
-//    void testGetReviewsByBookId_BookNotFound() {
-//        // Given
-//        Long bookId = 1L;
-//        Pageable pageable = PageRequest.of(0, 10);
-//
-//        when(bookRepository.findByBookId(bookId)).thenReturn(Optional.empty());
-//
-//        // When & Then
-//        assertThrows(
-//            BookNotFoundException.class, () -> reviewService.getReviewsByBookId(pageable, bookId));
-//        verify(bookRepository, times(1)).findByBookId(bookId);
-//        verify(reviewCustomRepository, never()).findReviewsByBookId(anyLong(), any(Pageable.class));
-//    }
+    @Test
+    void testPostReviewBook_Fail_MemberNotFound() {
+        // Given
+        String header = "invalidUser";
+        Long bookId = 1L;
+        Long orderId = 1L;
+        ReviewRequestWithUrl reviewRequest = new ReviewRequestWithUrl(5, "Great Book", "Loved it!", "");
+
+        when(memberRepository.findByMemberLoginId(header)).thenReturn(Optional.empty());
+
+        // When & Then
+        assertThrows(
+            MemberNotFoundException.class, () -> reviewService.postReviewBook(header, bookId, orderId, reviewRequest));
+        verify(memberRepository, times(1)).findByMemberLoginId(header);
+        verify(bookRepository, never()).findByBookId(anyLong());
+    }
+
+    @Test
+    void testPostReviewBook_Fail_BookNotFound() {
+        // Given
+        String header = "testUser";
+        Long bookId = 1L;
+        Long orderId = 1L;
+        ReviewRequestWithUrl reviewRequest = new ReviewRequestWithUrl(5, "Great Book", "Loved it!", "");
+
+        Member member = new Member();
+        Order order = new Order();
+
+        // Mock member and order are found
+        when(memberRepository.findByMemberLoginId(header)).thenReturn(Optional.of(member));
+        when(orderRepository.findById(orderId)).thenReturn(Optional.of(order));
+        // Mock book not found
+        when(bookRepository.findByBookId(bookId)).thenReturn(Optional.empty());
+
+        // When & Then
+        assertThrows(BookNotFoundException.class, () -> reviewService.postReviewBook(header, bookId, orderId, reviewRequest));
+
+        // Verify interactions
+        verify(memberRepository, times(1)).findByMemberLoginId(header);
+        verify(orderRepository, times(1)).findById(orderId);
+        verify(bookRepository, times(1)).findByBookId(bookId);
+        verify(reviewRepository, never()).save(any(Review.class));
+    }
+
+    @Test
+    void testAuthToWriteReview_Fail_NoOrdersFound() {
+        // Given
+        String header = "testUser";
+        Long bookId = 1L;
+
+        Member member = new Member();
+        when(memberRepository.findByMemberLoginId(header)).thenReturn(Optional.of(member));
+        when(bookRepository.findByBookId(bookId)).thenReturn(Optional.of(new Book()));
+        when(orderRepository.findOrderByCustomer(any())).thenReturn(List.of());
+
+        // When
+        Long result = reviewService.authToWriteReview(header, bookId);
+
+        // Then
+        assertEquals(null, result);
+        verify(orderRepository, times(1)).findOrderByCustomer(any());
+    }
+
+    @Test
+    void testGetReviewsByBookId_Success() {
+        // Given
+        Long bookId = 1L;
+        Pageable pageable = PageRequest.of(0, 10);
+
+        Page<BookReviewResponse> page = new PageImpl<>(List.of(
+            new BookReviewResponse("testUser", 5, "Great Book", "Loved it!", LocalDateTime.now(), "image_url")
+        ));
+
+        when(reviewCustomRepository.findReviewsByBookId(bookId, pageable)).thenReturn(page);
+
+        // When
+        Page<BookReviewResponse> result = reviewService.getReviewsByBookId(pageable, bookId);
+
+        // Then
+        assertNotNull(result);
+        assertEquals(1, result.getContent().size());
+        assertEquals("Great Book", result.getContent().get(0).getReviewTitle());
+        verify(reviewCustomRepository, times(1)).findReviewsByBookId(bookId, pageable);
+    }
+
+    @Test
+    void testGetReview_Fail_ReviewNotFound() {
+        // Given
+        String header = "testUser";
+        Long orderId = 1L;
+        Long bookId = 1L;
+
+        when(reviewRepository.findByReviewId(new ReviewId(orderId, bookId))).thenReturn(Optional.empty());
+
+        // When & Then
+        assertThrows(
+            ReviewNotFoundException.class, () -> reviewService.getReview(header, orderId, bookId));
+        verify(reviewRepository, times(1)).findByReviewId(any(ReviewId.class));
+    }
 
     @Test
     void testPostReviewBook_Success() {
@@ -216,5 +281,41 @@ class ReviewServiceTest {
         assertNotNull(result);
         assertEquals("Great Book", result.getReviewTitle());
         verify(reviewRepository, times(1)).findByReviewId(any(ReviewId.class));
+    }
+
+    @Test
+    void testPostReviewBook_WithImage_Success() {
+        // Given
+        String header = "testUser";
+        Long bookId = 1L;
+        Long orderId = 1L;
+        String imageUrl = "image_url";
+        ReviewRequestWithUrl reviewRequest = new ReviewRequestWithUrl(5, "Great Book", "Loved it!", imageUrl);
+
+        Member member = new Member();
+        member.setMemberPoint(0);
+        Book book = new Book();
+        Order order = new Order();
+        PointSaveRule pointSaveRule = new PointSaveRule("리뷰작성사진있음", 20, PointSaveType.INTEGER);
+
+        when(memberRepository.findByMemberLoginId(header)).thenReturn(Optional.of(member));
+        when(bookRepository.findByBookId(bookId)).thenReturn(Optional.of(book));
+        when(orderRepository.findById(orderId)).thenReturn(Optional.of(order));
+        when(reviewRepository.findByReviewId(any(ReviewId.class))).thenReturn(Optional.empty());
+        when(pointSaveRuleRepository.findPointSaveRuleByPointSaveRuleName("리뷰작성사진있음"))
+            .thenReturn(Optional.of(pointSaveRule));
+
+        // When
+        ResponseEntity<Void> response = reviewService.postReviewBook(header, bookId, orderId, reviewRequest);
+
+        // Then
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(20, member.getMemberPoint()); // 포인트가 정상적으로 추가되었는지 확인
+        verify(memberRepository, times(1)).findByMemberLoginId(header);
+        verify(bookRepository, times(1)).findByBookId(bookId);
+        verify(orderRepository, times(1)).findById(orderId);
+        verify(reviewRepository, times(1)).save(any(Review.class));
+        verify(pointSaveRuleRepository, times(1)).findPointSaveRuleByPointSaveRuleName("리뷰작성사진있음");
+        verify(pointHistoryRepository, times(1)).save(any(PointHistory.class));
     }
 }
