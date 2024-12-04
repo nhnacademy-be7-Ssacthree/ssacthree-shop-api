@@ -1,11 +1,6 @@
 package com.nhnacademy.ssacthree_shop_api.memberset.member.service.impl;
 
 import com.nhnacademy.ssacthree_shop_api.commons.dto.MessageResponse;
-import com.nhnacademy.ssacthree_shop_api.couponset.coupon.repository.CouponRepository;
-import com.nhnacademy.ssacthree_shop_api.couponset.coupon.service.CouponService;
-import com.nhnacademy.ssacthree_shop_api.couponset.couponrule.repository.CouponRuleRepository;
-import com.nhnacademy.ssacthree_shop_api.couponset.couponrule.service.CouponRuleService;
-import com.nhnacademy.ssacthree_shop_api.couponset.membercoupon.service.MemberCouponService;
 import com.nhnacademy.ssacthree_shop_api.customer.domain.Customer;
 import com.nhnacademy.ssacthree_shop_api.customer.dto.CustomerCreateRequest;
 import com.nhnacademy.ssacthree_shop_api.customer.service.CustomerService;
@@ -46,6 +41,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 public class MemberServiceImpl implements MemberService {
 
+
+    private static final String MEMBER_NOT_FOUND = "멤버를 찾을 수 없습니다.";
     private final MemberRepository memberRepository;
     private final CustomerService customerService;
     private final MemberGradeRepository memberGradeRepository;
@@ -53,15 +50,9 @@ public class MemberServiceImpl implements MemberService {
     private final MemberCustomRepository memberCustomRepository;
     private final PointHistoryService pointHistoryService;
     private final PointSaveRuleRepository pointSaveRuleRepository;
-    private final MemberCouponService memberCouponService;
-    private final CouponRepository couponRepository;
-    private final CouponService couponService;
-    private final CouponRuleRepository couponRuleRepository;
-    private final CouponRuleService couponRuleService;
 
     private final ApplicationEventPublisher applicationEventPublisher;
 
-    private static final String MEMBER_NOT_FOUND = "멤버를 찾을 수 없습니다.";
 
     /**
      * 회원 가입 및 회원가입 포인트 적립

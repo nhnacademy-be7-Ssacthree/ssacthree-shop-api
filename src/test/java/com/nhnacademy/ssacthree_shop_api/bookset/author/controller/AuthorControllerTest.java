@@ -6,12 +6,12 @@ import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nhnacademy.ssacthree_shop_api.bookset.author.domain.Author;
@@ -150,7 +150,8 @@ class AuthorControllerTest {
     @Test
     void updateAuthor_returnsUpdatedResponse() throws Exception {
         // Given: Mock 요청 데이터
-        AuthorUpdateRequest mockRequest = new AuthorUpdateRequest(1L, "Updated Author", "Updated Info");
+        AuthorUpdateRequest mockRequest = new AuthorUpdateRequest(1L, "Updated Author",
+            "Updated Info");
         Author mockAuthor = new Author(1L, "Updated Author", "Updated Info"); // 업데이트 후 예상 결과
 
         // authorService.updateAuthor 호출 시 반환값 설정
@@ -177,7 +178,8 @@ class AuthorControllerTest {
         doNothing().when(authorService).deleteAuthor(existingAuthorId);
 
         // When: DELETE 요청을 보내고
-        mockMvc.perform(delete(AUTHOR_PATH+"/{authorId}", existingAuthorId)) // 엔드포인트 경로는 실제 매핑에 맞춰야 합니다.
+        mockMvc.perform(
+                delete(AUTHOR_PATH + "/{authorId}", existingAuthorId)) // 엔드포인트 경로는 실제 매핑에 맞춰야 합니다.
             // Then: 성공 응답 메시지를 검증
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.message").value(AUTHOR_DELETE_SUCCESS_MESSAGE));
@@ -185,7 +187,6 @@ class AuthorControllerTest {
         // 서비스 메서드가 호출되었는지 확인
         verify(authorService, times(1)).deleteAuthor(existingAuthorId);
     }
-
 
 
 }

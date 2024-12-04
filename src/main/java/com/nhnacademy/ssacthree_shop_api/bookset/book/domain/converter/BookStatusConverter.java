@@ -3,7 +3,6 @@ package com.nhnacademy.ssacthree_shop_api.bookset.book.domain.converter;
 import com.nhnacademy.ssacthree_shop_api.bookset.book.domain.BookStatus;
 import jakarta.persistence.AttributeConverter;
 
-
 public class BookStatusConverter implements AttributeConverter<BookStatus, String> {
 
     /**

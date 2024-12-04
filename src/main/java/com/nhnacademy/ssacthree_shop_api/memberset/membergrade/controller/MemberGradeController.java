@@ -7,7 +7,6 @@ import com.nhnacademy.ssacthree_shop_api.memberset.membergrade.dto.MemberGradeUp
 import com.nhnacademy.ssacthree_shop_api.memberset.membergrade.service.MemberGradeService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.aspectj.bridge.Message;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -27,7 +26,8 @@ public class MemberGradeController {
     private final MemberGradeService memberGradeService;
 
     @PostMapping
-    public ResponseEntity<MessageResponse> createMemberGrade(@RequestBody MemberGradeCreateRequest memberGradeCreateRequest) {
+    public ResponseEntity<MessageResponse> createMemberGrade(
+        @RequestBody MemberGradeCreateRequest memberGradeCreateRequest) {
         memberGradeService.createMemberGrade(memberGradeCreateRequest);
 
         MessageResponse createResponse = new MessageResponse("생성 성공");
@@ -37,7 +37,8 @@ public class MemberGradeController {
     @GetMapping("/{memberGradeId}")
     public ResponseEntity<MemberGradeGetResponse> getMemberGrade(@PathVariable Long memberGradeId) {
 
-        MemberGradeGetResponse memberGradeGetResponse = memberGradeService.getMemberGradeById(memberGradeId);
+        MemberGradeGetResponse memberGradeGetResponse = memberGradeService.getMemberGradeById(
+            memberGradeId);
         return ResponseEntity.ok().body(memberGradeGetResponse);
     }
 
@@ -58,7 +59,7 @@ public class MemberGradeController {
         @RequestBody MemberGradeUpdateResponse memberGradeUpdateResponse) {
 
         memberGradeService.updateMemberGrade(memberGradeId, memberGradeUpdateResponse);
-        MessageResponse messageResponse = new MessageResponse(memberGradeId+ "가 수정 되었습니다.");
+        MessageResponse messageResponse = new MessageResponse(memberGradeId + "가 수정 되었습니다.");
         return ResponseEntity.ok().body(messageResponse);
     }
 }
