@@ -38,6 +38,9 @@ public class CategoryServiceImpl implements CategoryService {
     public CategoryInfoResponse saveCategory(CategorySaveRequest categorySaveRequest) {
         // CategorySaveRequest를 Category 엔티티로 변환
         Category category = new Category();
+        if(categorySaveRequest.getCategoryName().trim().isEmpty() || categorySaveRequest.getCategoryName().trim().isBlank()) {
+            throw new InvalidCategoryNameException("카테고리 이름은 1글자 이상이어야 합니다.");
+        }
         category.setCategoryName(categorySaveRequest.getCategoryName());
         category.setCategoryIsUsed(true);
 
@@ -308,6 +311,10 @@ public class CategoryServiceImpl implements CategoryService {
 
         if(category == null){
             throw new NotFoundException("해당하는 카테고리를 찾을 수 없습니다.");
+        }
+
+        if(request.getCategoryName().trim().isEmpty() || request.getCategoryName().trim().isBlank()) {
+            throw new InvalidCategoryNameException("카테고리 이름은 1글자 이상이어야 합니다.");
         }
 
         // 이름 중복 체크
