@@ -27,7 +27,6 @@ import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
 import java.util.List;
-
 @Slf4j
 @Repository
 @RequiredArgsConstructor
@@ -51,29 +50,29 @@ public class BookMgmtRepositoryImpl implements BookMgmtRepository {
     @Override
     public Page<BookSearchResponse> findAllBooks(Pageable pageable) {
         List<BookSearchResponse> books = queryFactory
-                .select(Projections.constructor(BookSearchResponse.class,
-                        book.bookId,
-                        book.bookName,
-                        book.bookInfo,
-                        book.bookStatus.stringValue()
-                ))
-                .from(book)
-                .where(book.bookStatus.ne(BookStatus.DELETE_BOOK))
-                .offset(pageable.getOffset())
-                .limit(pageable.getPageSize())
-                .orderBy(getOrderSpecifier(pageable))
-                .fetch();
+            .select(Projections.constructor(BookSearchResponse.class,
+                book.bookId,
+                book.bookName,
+                book.bookInfo,
+                book.bookStatus.stringValue()
+            ))
+            .from(book)
+            .where(book.bookStatus.ne(BookStatus.DELETE_BOOK))
+            .offset(pageable.getOffset())
+            .limit(pageable.getPageSize())
+            .orderBy(getOrderSpecifier(pageable))
+            .fetch();
 
         books.forEach(b -> log.info("bookStatus 확인용: {}", b.getBookStatus()));
 
         // Fetch authors for each book
         books.forEach(b -> {
             List<AuthorNameResponse> authors = queryFactory
-                    .select(Projections.constructor(AuthorNameResponse.class, author.authorName))
-                    .from(bookAuthor)
-                    .join(author).on(author.authorId.eq(bookAuthor.author.authorId))
-                    .where(bookAuthor.book.bookId.eq(b.getBookId()))
-                    .fetch();
+                .select(Projections.constructor(AuthorNameResponse.class, author.authorName))
+                .from(bookAuthor)
+                .join(author).on(author.authorId.eq(bookAuthor.author.authorId))
+                .where(bookAuthor.book.bookId.eq(b.getBookId()))
+                .fetch();
             b.setAuthors(authors);
         });
 

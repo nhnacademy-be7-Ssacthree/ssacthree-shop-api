@@ -16,14 +16,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nhnacademy.ssacthree_shop_api.bookset.tag.dto.request.TagUpdateRequest;
 import com.nhnacademy.ssacthree_shop_api.bookset.tag.dto.response.TagInfoResponse;
 import com.nhnacademy.ssacthree_shop_api.bookset.tag.service.TagService;
-import com.nhnacademy.ssacthree_shop_api.commons.paging.PageRequestBuilder;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -32,7 +30,6 @@ import org.springframework.test.web.servlet.MockMvc;
 
 @WebMvcTest(TagController.class)
 @AutoConfigureMockMvc(addFilters = false)
-@Import(PageRequestBuilder.class)
 class TagControllerTest {
 
     @Autowired

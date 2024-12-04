@@ -229,7 +229,7 @@ public class BookMgmtServiceImpl implements BookMgmtService {
     private void updatePublisher(Book book, Long publisherId) {
         Publisher publisher = publisherRepository.findById(publisherId)
             .orElseThrow(() -> new NotFoundException(PUBLISHER_NOT_FOUND_MESSAGE));
-        if (!book.getPublisher().equals(publisher)) {
+        if (book.getPublisher() == null || !book.getPublisher().equals(publisher)) {
             book.setPublisher(publisher);
         }
     }
