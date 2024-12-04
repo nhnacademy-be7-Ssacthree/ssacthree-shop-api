@@ -34,7 +34,6 @@ public class BookInfoResponse {
     private String bookStatus; // 도서 상태
 
     // FK
-    @Setter
     private PublisherNameResponse publisher;
 
     @Setter

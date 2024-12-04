@@ -43,7 +43,7 @@ public class ReviewCustomRepositoryImpl implements ReviewCustomRepository {
                 .orderBy(review.reviewCreatedAt.desc()); // 최신순 정렬
 
         // 페이징 처리
-        long total = query.fetchCount();
+        long total = query.fetch().size();
         List<BookReviewResponse> reviews = query
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())

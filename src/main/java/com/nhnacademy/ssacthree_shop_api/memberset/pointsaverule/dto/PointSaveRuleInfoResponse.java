@@ -1,7 +1,6 @@
 package com.nhnacademy.ssacthree_shop_api.memberset.pointsaverule.dto;
 
 import com.nhnacademy.ssacthree_shop_api.memberset.pointsaverule.domain.PointSaveRule;
-import com.nhnacademy.ssacthree_shop_api.memberset.pointsaverule.domain.PointSaveType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -10,12 +9,13 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Getter
 public class PointSaveRuleInfoResponse {
+
     private Long pointSaveRuleId;
     private String pointSaveRuleName;
     private int pointSaveAmount;
     private String pointSaveType;
 
-    public PointSaveRuleInfoResponse(PointSaveRule pointSaveRule){
+    public PointSaveRuleInfoResponse(PointSaveRule pointSaveRule) {
         this.pointSaveRuleId = pointSaveRule.getPointSaveRuleId();
         this.pointSaveRuleName = pointSaveRule.getPointSaveRuleName();
         this.pointSaveAmount = pointSaveRule.getPointSaveAmount();

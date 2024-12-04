@@ -1,8 +1,6 @@
 package com.nhnacademy.ssacthree_shop_api.bookset.category.domain;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;

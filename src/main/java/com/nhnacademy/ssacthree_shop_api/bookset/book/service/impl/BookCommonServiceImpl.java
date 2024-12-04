@@ -1,10 +1,7 @@
 package com.nhnacademy.ssacthree_shop_api.bookset.book.service.impl;
 
-import com.nhnacademy.ssacthree_shop_api.bookset.author.dto.AuthorNameResponse;
 import com.nhnacademy.ssacthree_shop_api.bookset.book.domain.Book;
-import com.nhnacademy.ssacthree_shop_api.bookset.book.dto.response.BookBaseResponse;
 import com.nhnacademy.ssacthree_shop_api.bookset.book.dto.response.BookInfoResponse;
-import com.nhnacademy.ssacthree_shop_api.bookset.book.dto.response.BookListBaseResponse;
 import com.nhnacademy.ssacthree_shop_api.bookset.book.dto.response.BookListResponse;
 import com.nhnacademy.ssacthree_shop_api.bookset.book.exception.BookNotFoundException;
 import com.nhnacademy.ssacthree_shop_api.bookset.book.repository.BookRepository;
@@ -15,20 +12,18 @@ import com.nhnacademy.ssacthree_shop_api.bookset.booklike.dto.request.BookLikeRe
 import com.nhnacademy.ssacthree_shop_api.bookset.booklike.dto.response.BookLikeResponse;
 import com.nhnacademy.ssacthree_shop_api.bookset.booklike.repository.BookLikeRepository;
 import com.nhnacademy.ssacthree_shop_api.bookset.category.dto.response.CategoryNameResponse;
-import com.nhnacademy.ssacthree_shop_api.bookset.tag.dto.response.TagInfoResponse;
 import com.nhnacademy.ssacthree_shop_api.memberset.member.domain.Member;
 import com.nhnacademy.ssacthree_shop_api.memberset.member.repository.MemberRepository;
 import jakarta.ws.rs.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -39,53 +34,7 @@ public class BookCommonServiceImpl implements BookCommonService {
     private final BookLikeRepository bookLikeRepository;
     private final MemberRepository memberRepository;
 
-    /**
-     * BookInfoResponse에 출판사, 카테고리, 태그, 작가 정보를 주입해주기 위한 메소드
-     * @param bookBaseResponse 도서 기본 정보(아직 출판사, 카테고리, 태그, 작가 정보 비어 있음)
-     */
-    private BookInfoResponse addAssociatedDataToBookInfoResponse(BookBaseResponse bookBaseResponse){
-        if(bookBaseResponse == null){
-            throw new NotFoundException("해당 도서를 찾을 수 없습니다");
-        }
-        BookInfoResponse bookInfoResponse = new BookInfoResponse(bookBaseResponse);
 
-        // 카테고리 설정
-        List<CategoryNameResponse> categories = bookRepository.findCategoriesByBookId(bookInfoResponse.getBookId());
-        bookInfoResponse.setCategories(categories);
-
-        // 태그 설정
-        List<TagInfoResponse> tags = bookRepository.findTagsByBookId(bookInfoResponse.getBookId());
-        bookInfoResponse.setTags(tags);
-
-        // 작가 설정
-        List<AuthorNameResponse> authors = bookRepository.findAuthorsByBookId(bookInfoResponse.getBookId());
-        bookInfoResponse.setAuthors(authors);
-
-        return bookInfoResponse;
-    }
-
-    private Page<BookListResponse> addAssociatedDataToBookListResponsePage(Page<BookListBaseResponse> booksPage) {
-        if (booksPage == null) {
-            throw new NotFoundException("해당 도서를 찾을 수 없습니다");
-        }
-
-        List<BookListResponse> bookListResponse = booksPage.getContent().stream()
-                .map(baseResponse -> {
-                    BookListResponse response = new BookListResponse(baseResponse);
-
-                    response.setCategories(bookRepository.findCategoriesByBookId(baseResponse.getBookId()));
-                    response.setTags(bookRepository.findTagsByBookId(baseResponse.getBookId()));
-                    response.setAuthors(bookRepository.findAuthorsByBookId(baseResponse.getBookId()));
-                    response.setLikeCount(bookRepository.findBookLikeByBookId(baseResponse.getBookId()));
-                    response.setReviewCount(bookRepository.findReviewCountByBookId(baseResponse.getBookId()));
-                    response.setReviewRateAverage(bookRepository.findReviewRateAverageByBookId(baseResponse.getBookId()));
-
-                    return response;
-                })
-                .collect(Collectors.toList());
-
-        return new PageImpl<>(bookListResponse, booksPage.getPageable(), booksPage.getTotalElements());
-    }
 
     /**
      * 판매 중, 재고 없음 상태 책 모두 조회
@@ -95,7 +44,7 @@ public class BookCommonServiceImpl implements BookCommonService {
     @Override
     @Transactional(readOnly = true)
     public Page<BookListResponse> getAllAvailableBooks(Pageable pageable) {
-        return addAssociatedDataToBookListResponsePage(bookRepository.findAllAvailableBooks(pageable));
+        return bookRepository.findAllAvailableBooks(pageable);
     }
 
     /**
@@ -104,8 +53,9 @@ public class BookCommonServiceImpl implements BookCommonService {
      * @return 도서 정보
      */
     @Override
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public BookInfoResponse getBook(Long bookId) {
-        return addAssociatedDataToBookInfoResponse(bookRepository.findBookById(bookId));
+        return bookRepository.findBookById(bookId);
     }
 
     /**
@@ -117,7 +67,7 @@ public class BookCommonServiceImpl implements BookCommonService {
     @Override
     @Transactional(readOnly = true)
     public Page<BookListResponse> getBooksByBookName(Pageable pageable, String bookName) {
-        return addAssociatedDataToBookListResponsePage(bookRepository.findBooksByBookName(pageable, bookName));
+        return bookRepository.findBooksByBookName(pageable, bookName);
     }
 
     /**
@@ -128,7 +78,7 @@ public class BookCommonServiceImpl implements BookCommonService {
     @Override
     public BookInfoResponse getBooksByBookIsbn(String isbn) {
 
-        return addAssociatedDataToBookInfoResponse(bookRepository.findByBookIsbn(isbn));
+        return bookRepository.findByBookIsbn(isbn);
     }
 
     /**
@@ -139,7 +89,7 @@ public class BookCommonServiceImpl implements BookCommonService {
      */
     @Override
     public Page<BookListResponse> getBooksByAuthorId(Pageable pageable, Long authorId) {
-        return addAssociatedDataToBookListResponsePage(bookRepository.findBooksByAuthorId(authorId, pageable));
+        return bookRepository.findBooksByAuthorId(authorId, pageable);
     }
 
     /**
@@ -150,7 +100,7 @@ public class BookCommonServiceImpl implements BookCommonService {
      */
     @Override
     public Page<BookListResponse> getBooksByCategoryId(Pageable pageable, Long categoryId) {
-        return addAssociatedDataToBookListResponsePage(bookRepository.findBooksByCategoryId(categoryId, pageable));
+        return bookRepository.findBooksByCategoryId(categoryId, pageable);
     }
 
     /**
@@ -161,7 +111,7 @@ public class BookCommonServiceImpl implements BookCommonService {
      */
     @Override
     public Page<BookListResponse> getBooksByTagId(Pageable pageable, Long tagId) {
-        return addAssociatedDataToBookListResponsePage(bookRepository.findBooksByTagId(tagId, pageable));
+        return bookRepository.findBooksByTagId(tagId, pageable);
     }
 
     /**
@@ -172,7 +122,7 @@ public class BookCommonServiceImpl implements BookCommonService {
      */
     @Override
     public Page<BookListResponse> getBooksByMemberId(Pageable pageable, Long customerId) {
-        return addAssociatedDataToBookListResponsePage(bookRepository.findBookLikesByCustomerId(customerId, pageable));
+        return bookRepository.findBookLikesByCustomerId(customerId, pageable);
     }
 
     /**
@@ -200,6 +150,12 @@ public class BookCommonServiceImpl implements BookCommonService {
         return bookRepository.findCategoriesByBookId(bookId);
     }
 
+    /**
+     * 좋아요 정보를 저장합니다.
+     * @param bookLikeRequest 좋아요 요청
+     * @param customerId 좋아요한 멤버의 customerId
+     * @return 좋아요 정보
+     */
     @Override
     public BookLikeResponse saveBookLike(BookLikeRequest bookLikeRequest, Long customerId) {
         Book book = bookRepository.findById(bookLikeRequest.getBookId()).orElseThrow(() -> new BookNotFoundException("해당 도서를 찾을 수 없습니다."));
@@ -209,10 +165,16 @@ public class BookCommonServiceImpl implements BookCommonService {
 
         bookLikeRepository.save(bookLike);
 
-        //todo: 좋아요 수 잘 올라갔는지 확인하기
+
         return new BookLikeResponse(bookLikeRequest, bookRepository.findBookLikeByBookId(book.getBookId()));
     }
 
+    /**
+     * 좋아요 정보를 삭제합니다.
+     * @param bookId 좋아요를 취소할 책 아이디
+     * @param customerId 좋아요를 취소하는 멤버의 customerId
+     * @return 좋아요 삭제 성공 여부
+     */
     @Override
     public Boolean deleteBookLike(Long bookId, Long customerId) {
 

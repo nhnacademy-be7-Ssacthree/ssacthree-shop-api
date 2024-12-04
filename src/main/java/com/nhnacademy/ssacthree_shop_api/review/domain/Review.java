@@ -5,7 +5,6 @@ import com.nhnacademy.ssacthree_shop_api.customer.domain.Customer;
 import com.nhnacademy.ssacthree_shop_api.orderset.order.domain.Order;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Null;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -50,19 +49,7 @@ public class Review {
     private String reviewContent;
 
     @NotNull
-    private LocalDateTime reviewCreatedAt = LocalDateTime.now();
+    private LocalDateTime reviewCreatedAt;
 
     private String reviewImageUrl;
-
-    public Review(ReviewId reviewId, Order order, Book book, Customer customer, int reviewRate, String reviewTitle,
-        String reviewContent, String reviewImageUrl) {
-        this.reviewId = reviewId;
-        this.order = order;
-        this.book = book;
-        this.customer = customer;
-        this.reviewRate = reviewRate;
-        this.reviewTitle = reviewTitle;
-        this.reviewContent = reviewContent;
-        this.reviewImageUrl = reviewImageUrl;
-    }
 }
