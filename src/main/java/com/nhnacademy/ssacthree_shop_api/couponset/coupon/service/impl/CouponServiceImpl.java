@@ -8,8 +8,6 @@ import com.nhnacademy.ssacthree_shop_api.couponset.coupon.repository.CouponRepos
 import com.nhnacademy.ssacthree_shop_api.couponset.coupon.service.CouponService;
 import com.nhnacademy.ssacthree_shop_api.couponset.couponrule.domain.CouponRule;
 import com.nhnacademy.ssacthree_shop_api.couponset.couponrule.repository.CouponRuleRepository;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,9 +18,6 @@ import java.util.List;
 @RequiredArgsConstructor
 @Transactional
 public class CouponServiceImpl implements CouponService {
-
-    @PersistenceContext
-    private EntityManager entityManager;
 
     private final CouponRepository couponRepository;
     private final CouponRuleRepository couponRuleRepository;
