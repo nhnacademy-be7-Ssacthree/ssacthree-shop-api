@@ -109,43 +109,4 @@ public class BookUpdateResponse {
         this.publisher = bookBaseResponse.getPublisher();
     }
 
-    public void clearCategories() {
-        if (this.categories != null) {
-            this.categories.clear();
-        }
-    }
-
-    public void addCategory(CategoryNameResponse category) {
-        if (this.categories == null) {
-            this.categories = new ArrayList<>();
-        }
-        this.categories.add(category);
-    }
-
-    public void clearTags() {
-        if (this.tags != null) {
-            this.tags.clear();
-        }
-    }
-
-    public void addTag(TagInfoResponse tag) {
-        if (this.tags == null) {
-            this.tags = new ArrayList<>();
-        }
-        this.tags.add(tag);
-    }
-
-    public void clearAuthors() {
-        if (this.authors != null) {
-            this.authors.clear();
-        }
-    }
-
-    public void addAuthor(AuthorNameResponse author) {
-        if (this.authors == null) {
-            this.authors = new ArrayList<>();
-        }
-        this.authors.add(author);
-    }
-
 }

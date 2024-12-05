@@ -110,6 +110,4 @@ public class Book {
         }
         bookAuthors.clear();
     }
-
-
 }

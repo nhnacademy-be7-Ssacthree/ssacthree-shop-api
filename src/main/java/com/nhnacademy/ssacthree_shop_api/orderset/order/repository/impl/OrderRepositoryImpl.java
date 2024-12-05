@@ -37,23 +37,30 @@ public class OrderRepositoryImpl implements OrderRepositoryCustom {
         QOrderToStatusMapping orderToStatusMapping = QOrderToStatusMapping.orderToStatusMapping;
         QOrderStatus orderStatus = QOrderStatus.orderStatus;
 
-        List<Tuple> rawResults = queryFactory
-                .select(
-                        order.id,
-                        order.ordered_date,
-                        order.total_price,
-                        orderToStatusMapping.orderStatus.orderStatusEnum.stringValue()
-                )
-                .from(order)
-                .leftJoin(orderToStatusMapping).on(order.id.eq(orderToStatusMapping.order.id))
-                .leftJoin(orderStatus).on(orderToStatusMapping.orderStatus.id.eq(orderStatus.id))
-                .where(
-                        order.customer.customerId.eq(customerId)
-                                .and(order.ordered_date.between(startDate, endDate))
-                )
-                .offset(pageable.getOffset())
-                .limit(pageable.getPageSize())
-                .fetch();
+      List<Tuple> rawResults = queryFactory
+          .select(
+              order.id,
+              order.ordered_date,
+              order.total_price,
+              orderToStatusMapping.orderStatus.orderStatusEnum.stringValue()
+          )
+          .from(order)
+          .leftJoin(orderToStatusMapping).on(
+              order.id.eq(orderToStatusMapping.order.id)
+                  .and(orderToStatusMapping.orderStatusCreatedAt.eq(
+                      JPAExpressions.select(orderToStatusMapping.orderStatusCreatedAt.max())
+                          .from(orderToStatusMapping)
+                          .where(orderToStatusMapping.order.id.eq(order.id))
+                  ))
+          )
+          .leftJoin(orderStatus).on(orderToStatusMapping.orderStatus.id.eq(orderStatus.id))
+          .where(
+              order.customer.customerId.eq(customerId)
+                  .and(order.ordered_date.between(startDate, endDate))
+          )
+          .offset(pageable.getOffset())
+          .limit(pageable.getPageSize())
+          .fetch();
 
         List<OrderListResponse> results = rawResults.stream()
                 .map(tuple -> new OrderListResponse(
@@ -143,7 +150,7 @@ public class OrderRepositoryImpl implements OrderRepositoryCustom {
         .select(order.id)
         .from(order)
         .where(order.order_number.eq(orderNumber))
-        .fetchOne();
+        .fetchFirst();  // 중복 데이터 발생 시 하나만 가져오게 합니다. (NonUniqueResultException 발생 방지)
 
     return Optional.ofNullable(orderId);
   }
