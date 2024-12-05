@@ -1,7 +1,6 @@
 package com.nhnacademy.ssacthree_shop_api.couponset.coupon.service.impl;
 
 import com.nhnacademy.ssacthree_shop_api.couponset.coupon.domain.Coupon;
-import com.nhnacademy.ssacthree_shop_api.couponset.coupon.domain.QCoupon;
 import com.nhnacademy.ssacthree_shop_api.couponset.coupon.dto.CouponCreateRequest;
 import com.nhnacademy.ssacthree_shop_api.couponset.coupon.dto.CouponGetResponse;
 import com.nhnacademy.ssacthree_shop_api.couponset.coupon.dto.CouponUpdateRequest;
@@ -9,8 +8,6 @@ import com.nhnacademy.ssacthree_shop_api.couponset.coupon.repository.CouponRepos
 import com.nhnacademy.ssacthree_shop_api.couponset.coupon.service.CouponService;
 import com.nhnacademy.ssacthree_shop_api.couponset.couponrule.domain.CouponRule;
 import com.nhnacademy.ssacthree_shop_api.couponset.couponrule.repository.CouponRuleRepository;
-import com.querydsl.core.types.Projections;
-import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
@@ -32,23 +29,7 @@ public class CouponServiceImpl implements CouponService {
 
     @Override
     public List<CouponGetResponse> getAllCoupons() {
-        QCoupon coupon = QCoupon.coupon;
-
-        return new JPAQueryFactory(entityManager)
-                .select(Projections.constructor(
-                        CouponGetResponse.class,
-                        coupon.couponId,
-                        coupon.couponName,
-                        coupon.couponDescription,
-                        coupon.couponEffectivePeriod,
-                        coupon.couponEffectivePeriodUnit,
-                        coupon.couponCreateAt,
-                        coupon.couponExpiredAt,
-                        coupon.couponRule.id
-                ))
-                .from(coupon)
-                .orderBy(coupon.couponCreateAt.asc())
-                .fetch();
+        return couponRepository.getAllCoupons();
     }
 
     @Override
