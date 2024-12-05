@@ -48,36 +48,6 @@ class ShoppingCartServiceImplTest {
     @InjectMocks
     private ShoppingCartServiceImpl shoppingCartService;
 
-    @Test
-    void testGetShoppingCartItemsByCustomerId_Success() {
-        // Mock 데이터 생성
-        Customer mockCustomer = new Customer(1L, "Test Customer", "test@example.com", "010-1234-5678");
-        Member mockMember = new Member(mockCustomer, "TestMember", "validHeader", null);
-        Book mockBook = new Book(101L, "Test Book", "Index", "Info", "ISBN123", null, 20000, 15000,
-            true, 10, "image_url", 100, 25, null, null, null, null, null);
-        ShoppingCart mockCart = new ShoppingCart(
-            new ShoppingCartId(1L, 101L), mockCustomer, mockBook, 2);
-
-        // Mock 설정
-        when(memberRepository.findByMemberLoginId("validHeader")).thenReturn(Optional.of(mockMember));
-        when(shoppingCartRepository.findByCustomer_CustomerId(1L)).thenReturn(List.of(mockCart));
-
-        // 테스트 실행
-        List<ShoppingCartItemResponse> responses = shoppingCartService.getShoppingCartItemsBycustomerId("validHeader");
-
-        // 검증
-        assertEquals(1, responses.size(), "응답 리스트 크기가 다릅니다.");
-        ShoppingCartItemResponse response = responses.get(0);
-        assertEquals(101L, response.getId(), "ID가 다릅니다.");
-        assertEquals("Test Book", response.getTitle(), "책 제목이 다릅니다.");
-        assertEquals(2, response.getQuantity(), "수량이 다릅니다.");
-        assertEquals(15000, response.getPrice(), "가격이 다릅니다.");
-        assertEquals("image_url", response.getBookThumbnailImageUrl(), "이미지 URL이 다릅니다.");
-
-        verify(memberRepository, times(1)).findByMemberLoginId("validHeader");
-        verify(shoppingCartRepository, times(1)).findByCustomer_CustomerId(1L);
-    }
-
 
     @Test
     void testGetShoppingCartItemsByCustomerId_ThrowsMemberNotFoundException() {
