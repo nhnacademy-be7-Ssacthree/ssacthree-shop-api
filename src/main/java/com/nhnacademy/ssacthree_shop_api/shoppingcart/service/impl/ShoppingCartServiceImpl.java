@@ -107,7 +107,8 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
         return true;
     }
 
-    private void saveOrUpdateCarts(List<ShoppingCartRequest> cartList, Long customerId, Customer customer) {
+    private void
+    saveOrUpdateCarts(List<ShoppingCartRequest> cartList, Long customerId, Customer customer) {
         for (ShoppingCartRequest cartItem : cartList) {
             Long bookId = cartItem.getBookId();
             Book book = bookRepository.findByBookId(bookId)
