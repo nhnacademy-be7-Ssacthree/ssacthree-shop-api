@@ -1,33 +1,22 @@
 package com.nhnacademy.ssacthree_shop_api.orderset.deliveryrule.service.impl;
 
 import com.nhnacademy.ssacthree_shop_api.orderset.deliveryrule.domain.DeliveryRule;
-import com.nhnacademy.ssacthree_shop_api.orderset.deliveryrule.domain.QDeliveryRule;
 import com.nhnacademy.ssacthree_shop_api.orderset.deliveryrule.dto.DeliveryRuleCreateRequest;
 import com.nhnacademy.ssacthree_shop_api.orderset.deliveryrule.dto.DeliveryRuleGetResponse;
 import com.nhnacademy.ssacthree_shop_api.orderset.deliveryrule.dto.DeliveryRuleUpdateRequest;
 import com.nhnacademy.ssacthree_shop_api.orderset.deliveryrule.exception.DeliveryRuleNotFoundException;
 import com.nhnacademy.ssacthree_shop_api.orderset.deliveryrule.repository.DeliveryRuleRepository;
 import com.nhnacademy.ssacthree_shop_api.orderset.deliveryrule.service.DeliveryRuleService;
-import com.nhnacademy.ssacthree_shop_api.orderset.packaging.domain.Packaging;
-import com.nhnacademy.ssacthree_shop_api.orderset.packaging.dto.PackagingGetResponse;
-import com.querydsl.core.types.Projections;
-import com.querydsl.jpa.impl.JPAQueryFactory;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 @Transactional
 public class DeliveryRuleServiceImpl implements DeliveryRuleService {
-
-    @PersistenceContext
-    private EntityManager entityManager;
 
     private final DeliveryRuleRepository deliveryRuleRepository;
 
@@ -78,22 +67,7 @@ public class DeliveryRuleServiceImpl implements DeliveryRuleService {
 
     @Override
     public List<DeliveryRuleGetResponse> getAllDeliveryRules() {
-        QDeliveryRule deliveryRule = QDeliveryRule.deliveryRule;
-
-        return new JPAQueryFactory(entityManager)
-                .select(Projections.constructor(
-                        DeliveryRuleGetResponse.class,
-                        deliveryRule.deliveryRuleId,
-                        deliveryRule.deliveryRuleName,
-                        deliveryRule.deliveryFee,
-                        deliveryRule.deliveryDiscountCost,
-                        deliveryRule.deliveryRuleIsSelected,
-                        deliveryRule.deliveryRuleCreatedAt
-                ))
-                .from(deliveryRule)
-                .orderBy(deliveryRule.deliveryRuleIsSelected.desc())
-                .orderBy(deliveryRule.deliveryRuleCreatedAt.asc())
-                .fetch();
+        return deliveryRuleRepository.getAllDeliveryRules();
     }
 
     @Override
