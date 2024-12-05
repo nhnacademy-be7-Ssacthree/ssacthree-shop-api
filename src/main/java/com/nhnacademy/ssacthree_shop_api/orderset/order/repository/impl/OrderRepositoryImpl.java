@@ -97,6 +97,7 @@ public class OrderRepositoryImpl implements OrderRepositoryCustom {
                         order.ordered_date,
                         order.total_price,
                         orderToStatusMapping.orderStatus.orderStatusEnum.stringValue(),
+                        orderToStatusMapping.orderStatusCreatedAt,
                         order.customer.customerName,
                         order.order_number,
                         order.invoice_number
@@ -124,6 +125,7 @@ public class OrderRepositoryImpl implements OrderRepositoryCustom {
                         Objects.requireNonNull(tuple.get(order.ordered_date)).toLocalDate(), // LocalDateTime → LocalDate 변환
                         tuple.get(order.total_price),
                         tuple.get(orderToStatusMapping.orderStatus.orderStatusEnum.stringValue()),
+                        Objects.requireNonNull(tuple.get(orderToStatusMapping.orderStatusCreatedAt)).toLocalDate(),
                         tuple.get(order.customer.customerName),
                         tuple.get(order.order_number),
                         tuple.get(order.invoice_number)

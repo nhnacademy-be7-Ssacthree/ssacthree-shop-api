@@ -141,7 +141,6 @@ public class OrderServiceImpl implements OrderService {
 
         // TODO : 장바구니 비우기
 
-        // TODO : 재고 차감 -> 상세에서 처리
 
 
         return new OrderResponse(order.getId());
