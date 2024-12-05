@@ -39,4 +39,11 @@ public interface CategoryCustomRepository {
      * @return 카테고리 이름
      */
     String findCategoryNameByCategoryId(Long categoryId);
+
+    /**
+     * 최상위 카테고리(부모가 없는 카테고리) 목록을 조회합니다.
+     *
+     * @return 최상위 카테고리 목록
+     */
+    List<Category> findBySuperCategoryIsNullAndCategoryIsUsed();
 }

@@ -1,8 +1,8 @@
 package com.nhnacademy.ssacthree_shop_api.orderset.orderdetail.controller;
 
-import com.nhnacademy.ssacthree_shop_api.commons.exception.IllegalArgumentException;
-import com.nhnacademy.ssacthree_shop_api.commons.exception.NotFoundException;
 import com.nhnacademy.ssacthree_shop_api.orderset.orderdetail.dto.OrderDetailResponse;
+import com.nhnacademy.ssacthree_shop_api.orderset.orderdetail.exception.OrderNumberNotFoundException;
+import com.nhnacademy.ssacthree_shop_api.orderset.orderdetail.exception.OrderPhoneMismatchException;
 import com.nhnacademy.ssacthree_shop_api.orderset.orderdetail.service.OrderDetailService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -34,15 +34,16 @@ public class OrderDetailController {
     log.info("OrderNumber로 주문상세를 조회합니다.");
     // 1. orderNumber 로 orderId 조회
     Long orderId = orderDetailService.getOrderId(orderNumber)
-        .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 주문번호입니다.: " + orderNumber));
+        .orElseThrow(() -> new OrderNumberNotFoundException("존재하지 않는 주문번호입니다.: " + orderNumber));
+    log.info("조회된 orderId: {}", orderId);
 
     // 2. 주문 내역의 전화번호와 일치하는지 확인
     // 주문번호로 조회한 주문의 전화번호와 일치하지 않을 때
     log.info("전화번호를 비교합니다.");
-    if(!orderDetailService.comparePhoneNumber(orderId, phoneNumber)) {
+    if(Boolean.FALSE.equals(orderDetailService.comparePhoneNumber(orderId, phoneNumber))) {
       log.info("orderId: {} / phoneNumber: {}, / 비교결과: {}", orderId, phoneNumber, orderDetailService.comparePhoneNumber(orderId, phoneNumber));
       // 커스텀 예외를 해야하나?
-      throw new NotFoundException("주문번호와 전화번호가 일치하지 않습니다.");
+      throw new OrderPhoneMismatchException(phoneNumber);
     }
 
     // 3. OrderId로 주문상세 받아옴.

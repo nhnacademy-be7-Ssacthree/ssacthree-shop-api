@@ -14,8 +14,9 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.authorizeHttpRequests(authorizeRequests ->
-            authorizeRequests.requestMatchers("/api/**").permitAll().requestMatchers("/actuator/**").permitAll()
-                    .requestMatchers("/error").permitAll());
+            authorizeRequests.requestMatchers("/api/**").permitAll().requestMatchers("/actuator/**")
+                .permitAll()
+                .requestMatchers("/error").permitAll());
 
         http.csrf(AbstractHttpConfigurer::disable);
 

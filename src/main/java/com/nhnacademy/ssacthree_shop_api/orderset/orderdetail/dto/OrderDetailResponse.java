@@ -1,6 +1,5 @@
 package com.nhnacademy.ssacthree_shop_api.orderset.orderdetail.dto;
 
-
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -9,7 +8,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 // orderDetail 에 사용되는 DTO
-
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
@@ -43,7 +41,6 @@ public class OrderDetailResponse {
   private String paymentStatus;             // enum -> string 변환, 한글화 필요 (PaymentStatusEnum)
 
   // 결제 -> 결제 타입 조회
-  private String paymentTypeName;           // 결제 타입 (
-
+  private String paymentTypeName;           // 결제 타입
 
 }

@@ -9,12 +9,13 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Getter
 public class PointSaveRuleInfoResponse {
+
     private Long pointSaveRuleId;
     private String pointSaveRuleName;
     private int pointSaveAmount;
     private String pointSaveType;
 
-    public PointSaveRuleInfoResponse(PointSaveRule pointSaveRule){
+    public PointSaveRuleInfoResponse(PointSaveRule pointSaveRule) {
         this.pointSaveRuleId = pointSaveRule.getPointSaveRuleId();
         this.pointSaveRuleName = pointSaveRule.getPointSaveRuleName();
         this.pointSaveAmount = pointSaveRule.getPointSaveAmount();

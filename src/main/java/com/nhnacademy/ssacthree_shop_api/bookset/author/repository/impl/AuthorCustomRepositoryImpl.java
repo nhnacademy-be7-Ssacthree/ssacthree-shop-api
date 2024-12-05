@@ -47,19 +47,16 @@ public class AuthorCustomRepositoryImpl implements AuthorCustomRepository {
     }
 
     @Override
-    public List<AuthorGetResponse> findAllAuthorList(){
-        QAuthor qAuthor = QAuthor.author;
-
-        return new JPAQueryFactory(entityManager)
-                .select(Projections.constructor(
-                        AuthorGetResponse.class,
-                        qAuthor.authorId,
-                        qAuthor.authorName,
-                        qAuthor.authorInfo
-                ))
-                .from(qAuthor)
-                .orderBy(qAuthor.authorId.asc())
-                .fetch();
+    public List<AuthorGetResponse> findAllAuthorList() {
+        return queryFactory.select(Projections.constructor(
+                AuthorGetResponse.class,
+                author.authorId,
+                author.authorName,
+                author.authorInfo
+            ))
+            .from(author)
+            .orderBy(author.authorId.asc())
+            .fetch();
     }
 
     @Override
@@ -74,4 +71,5 @@ public class AuthorCustomRepositoryImpl implements AuthorCustomRepository {
                 .where(author.authorId.eq(authorId))
                 .fetchOne();
     }
+
 }
