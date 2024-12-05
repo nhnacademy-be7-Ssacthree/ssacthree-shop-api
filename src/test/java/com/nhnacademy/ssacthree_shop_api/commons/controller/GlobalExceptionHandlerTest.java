@@ -1,10 +1,12 @@
 package com.nhnacademy.ssacthree_shop_api.commons.controller;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.nhnacademy.ssacthree_shop_api.commons.dto.ErrorResponse;
 import com.nhnacademy.ssacthree_shop_api.commons.dto.OrderDetailErrorResponse;
 import com.nhnacademy.ssacthree_shop_api.commons.exception.CustomException;
+import com.nhnacademy.ssacthree_shop_api.commons.exception.NotFoundException;
 import com.nhnacademy.ssacthree_shop_api.orderset.orderdetail.exception.OrderNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -44,66 +46,49 @@ class GlobalExceptionHandlerTest {
         assertThat(response.getBody().getStatus()).isEqualTo(HttpStatus.NOT_FOUND);
     }
 
+
+
     @Test
-    public void testHandleCustomException() {
-        // Given: CustomException 생성
-        String errorMessage = "Custom error occurred";
-        int errorCode = 400;
-        CustomException exception = new CustomException(errorMessage, errorCode);
+    void testHandleCustomException() {
+        // given
+        CustomException exception = new CustomException("Custom exception occurred",
+            HttpStatus.BAD_REQUEST.value());
 
-        // When: 예외 핸들러 호출
-        ResponseEntity<ErrorResponse> response = globalExceptionHandler.handleCustomException(exception);
+        // when
+        var response = handler.handleCustomException(exception);
 
-        // Then: 응답 검증
-        assertThat(response.getStatusCodeValue()).isEqualTo(errorCode);
-        assertThat(response.getBody()).isNotNull();
-        assertThat(response.getBody().getMessage()).isEqualTo(errorMessage);
-        assertThat(response.getBody().getStatusCode()).isEqualTo(errorCode);
+        // then
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        ErrorResponse body = response.getBody();
+        assertEquals("Custom exception occurred", body.getMessage());
+        assertEquals(HttpStatus.BAD_REQUEST.value(), body.getStatusCode());
     }
 
-//    @Test
-//    void testHandleCustomException() {
-//        // given
-//        CustomException exception = new CustomException("Custom exception occurred",
-//            HttpStatus.BAD_REQUEST.value());
-//
-//        // when
-//        var response = handler.handleCustomException(exception);
-//
-//        // then
-//        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-//        ErrorResponse body = response.getBody();
-//        assertEquals("Custom exception occurred", body.getMessage());
-//        assertEquals(HttpStatus.BAD_REQUEST.value(), body.getStatusCode());
-//    }
-//
-//    @Test
-//    void testHandleNotFoundException() {
-//        // given
-//        NotFoundException exception = new NotFoundException("Not Found Exception occurred");
-//
-//        // when
-//        var response = handler.handleNotFoundException(exception);
-//
-//        // then
-//        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
-//        assertEquals("Not Found Exception occurred", response.getBody());
-//    }
-//
-//    @Test
-//    void testHandleIllegalArgumentException() {
-//        // given
-//        IllegalArgumentException exception = new IllegalArgumentException(
-//            "Invalid argument provided");
-//
-//        // when
-//        var response = handler.handleIllegalArgumentException(exception);
-//
-//        // then
-//        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-//        assertEquals("Invalid argument provided", response.getBody());
-//    }
+    @Test
+    void testHandleNotFoundException() {
+        // given
+        NotFoundException exception = new NotFoundException("Not Found Exception occurred");
 
+        // when
+        var response = handler.handleNotFoundException(exception);
 
+        // then
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+        assertEquals("Not Found Exception occurred", response.getBody());
+    }
+
+    @Test
+    void testHandleIllegalArgumentException() {
+        // given
+        IllegalArgumentException exception = new IllegalArgumentException(
+            "Invalid argument provided");
+
+        // when
+        var response = handler.handleIllegalArgumentException(exception);
+
+        // then
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        assertEquals("Invalid argument provided", response.getBody());
+    }
 
 }
