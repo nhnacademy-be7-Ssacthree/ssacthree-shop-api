@@ -212,6 +212,7 @@ public class OrderDetailServiceImpl implements OrderDetailService {
                 paymentTypeName
         );
     }
+
     public String convertPaymentStatus(Payment payment){
         log.info("payment상태변환");
         if(payment.getPaymentStatus().name().equals("DONE")){

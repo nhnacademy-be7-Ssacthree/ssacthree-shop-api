@@ -22,15 +22,10 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(OrderDetailCustomException.class)
     public ResponseEntity<OrderDetailErrorResponse> orderDetailhandleCustomExcetion(OrderDetailCustomException e){
-
-        log.info("예외발생: 존재하지않는주문번호입니다.");
-
         OrderDetailErrorResponse errorResponse = new OrderDetailErrorResponse(
             e.getMessage(), e.getStatus()  // 메시지와 HttpStatus 전달
         );
-
         return ResponseEntity.status(e.getStatus()).body(errorResponse);
-
     }
 
 }
