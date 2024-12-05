@@ -27,7 +27,6 @@ import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
 import java.util.List;
-
 @Slf4j
 @Repository
 @RequiredArgsConstructor
@@ -51,29 +50,29 @@ public class BookMgmtRepositoryImpl implements BookMgmtRepository {
     @Override
     public Page<BookSearchResponse> findAllBooks(Pageable pageable) {
         List<BookSearchResponse> books = queryFactory
-                .select(Projections.constructor(BookSearchResponse.class,
-                        book.bookId,
-                        book.bookName,
-                        book.bookInfo,
-                        book.bookStatus.stringValue()
-                ))
-                .from(book)
-                .where(book.bookStatus.ne(BookStatus.DELETE_BOOK))
-                .offset(pageable.getOffset())
-                .limit(pageable.getPageSize())
-                .orderBy(getOrderSpecifier(pageable))
-                .fetch();
+            .select(Projections.constructor(BookSearchResponse.class,
+                book.bookId,
+                book.bookName,
+                book.bookInfo,
+                book.bookStatus.stringValue()
+            ))
+            .from(book)
+            .where(book.bookStatus.ne(BookStatus.DELETE_BOOK))
+            .offset(pageable.getOffset())
+            .limit(pageable.getPageSize())
+            .orderBy(getOrderSpecifier(pageable))
+            .fetch();
 
         books.forEach(b -> log.info("bookStatus 확인용: {}", b.getBookStatus()));
 
         // Fetch authors for each book
         books.forEach(b -> {
             List<AuthorNameResponse> authors = queryFactory
-                    .select(Projections.constructor(AuthorNameResponse.class, author.authorName))
-                    .from(bookAuthor)
-                    .join(author).on(author.authorId.eq(bookAuthor.author.authorId))
-                    .where(bookAuthor.book.bookId.eq(b.getBookId()))
-                    .fetch();
+                .select(Projections.constructor(AuthorNameResponse.class, author.authorName))
+                .from(bookAuthor)
+                .join(author).on(author.authorId.eq(bookAuthor.author.authorId))
+                .where(bookAuthor.book.bookId.eq(b.getBookId()))
+                .fetch();
             b.setAuthors(authors);
         });
 
@@ -87,16 +86,23 @@ public class BookMgmtRepositoryImpl implements BookMgmtRepository {
     }
 
     private OrderSpecifier<?>[] getOrderSpecifier(Pageable pageable) {
-        Sort sort = pageable.getSort(); // pageable에서 Sort 객체 가져오기
+        Sort sort = pageable.getSort();
 
         List<OrderSpecifier<?>> orders = new ArrayList<>();
         for (Sort.Order order : sort) {
-            PathBuilder<Object> pathBuilder = new PathBuilder<>(book.getType(), "book"); // book의 타입과 엔티티를 사용
-            OrderSpecifier<?> orderSpecifier = getOrderSpecifierForField(order, pathBuilder);
-            orders.add(orderSpecifier);
+            PathBuilder<Object> pathBuilder = new PathBuilder<>(book.getType(), "book");
+            try {
+                OrderSpecifier<?> orderSpecifier = getOrderSpecifierForField(order, pathBuilder);
+                if (orderSpecifier != null) {
+                    orders.add(orderSpecifier);
+                }
+            } catch (IllegalArgumentException e) {
+                log.error("Sorting property not recognized: {}", order.getProperty());
+            }
         }
         return orders.toArray(new OrderSpecifier[0]);
     }
+
 
 
 
@@ -116,7 +122,7 @@ public class BookMgmtRepositoryImpl implements BookMgmtRepository {
                 ? pathBuilder.getNumber(BOOK_ISBN, Integer.class).desc()
                 : pathBuilder.getNumber(BOOK_ISBN, Integer.class).asc();
         } else {
-            return null;
+            throw new IllegalArgumentException("Unknown property for sorting: " + property); // 예외 처리
         }
     }
 

@@ -1,14 +1,20 @@
 package com.nhnacademy.ssacthree_shop_api.review.controller;
 
+import com.nhnacademy.ssacthree_shop_api.review.dto.BookReviewResponse;
 import com.nhnacademy.ssacthree_shop_api.review.dto.MemberReviewResponse;
 import com.nhnacademy.ssacthree_shop_api.review.dto.ReviewRequestWithUrl;
 import com.nhnacademy.ssacthree_shop_api.review.dto.ReviewResponse;
 import com.nhnacademy.ssacthree_shop_api.review.service.ReviewService;
+import java.time.LocalDateTime;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -37,6 +43,31 @@ class ReviewControllerTest {
         mockMvc = MockMvcBuilders.standaloneSetup(reviewController).build();
     }
 
+    @Test
+    void testGetReviewsByBookId() throws Exception {
+        // Given
+        Long bookId = 1L;
+        int page = 0;
+        int size = 10;
+        String[] sort = {"reviewCreatedAt,desc"};
+        Pageable pageable = PageRequest.of(page, size);
+
+        List<BookReviewResponse> reviews = List.of(
+            new BookReviewResponse("user1", 5, "Excellent Book", "Really enjoyed it!", LocalDateTime.now(), "image_url")
+        );
+
+        Page<BookReviewResponse> reviewPage = new PageImpl<>(reviews, pageable, reviews.size());
+
+        when(reviewService.getReviewsByBookId(any(Pageable.class), eq(bookId))).thenReturn(reviewPage);
+
+        // When & Then
+        mockMvc.perform(get("/api/shop/books/reviews/{book-id}", bookId)
+                .param("page", String.valueOf(page))
+                .param("size", String.valueOf(size))
+                .param("sort", sort)
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk());
+    }
 
     @Test
     void testPostReviewBook() throws Exception {
@@ -44,7 +75,6 @@ class ReviewControllerTest {
         String header = "testUser";
         Long bookId = 1L;
         Long orderId = 123L;
-        ReviewRequestWithUrl reviewRequest = new ReviewRequestWithUrl(5, "Great Book", "Loved it!", "image_url");
 
         when(reviewService.postReviewBook(eq(header), eq(bookId), eq(orderId), any(ReviewRequestWithUrl.class)))
             .thenReturn(new ResponseEntity<>(HttpStatus.CREATED));
@@ -68,7 +98,7 @@ class ReviewControllerTest {
         Long bookId = 1L;
         Long orderId = 123L;
 
-        when(reviewService.authToWriteReview(eq(header), eq(bookId))).thenReturn(orderId);
+        when(reviewService.authToWriteReview(header, bookId)).thenReturn(orderId);
 
         // When & Then
         mockMvc.perform(get("/api/shop/members/reviews/{book-id}", bookId)
@@ -76,7 +106,7 @@ class ReviewControllerTest {
             .andExpect(status().isOk())
             .andExpect(content().string(String.valueOf(orderId)));
 
-        verify(reviewService, times(1)).authToWriteReview(eq(header), eq(bookId));
+        verify(reviewService, times(1)).authToWriteReview(header, bookId);
     }
 
     @Test
@@ -95,7 +125,7 @@ class ReviewControllerTest {
                 null                 // reviewImageUrl
             ));
 
-        when(reviewService.getReviewsByMemberId(eq(header))).thenReturn(reviews);
+        when(reviewService.getReviewsByMemberId(header)).thenReturn(reviews);
 
         // When & Then
         mockMvc.perform(get("/api/shop/members/reviews")
@@ -104,7 +134,7 @@ class ReviewControllerTest {
             .andExpect(jsonPath("$[0].bookTitle").value("Book Title"))
             .andExpect(jsonPath("$[0].reviewRate").value(5));
 
-        verify(reviewService, times(1)).getReviewsByMemberId(eq(header));
+        verify(reviewService, times(1)).getReviewsByMemberId(header);
     }
 
     @Test
@@ -115,7 +145,7 @@ class ReviewControllerTest {
         Long bookId = 1L;
         ReviewResponse reviewResponse = new ReviewResponse( 5, "Great Read", "Loved it!", "image_url");
 
-        when(reviewService.getReview(eq(header), eq(orderId), eq(bookId))).thenReturn(reviewResponse);
+        when(reviewService.getReview(header, orderId, bookId)).thenReturn(reviewResponse);
 
         // When & Then
         mockMvc.perform(get("/api/shop/members/reviews/update/{order-id}/{book-id}", orderId, bookId)
@@ -124,6 +154,6 @@ class ReviewControllerTest {
             .andExpect(jsonPath("$.reviewTitle").value("Great Read"))
             .andExpect(jsonPath("$.reviewRate").value(5));
 
-        verify(reviewService, times(1)).getReview(eq(header), eq(orderId), eq(bookId));
+        verify(reviewService, times(1)).getReview(header, orderId, bookId);
     }
 }

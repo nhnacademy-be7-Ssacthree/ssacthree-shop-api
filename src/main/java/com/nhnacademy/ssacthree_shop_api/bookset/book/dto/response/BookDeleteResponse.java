@@ -11,6 +11,7 @@ import java.util.List;
 
 @AllArgsConstructor
 @Getter
+@Setter
 @NoArgsConstructor
 public class BookDeleteResponse {
     private Long bookId;

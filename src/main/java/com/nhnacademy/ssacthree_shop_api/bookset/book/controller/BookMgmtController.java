@@ -25,7 +25,7 @@ import org.springframework.web.bind.annotation.*;
 public class BookMgmtController {
     public static final String BOOK_CREATE_SUCCESS_MESSAGE = "도서 정보 생성 성공";
     public static final String BOOK_UPDATE_SUCCESS_MESSAGE = "도서 정보 수정 성공";
-    public static final String BOOK_DELETE_SUCCESS_MESSAGE = "도서 정소 삭제 성공";
+    public static final String BOOK_DELETE_SUCCESS_MESSAGE = "도서 정보 삭제 성공";
 
     private final BookMgmtService bookMgmtService;
 

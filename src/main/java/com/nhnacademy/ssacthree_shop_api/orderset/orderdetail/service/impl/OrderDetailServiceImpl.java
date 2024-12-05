@@ -4,17 +4,16 @@ import com.nhnacademy.ssacthree_shop_api.bookset.book.domain.Book;
 import com.nhnacademy.ssacthree_shop_api.bookset.book.dto.response.BookInfoResponse;
 import com.nhnacademy.ssacthree_shop_api.bookset.book.repository.BookRepository;
 import com.nhnacademy.ssacthree_shop_api.bookset.book.service.BookCommonService;
-import com.nhnacademy.ssacthree_shop_api.commons.exception.NotFoundException;
-import com.nhnacademy.ssacthree_shop_api.orderset.deliveryrule.domain.DeliveryRule;
 import com.nhnacademy.ssacthree_shop_api.orderset.deliveryrule.domain.DeliveryRule;
 import com.nhnacademy.ssacthree_shop_api.orderset.order.domain.Order;
 import com.nhnacademy.ssacthree_shop_api.orderset.order.dto.OrderDetailSaveRequest;
 import com.nhnacademy.ssacthree_shop_api.orderset.order.repository.OrderRepository;
 import com.nhnacademy.ssacthree_shop_api.orderset.order.repository.OrderRepositoryCustom;
-import com.nhnacademy.ssacthree_shop_api.orderset.order.repository.OrderRepository;
 import com.nhnacademy.ssacthree_shop_api.orderset.orderdetail.domain.OrderDetail;
 import com.nhnacademy.ssacthree_shop_api.orderset.orderdetail.dto.OrderDetailDTO;
 import com.nhnacademy.ssacthree_shop_api.orderset.orderdetail.dto.OrderDetailResponse;
+import com.nhnacademy.ssacthree_shop_api.orderset.orderdetail.exception.OrderNotFoundException;
+import com.nhnacademy.ssacthree_shop_api.orderset.orderdetail.exception.PaymentNotFoundException;
 import com.nhnacademy.ssacthree_shop_api.orderset.orderdetail.repo.OrderDetailRepository;
 import com.nhnacademy.ssacthree_shop_api.orderset.orderdetail.service.OrderDetailService;
 import com.nhnacademy.ssacthree_shop_api.orderset.orderdetailpackaging.domain.OrderDetailPackaging;
@@ -24,7 +23,6 @@ import com.nhnacademy.ssacthree_shop_api.orderset.packaging.repository.Packaging
 
 import com.nhnacademy.ssacthree_shop_api.orderset.payment.domain.Payment;
 import com.nhnacademy.ssacthree_shop_api.orderset.payment.domain.repository.PaymentRepository;
-import jakarta.persistence.EntityNotFoundException;
 
 import java.util.Objects;
 import java.util.Optional;
@@ -74,7 +72,7 @@ public class OrderDetailServiceImpl implements OrderDetailService {
             // 재고 차감 - 배타락 이용 (읽기, 쓰기 동시 불가하게)
             book.setStock(book.getStock() - orderDetailSaveRequest.getQuantity());
 
-            //TODO : 주문 상세 리스트 저장
+            // TODO : 주문 상세 리스트 저장
             OrderDetail orderDetail = new OrderDetail(
                     order,
                     book,
@@ -116,8 +114,7 @@ public class OrderDetailServiceImpl implements OrderDetailService {
     // orderNumber로 orderId 조회
     @Override
     public Optional<Long> getOrderId(String orderNumber) {
-        Optional<Long> orderId = orderRepositoryCustom.findOrderIdByOrderNumber(orderNumber);
-        return orderId;
+        return orderRepositoryCustom.findOrderIdByOrderNumber(orderNumber);
     }
 
 
@@ -130,7 +127,8 @@ public class OrderDetailServiceImpl implements OrderDetailService {
         if (optionalOrder.isPresent()) {    // null 아니면
             order = optionalOrder.get();
         } else {
-            throw new NotFoundException("Order not found with id: " + orderId);
+            log.info("comparePhoneNumber, false 반환, Order이 Null 입니다.");
+            throw new OrderNotFoundException(orderId);
         }
 
         // 구매자의 전화번호와 동일한가?
@@ -150,7 +148,7 @@ public class OrderDetailServiceImpl implements OrderDetailService {
     public OrderDetailResponse getOrderDetail(Long orderId) {
         // 1. 주문 정보 조회
         Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new EntityNotFoundException("해당 주문을 찾을 수 없습니다: " + orderId));
+                .orElseThrow(() -> new OrderNotFoundException(orderId));
 
 
         // 2. 주문 상세 정보 조회
@@ -183,7 +181,7 @@ public class OrderDetailServiceImpl implements OrderDetailService {
 
         // 3. 결제 정보 조회
         Payment payment = paymentRepository.findByOrder(order)
-                .orElseThrow(() -> new EntityNotFoundException("결제 정보를 찾을 수 없습니다: " + orderId));
+                .orElseThrow(() -> new PaymentNotFoundException("결제 정보를 찾을 수 없습니다: " + orderId));
         log.info("payment내용: {} / {}", payment.getId(), payment.getPaymentKey());
         String paymentTypeName = payment.getPaymentType().getPaymentTypeName();
 
@@ -192,7 +190,7 @@ public class OrderDetailServiceImpl implements OrderDetailService {
         int deliveryFee = deliveryRule.getDeliveryFee();
 
         // 5. DTO 매핑
-        OrderDetailResponse orderDetailResponse = new OrderDetailResponse(
+        return new OrderDetailResponse(
                 order.getId(),
                 order.getOrdered_date().toLocalDate(),
                 order.getOrder_number(),
@@ -214,8 +212,8 @@ public class OrderDetailServiceImpl implements OrderDetailService {
                 convertPaymentStatus(payment),
                 paymentTypeName
         );
-        return orderDetailResponse;
     }
+
     public String convertPaymentStatus(Payment payment){
         log.info("payment상태변환");
         if(payment.getPaymentStatus().name().equals("DONE")){

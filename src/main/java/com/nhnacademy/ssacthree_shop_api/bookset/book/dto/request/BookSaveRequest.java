@@ -3,12 +3,14 @@ package com.nhnacademy.ssacthree_shop_api.bookset.book.dto.request;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
 import java.util.List;
 
 @Getter
+@Setter
 @NoArgsConstructor
 public class BookSaveRequest {
     private String bookName;
