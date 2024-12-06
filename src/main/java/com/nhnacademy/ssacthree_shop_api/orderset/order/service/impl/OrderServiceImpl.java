@@ -4,7 +4,6 @@ import com.nhnacademy.ssacthree_shop_api.commons.exception.NotFoundException;
 import com.nhnacademy.ssacthree_shop_api.customer.domain.Customer;
 import com.nhnacademy.ssacthree_shop_api.customer.repository.CustomerRepository;
 import com.nhnacademy.ssacthree_shop_api.memberset.member.domain.Member;
-import com.nhnacademy.ssacthree_shop_api.memberset.member.exception.MemberNotFoundException;
 import com.nhnacademy.ssacthree_shop_api.memberset.member.repository.MemberRepository;
 import com.nhnacademy.ssacthree_shop_api.memberset.pointhistory.domain.PointHistory;
 import com.nhnacademy.ssacthree_shop_api.memberset.pointhistory.dto.PointHistorySaveRequest;
@@ -100,9 +99,6 @@ public class OrderServiceImpl implements OrderService {
             throw new RuntimeException("주문상세 정보 저장에 실패했습니다." + e.getMessage());
         }
 
-        // TODO : 포장 테이블 생성 - 주문 상세쪽에서 처리해야할 듯.
-        // 현재는 포장을 받아올 수 없어서 저장 불가함 ...
-
         // TODO : 주문 완료시 상태 생성 - 결제 완료, 대기
         OrderStatus orderStatus= orderStatusRepository.findById(1L)
                 .orElseThrow(() -> new RuntimeException("상태를 찾을 수 없습니다."));
@@ -145,7 +141,6 @@ public class OrderServiceImpl implements OrderService {
 
         // TODO : 장바구니 비우기
 
-        // TODO : 재고 차감 -> 상세에서 처리
 
 
         return new OrderResponse(order.getId());
@@ -240,13 +235,13 @@ public class OrderServiceImpl implements OrderService {
 
 
     // OrderId로 order 객체 반환
-//    @Override
-//    public Order getOrder(Long orderId) {
-//        Optional<Order> optionalOrder = orderRepository.findById(orderId);
-//        if (optionalOrder.isPresent()) {
-//            return optionalOrder.get();
-//        } else {
-//            throw new NotFoundException("Order not found with id: " + orderId);
-//        }
-//    }
+    @Override
+    public Order getOrder(Long orderId) {
+        Optional<Order> optionalOrder = orderRepository.findById(orderId);
+        if (optionalOrder.isPresent()) {
+            return optionalOrder.get();
+        } else {
+            throw new NotFoundException("해당 주문이 존재하지 않습니다.");
+        }
+    }
 }
