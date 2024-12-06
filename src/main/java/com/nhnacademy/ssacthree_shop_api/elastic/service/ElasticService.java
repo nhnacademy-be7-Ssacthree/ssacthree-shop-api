@@ -40,6 +40,7 @@ public class ElasticService {
   private static final String SALE_PRICE = "salePrice";
   private static final String BOOK_VIEW_COUNT = "bookViewCount";
   private static final String SCORE = "_score";
+  private static final String CATEGORY = "category";
 
   /**
    * Elasticsearch 클러스터 상태 확인 메서드
@@ -112,7 +113,7 @@ public class ElasticService {
 
     // 3. 쿼리 구성
     Map<String, Object> query = new HashMap<>();
-    query.put("query", Map.of("bool", boolQuery));
+    query.put(QUERY, Map.of("bool", boolQuery));
     query.put("track_total_hits", true); // 전체 데이터 개수 요청
     query.put("from", (searchRequest.getPage()) * searchRequest.getPageSize());
     query.put("size", searchRequest.getPageSize());
@@ -135,7 +136,7 @@ public class ElasticService {
   public Map<String, Object> createKeywordSearchCondition(String keyword) {
     return Map.of(
         "multi_match", Map.of(
-            "query", keyword,
+            QUERY, keyword,
             "fields", List.of(
                 "bookName.nori^100",
                 "bookName^15",
@@ -180,9 +181,9 @@ public class ElasticService {
    */
   public Map<String, Object> getFilterConditions(Map<String, String> filters) {
     //controller filters에 에서 category, tag 로 넣어줌
-    if (filters.containsKey("category") && filters.get("category") != null && !filters.get("category").isEmpty()) {
+    if (filters.containsKey(CATEGORY) && filters.get(CATEGORY) != null && !filters.get(CATEGORY).isEmpty()) {
       // 카테고리가 입력된 경우, 카테고리 필터만 추가
-      return Map.of("term", Map.of("category.keyword", filters.get("category"))); // keyword로 정확히 일치할 때만 검색이 됩니다.
+      return Map.of("term", Map.of("category.keyword", filters.get(CATEGORY))); // keyword로 정확히 일치할 때만 검색이 됩니다.
     }
 
     if (filters.containsKey("tag") && filters.get("tag") != null && !filters.get("tag").isEmpty()) {
@@ -247,18 +248,18 @@ public class ElasticService {
     book.setBookIndex((String) source.get("bookIndex"));
     book.setBookInfo((String) source.get("bookInfo"));
     book.setBookIsbn((String) source.get("bookIsbn"));
-    book.setPublicationDate(convertToLocaldate((String) source.get("publicationDate")));
+    book.setPublicationDate(convertToLocaldate((String) source.get(PUBLICATION_DATE)));
     book.setRegularPrice(
         source.get("regularPrice") != null ? ((Number) source.get("regularPrice")).intValue() : null
     );
     book.setSalePrice(
-        source.get("salePrice") != null ? ((Number) source.get("salePrice")).intValue() : null
+        source.get(SALE_PRICE) != null ? ((Number) source.get(SALE_PRICE)).intValue() : null
     );
     book.setPacked((Boolean) source.getOrDefault("isPacked", false));
     book.setStock(source.get("stock") != null ? ((Number) source.get("stock")).intValue() : null);
     book.setBookThumbnailImageUrl((String) source.get("bookThumbnailImageUrl"));
     book.setBookViewCount(
-        source.get("bookViewCount") != null ? ((Number) source.get("bookViewCount")).intValue() : null
+        source.get(BOOK_VIEW_COUNT) != null ? ((Number) source.get(BOOK_VIEW_COUNT)).intValue() : null
     );
     book.setBookDiscount(
         source.get("bookDiscount") != null ? ((Number) source.get("bookDiscount")).intValue() : null
@@ -272,15 +273,16 @@ public class ElasticService {
             ? ((List<?>) source.get("tagNames")).stream()
             .filter(String.class::isInstance)
             .map(String.class::cast)
-            .collect(Collectors.toList())
+            .toList()  // Collect 대신 toList 사용
             : Collections.emptyList()
     );
+
     book.setCategory(
-        source.get("category") != null
-            ? ((List<?>) source.get("category")).stream()
+        source.get(CATEGORY) != null
+            ? ((List<?>) source.get(CATEGORY)).stream()
             .filter(String.class::isInstance)
             .map(String.class::cast)
-            .collect(Collectors.toList())
+            .toList()  // Collect 대신 toList 사용
             : Collections.emptyList()
     );
 

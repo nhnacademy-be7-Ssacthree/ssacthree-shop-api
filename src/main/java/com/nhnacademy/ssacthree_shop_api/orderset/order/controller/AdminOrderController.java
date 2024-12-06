@@ -51,9 +51,9 @@ public class AdminOrderController {
         boolean success = orderService.updateOrderStatus(orderId, status);
 
         if (success) {
-            return ResponseEntity.ok(new MessageResponse("Order status updated successfully."));
+            return ResponseEntity.ok(new MessageResponse("주문 상태 변경 성공"));
         } else {
-            return ResponseEntity.badRequest().body(new MessageResponse("Failed to update order status."));
+            return ResponseEntity.badRequest().body(new MessageResponse("주문 상태 변경 실패"));
         }
     }
 }

@@ -16,6 +16,7 @@ public class AdminOrderListResponse {
     private LocalDate orderDate;
     private int totalPrice;
     private String orderStatus;
+    private LocalDate orderStatusCreatedAt;
     private String customerName;
     private String orderNumber;
     private String invoiceNumber;

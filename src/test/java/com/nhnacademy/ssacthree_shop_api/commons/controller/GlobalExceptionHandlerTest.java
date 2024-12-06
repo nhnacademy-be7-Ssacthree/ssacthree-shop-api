@@ -30,7 +30,7 @@ class GlobalExceptionHandlerTest {
     private final GlobalExceptionHandler globalExceptionHandler = new GlobalExceptionHandler();
 
     @Test
-    public void testOrderDetailHandleCustomException() {
+    void testOrderDetailHandleCustomException() {
         // Given: OrderNotFoundException 생성
         Long invalidOrderId = 9999L;
         OrderNotFoundException exception = new OrderNotFoundException(invalidOrderId);
@@ -42,10 +42,10 @@ class GlobalExceptionHandlerTest {
         // Then: 응답 확인
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
         assertThat(response.getBody()).isNotNull();
-        assertThat(response.getBody().getMessage()).isEqualTo("해당 주문을 찾지 못함 / 주문번호: " + invalidOrderId);
+        assertThat(response.getBody().getMessage()).isEqualTo(
+            "해당 주문을 찾지 못함 / 주문번호: " + invalidOrderId);
         assertThat(response.getBody().getStatus()).isEqualTo(HttpStatus.NOT_FOUND);
     }
-
 
 
     @Test
