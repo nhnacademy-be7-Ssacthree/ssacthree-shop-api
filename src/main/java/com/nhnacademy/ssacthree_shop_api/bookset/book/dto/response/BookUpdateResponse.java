@@ -10,9 +10,7 @@ import com.nhnacademy.ssacthree_shop_api.bookset.tag.dto.response.TagInfoRespons
 import lombok.*;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Builder
 @Setter
@@ -79,16 +77,17 @@ public class BookUpdateResponse {
         // bookCategory 요소 하나씩 CategoryNameResponse로 변환 후
         // collect를 통해 리스트로 묶어서 반환
         this.categories = book.getBookCategories().stream()
-                .map(bookCategory -> new CategoryNameResponse(bookCategory.getCategory()))
-                .collect(Collectors.toList());
+            .map(bookCategory -> new CategoryNameResponse(bookCategory.getCategory()))
+            .toList();  // Stream.collect(Collectors.toList()) 대신 Stream.toList()
 
         this.tags = book.getBookTags().stream()
-                .map(bookTag -> new TagInfoResponse(bookTag.getTag()))
-                .collect(Collectors.toList());
+            .map(bookTag -> new TagInfoResponse(bookTag.getTag()))
+            .toList();  // Stream.collect(Collectors.toList()) 대신 Stream.toList()
 
         this.authors = book.getBookAuthors().stream()
-                .map(bookAuthor -> new AuthorNameResponse(bookAuthor.getAuthor()))
-                .collect(Collectors.toList());
+            .map(bookAuthor -> new AuthorNameResponse(bookAuthor.getAuthor()))
+            .toList();  // Stream.collect(Collectors.toList()) 대신 Stream.toList()
+
     }
 
     public BookUpdateResponse(BookBaseResponse bookBaseResponse) {

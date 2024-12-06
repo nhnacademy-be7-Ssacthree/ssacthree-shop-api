@@ -49,9 +49,6 @@ public class OrderSaveRequest {
     private String orderNumber;
 
     // 쿠폰아이디? -> 일단 막아두고 도서에서 쓰게 함.
-    //TODO : 어떻게 하지
-    // private Long couponId;
-
-
+    // TODO : 어떻게 하지
 
 }

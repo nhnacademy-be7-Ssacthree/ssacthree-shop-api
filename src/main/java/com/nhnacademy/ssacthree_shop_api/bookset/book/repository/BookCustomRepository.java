@@ -1,9 +1,7 @@
 package com.nhnacademy.ssacthree_shop_api.bookset.book.repository;
 
 import com.nhnacademy.ssacthree_shop_api.bookset.author.dto.AuthorNameResponse;
-import com.nhnacademy.ssacthree_shop_api.bookset.book.dto.response.BookBaseResponse;
 import com.nhnacademy.ssacthree_shop_api.bookset.book.dto.response.BookInfoResponse;
-import com.nhnacademy.ssacthree_shop_api.bookset.book.dto.response.BookListBaseResponse;
 import com.nhnacademy.ssacthree_shop_api.bookset.book.dto.response.BookListResponse;
 import com.nhnacademy.ssacthree_shop_api.bookset.category.dto.response.CategoryNameResponse;
 import com.nhnacademy.ssacthree_shop_api.bookset.tag.dto.response.TagInfoResponse;

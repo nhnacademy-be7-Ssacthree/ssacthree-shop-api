@@ -73,13 +73,13 @@ public class DeliveryRuleServiceImpl implements DeliveryRuleService {
     @Override
     public DeliveryRuleGetResponse getCurrentDeliveryRule() {
         DeliveryRule deliveryRule = deliveryRuleRepository.findByDeliveryRuleIsSelectedTrue();
-        DeliveryRuleGetResponse response = new DeliveryRuleGetResponse(
-                deliveryRule.getDeliveryRuleId(),
-                deliveryRule.getDeliveryRuleName(),
-                deliveryRule.getDeliveryFee(),
-                deliveryRule.getDeliveryDiscountCost(),
-                true,
-                deliveryRule.getDeliveryRuleCreatedAt());
-        return response;
+
+        return new DeliveryRuleGetResponse(
+            deliveryRule.getDeliveryRuleId(),
+            deliveryRule.getDeliveryRuleName(),
+            deliveryRule.getDeliveryFee(),
+            deliveryRule.getDeliveryDiscountCost(),
+            true,
+            deliveryRule.getDeliveryRuleCreatedAt());
     }
 }
