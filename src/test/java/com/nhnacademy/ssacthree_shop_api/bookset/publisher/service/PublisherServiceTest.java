@@ -106,5 +106,20 @@ class PublisherServiceTest {
         verify(publisherRepository, times(1)).findAllPublisherList();
     }
 
-    // 추가적으로 에러 처리를 테스트하는 메서드를 추가할 수 있습니다.
+    @Test
+    void testUpdatePublisher_InvalidId() {
+        // Arrange
+        PublisherUpdateRequest request = new PublisherUpdateRequest();
+        request.setPublisherId(0L); // 잘못된 ID 값 (0 이하)
+
+        // Act & Assert
+        IllegalArgumentException exception = assertThrows(
+                IllegalArgumentException.class,
+                () -> publisherService.updatePublisher(request)
+        );
+
+        assertEquals("출판사 ID가 잘못되었습니다.", exception.getMessage());
+        verify(publisherRepository, never()).findById(anyLong());
+        verify(publisherRepository, never()).save(any(Publisher.class));
+    }
 }

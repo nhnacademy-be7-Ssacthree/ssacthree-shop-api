@@ -52,12 +52,4 @@ public class PublisherService {
 
         return publisherRepository.save(publisher);
     }
-
-    private Publisher convertToPublisherEntity(PublisherGetResponse publisherGetResponse){
-        return new Publisher(
-                publisherGetResponse.getPublisherId(),
-                publisherGetResponse.getPublisherName(),
-                publisherGetResponse.isPublisherIsUsed()
-        );
-    }
 }
