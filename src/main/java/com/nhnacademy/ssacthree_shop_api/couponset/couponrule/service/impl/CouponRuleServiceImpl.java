@@ -1,16 +1,11 @@
 package com.nhnacademy.ssacthree_shop_api.couponset.couponrule.service.impl;
 
 import com.nhnacademy.ssacthree_shop_api.couponset.couponrule.domain.CouponRule;
-import com.nhnacademy.ssacthree_shop_api.couponset.couponrule.domain.QCouponRule;
 import com.nhnacademy.ssacthree_shop_api.couponset.couponrule.dto.CouponRuleCreateRequest;
 import com.nhnacademy.ssacthree_shop_api.couponset.couponrule.dto.CouponRuleGetResponse;
 import com.nhnacademy.ssacthree_shop_api.couponset.couponrule.dto.CouponRuleUpdateRequest;
 import com.nhnacademy.ssacthree_shop_api.couponset.couponrule.repository.CouponRuleRepository;
 import com.nhnacademy.ssacthree_shop_api.couponset.couponrule.service.CouponRuleService;
-import com.querydsl.core.types.Projections;
-import com.querydsl.jpa.impl.JPAQueryFactory;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -20,53 +15,16 @@ import java.util.List;
 @RequiredArgsConstructor
 public class CouponRuleServiceImpl implements CouponRuleService {
 
-    @PersistenceContext
-    private EntityManager entityManager;
-
     private final CouponRuleRepository couponRuleRepository;
 
     @Override
     public List<CouponRuleGetResponse> getAllCouponRules() {
-        QCouponRule couponRule = QCouponRule.couponRule;
-
-        return new JPAQueryFactory(entityManager)
-                .select(Projections.constructor(
-                        CouponRuleGetResponse.class,
-                        couponRule.id,
-                        couponRule.couponType,
-                        couponRule.couponMinOrderPrice,
-                        couponRule.maxDiscountPrice,
-                        couponRule.couponDiscountPrice,
-                        couponRule.couponRuleName,
-                        couponRule.couponIsUsed,
-                        couponRule.couponRuleCreatedAt
-                ))
-                .from(couponRule)
-                .orderBy(couponRule.couponIsUsed.desc())
-                .orderBy(couponRule.couponRuleCreatedAt.asc())
-                .fetch();
+        return couponRuleRepository.getAllCouponRules();
     }
 
     @Override
     public List<CouponRuleGetResponse> getAllSelectedCouponRules() {
-        QCouponRule couponRule = QCouponRule.couponRule;
-
-        return new JPAQueryFactory(entityManager)
-                .select(Projections.constructor(
-                        CouponRuleGetResponse.class,
-                        couponRule.id,
-                        couponRule.couponType,
-                        couponRule.couponMinOrderPrice,
-                        couponRule.maxDiscountPrice,
-                        couponRule.couponDiscountPrice,
-                        couponRule.couponRuleName,
-                        couponRule.couponIsUsed,
-                        couponRule.couponRuleCreatedAt
-                ))
-                .from(couponRule)
-                .where(couponRule.couponIsUsed.eq(true))
-                .orderBy(couponRule.couponRuleCreatedAt.asc())
-                .fetch();
+        return couponRuleRepository.getAllSelectedCouponRules();
     }
 
     @Override

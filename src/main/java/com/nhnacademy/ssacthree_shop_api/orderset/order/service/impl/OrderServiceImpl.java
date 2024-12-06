@@ -119,7 +119,7 @@ public class OrderServiceImpl implements OrderService {
         if (optionalMember.isPresent()) {
             Member member = optionalMember.get();
             int pointHistory = 0;
-            PointSaveRule pointSaveRule = pointSaveRuleRepository.findPointSaveRuleByPointSaveRuleName("도서구매적립")
+            PointSaveRule pointSaveRule = pointSaveRuleRepository.findPointSaveRuleByPointSaveRuleName("도서 구매 적립")
                     .orElseThrow(() -> new PointSaveRuleNotFoundException("정책이 존재하지 않습니다."));
 
             PointHistory savePointHistory = pointHistoryService.savePointHistory(
