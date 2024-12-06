@@ -75,12 +75,12 @@ class PointSaveRuleServiceImplTest {
         assertEquals(2, result.size());
 
         // 첫 번째 규칙 검증
-        assertEquals(1L, result.get(0).getPointSaveRuleId());
-        assertEquals("Rule1", result.get(0).getPointSaveRuleName());
-        assertEquals(10, result.get(0).getPointSaveAmount());
-        assertNotNull(result.get(0).getPointSaveRuleGenerateDate()); // 현재 시간을 확인
+        assertEquals(1L, result.getFirst().getPointSaveRuleId());
+        assertEquals("Rule1", result.getFirst().getPointSaveRuleName());
+        assertEquals(10, result.getFirst().getPointSaveAmount());
+        assertNotNull(result.getFirst().getPointSaveRuleGenerateDate()); // 현재 시간을 확인
         assertTrue(result.get(0).isPointSaveRuleIsSelected());
-        assertEquals(PointSaveType.PERCENT, result.get(0).getPointSaveType());
+        assertEquals(PointSaveType.PERCENT, result.getFirst().getPointSaveType());
 
         // 두 번째 규칙 검증
         assertEquals(2L, result.get(1).getPointSaveRuleId());
