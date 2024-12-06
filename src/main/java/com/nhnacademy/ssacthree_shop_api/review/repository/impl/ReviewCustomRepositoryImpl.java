@@ -28,26 +28,26 @@ public class ReviewCustomRepositoryImpl implements ReviewCustomRepository {
 
         // QueryDSL로 리뷰 조회 쿼리 작성
         JPAQuery<BookReviewResponse> query = queryFactory
-                .select(Projections.constructor(BookReviewResponse.class,
-                        member.memberLoginId,       // Member Login ID
-                        review.reviewRate,          // 리뷰 평점
-                        review.reviewTitle,         // 리뷰 제목
-                        review.reviewContent,       // 리뷰 내용
-                        review.reviewCreatedAt,     // 리뷰 생성일
-                        review.reviewImageUrl       // 리뷰 이미지 URL
-                ))
-                .from(review)
-                .join(review.customer, customer) // Review -> Customer 조인
-                .join(member).on(member.customer.customerId.eq(customer.customerId)) // Customer -> Member 조인
-                .where(review.book.bookId.eq(bookId)) // bookId 조건
-                .orderBy(review.reviewCreatedAt.desc()); // 최신순 정렬
+            .select(Projections.constructor(BookReviewResponse.class,
+                member.memberLoginId,       // Member Login ID
+                review.reviewRate,          // 리뷰 평점
+                review.reviewTitle,         // 리뷰 제목
+                review.reviewContent,       // 리뷰 내용
+                review.reviewCreatedAt,     // 리뷰 생성일
+                review.reviewImageUrl       // 리뷰 이미지 URL
+            ))
+            .from(review)
+            .join(review.customer, customer) // Review -> Customer 조인
+            .join(member).on(member.customer.customerId.eq(customer.customerId)) // Customer -> Member 조인
+            .where(review.book.bookId.eq(bookId)) // bookId 조건
+            .orderBy(review.reviewCreatedAt.desc()); // 최신순 정렬
 
         // 페이징 처리
         long total = query.fetch().size();
         List<BookReviewResponse> reviews = query
-                .offset(pageable.getOffset())
-                .limit(pageable.getPageSize())
-                .fetch();
+            .offset(pageable.getOffset())
+            .limit(pageable.getPageSize())
+            .fetch();
 
         // Page 객체로 반환
         return new PageImpl<>(reviews, pageable, total);

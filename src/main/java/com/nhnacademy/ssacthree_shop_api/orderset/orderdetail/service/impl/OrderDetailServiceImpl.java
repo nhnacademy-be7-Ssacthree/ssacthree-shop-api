@@ -33,6 +33,7 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Slf4j
 @Service
@@ -194,7 +195,8 @@ public class OrderDetailServiceImpl implements OrderDetailService {
                 order.getOrdered_date().toLocalDate(),
                 order.getOrder_number(),
                 order.getDeliveryDate(),
-                "읏짜", // 송장 번호 (별도로 저장되어 있다면 추가 가능)
+            Optional.ofNullable(order.getInvoice_number())
+                .orElse("배송 준비 중"),
                 order.getReceiverName(),
                 order.getReceiverPhone(),
                 order.getOrderRequest(),
@@ -221,6 +223,5 @@ public class OrderDetailServiceImpl implements OrderDetailService {
             return "결제 취소";
         }
     }
-
 
 }
