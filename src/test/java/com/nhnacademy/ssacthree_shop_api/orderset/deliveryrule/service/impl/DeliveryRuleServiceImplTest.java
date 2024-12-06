@@ -65,12 +65,12 @@ class DeliveryRuleServiceImplTest {
         assertEquals(2, result.size());
 
         // 첫 번째 규칙 검증
-        assertEquals(1L, result.get(0).getDeliveryRuleId());
-        assertEquals("Rule1", result.get(0).getDeliveryRuleName());
-        assertEquals(10000, result.get(0).getDeliveryFee());
-        assertEquals(1000, result.get(0).getDeliveryDiscountCost());
-        assertTrue(result.get(0).isDeliveryRuleIsSelected());
-        assertNotNull(result.get(0).getDeliveryRuleCreatedAt());
+        assertEquals(1L, result.getFirst().getDeliveryRuleId());
+        assertEquals("Rule1", result.getFirst().getDeliveryRuleName());
+        assertEquals(10000, result.getFirst().getDeliveryFee());
+        assertEquals(1000, result.getFirst().getDeliveryDiscountCost());
+        assertTrue(result.getFirst().isDeliveryRuleIsSelected());
+        assertNotNull(result.getFirst().getDeliveryRuleCreatedAt());
 
         // 두 번째 규칙 검증
         assertEquals(2L, result.get(1).getDeliveryRuleId());
