@@ -6,6 +6,8 @@ import com.nhnacademy.ssacthree_shop_api.orderset.order.domain.Order;
 import com.nhnacademy.ssacthree_shop_api.orderset.order.service.OrderService;
 import com.nhnacademy.ssacthree_shop_api.orderset.orderstatus.domain.OrderStatus;
 import com.nhnacademy.ssacthree_shop_api.orderset.orderstatus.domain.repository.OrderStatusRepository;
+import com.nhnacademy.ssacthree_shop_api.orderset.order.repository.OrderRepository;
+import com.nhnacademy.ssacthree_shop_api.orderset.ordertostatusmapping.OrderStatusEnum;
 import com.nhnacademy.ssacthree_shop_api.orderset.ordertostatusmapping.OrderToStatusMapping;
 import com.nhnacademy.ssacthree_shop_api.orderset.ordertostatusmapping.repository.OrderToStatusMappingRepository;
 import com.nhnacademy.ssacthree_shop_api.orderset.payment.domain.Payment;
@@ -29,6 +31,7 @@ import java.time.ZonedDateTime;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -71,6 +74,7 @@ public class PaymentServiceImpl implements PaymentService {
         Order order = orderService.getOrder(orderId);
 
         // 토스페이먼츠 결제 취소
+
         String url = "https://api.tosspayments.com/v1/payments/" + paymentCancelRequest.getPaymentKey() + "/cancel";
 
         String widgetSecretKey = "test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6";
@@ -108,6 +112,7 @@ public class PaymentServiceImpl implements PaymentService {
             orderToStatusMappingRepository.save(orderToStatusMapping);
 
             // 포인트, 쿠폰 보상 ?
+
 
             return response;
         } catch (HttpClientErrorException.Forbidden ex) {

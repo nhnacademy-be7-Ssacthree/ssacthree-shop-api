@@ -5,6 +5,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
 
-public interface CouponRuleRepository extends JpaRepository<CouponRule, Long> {
+public interface CouponRuleRepository extends JpaRepository<CouponRule, Long>, CouponRuleCustomRepository {
     Optional<CouponRule> findByCouponRuleName(String couponRuleName);
 }

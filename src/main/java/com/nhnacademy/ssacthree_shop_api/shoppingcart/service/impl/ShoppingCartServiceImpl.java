@@ -95,7 +95,8 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
         }
     }
 
-    private boolean isCartUnmatched(ShoppingCart existingCart, List<ShoppingCartRequest> cartList, Long customerId) {
+    public boolean isCartUnmatched(ShoppingCart existingCart, List<ShoppingCartRequest> cartList,
+        Long customerId) {
         for (ShoppingCartRequest cartRequest : cartList) {
             ShoppingCartId existingCartId = existingCart.getShoppingCartId();
             ShoppingCartId newCartId = new ShoppingCartId(customerId, cartRequest.getBookId());
@@ -106,7 +107,8 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
         return true;
     }
 
-    private void saveOrUpdateCarts(List<ShoppingCartRequest> cartList, Long customerId, Customer customer) {
+    private void
+    saveOrUpdateCarts(List<ShoppingCartRequest> cartList, Long customerId, Customer customer) {
         for (ShoppingCartRequest cartItem : cartList) {
             Long bookId = cartItem.getBookId();
             Book book = bookRepository.findByBookId(bookId)
