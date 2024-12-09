@@ -20,8 +20,11 @@ import com.nhnacademy.ssacthree_shop_api.memberset.pointsaverule.dto.PointSaveRu
 import com.nhnacademy.ssacthree_shop_api.memberset.pointsaverule.dto.PointSaveRuleUpdateRequest;
 import com.nhnacademy.ssacthree_shop_api.memberset.pointsaverule.exception.PointSaveRuleNotFoundException;
 import com.nhnacademy.ssacthree_shop_api.memberset.pointsaverule.repository.PointSaveRuleRepository;
-import jakarta.persistence.EntityManager;
+
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -38,9 +41,58 @@ class PointSaveRuleServiceImplTest {
     @Mock
     private PointSaveRuleRepository pointSaveRuleRepository;
 
-    @Mock
-    private EntityManager entityManager;
+    @Test
+    void testGetAllPointSaveRules() {
+        // Given: 샘플 데이터 준비
+        PointSaveRuleGetResponse rule1 = new PointSaveRuleGetResponse(
+                1L,
+                "Rule1",
+                10,
+                LocalDateTime.now(),
+                true,
+                PointSaveType.PERCENT
+        );
 
+        PointSaveRuleGetResponse rule2 = new PointSaveRuleGetResponse(
+                2L,
+                "Rule2",
+                20,
+                LocalDateTime.now(),
+                false,
+                PointSaveType.INTEGER
+        );
+
+        List<PointSaveRuleGetResponse> ruleList = List.of(rule1, rule2);
+
+        // When: pointSaveRuleRepository의 getAllPointSaveRules 메서드가 호출될 때
+        when(pointSaveRuleRepository.getAllPointSaveRules()).thenReturn(ruleList);
+
+        // Then: 서비스 메서드가 반환하는 값 확인
+        List<PointSaveRuleGetResponse> result = pointSaveRuleService.getAllPointSaveRules();
+
+        // 검증
+        assertNotNull(result);
+        assertEquals(2, result.size());
+
+        // 첫 번째 규칙 검증
+        assertEquals(1L, result.getFirst().getPointSaveRuleId());
+        assertEquals("Rule1", result.getFirst().getPointSaveRuleName());
+        assertEquals(10, result.getFirst().getPointSaveAmount());
+        assertNotNull(result.getFirst().getPointSaveRuleGenerateDate()); // 현재 시간을 확인
+        assertTrue(result.get(0).isPointSaveRuleIsSelected());
+        assertEquals(PointSaveType.PERCENT, result.getFirst().getPointSaveType());
+
+        // 두 번째 규칙 검증
+        assertEquals(2L, result.get(1).getPointSaveRuleId());
+        assertEquals("Rule2", result.get(1).getPointSaveRuleName());
+        assertEquals(20, result.get(1).getPointSaveAmount());
+        assertNotNull(result.get(1).getPointSaveRuleGenerateDate()); // 현재 시간을 확인
+        assertFalse(result.get(1).isPointSaveRuleIsSelected());
+        assertEquals(PointSaveType.INTEGER, result.get(1).getPointSaveType());
+
+        // pointSaveRuleRepository.getAllPointSaveRules 메서드가 정확히 한 번 호출되었는지 확인
+        verify(pointSaveRuleRepository).getAllPointSaveRules();
+    }
 
     @Test
     void testUpdatePointSaveRule_Success() {
@@ -167,5 +219,70 @@ class PointSaveRuleServiceImplTest {
             ruleName);
     }
 
+    @Test
+    void testUpdatePointSaveRule_AlreadySelected() {
+        PointSaveRuleUpdateRequest request = new PointSaveRuleUpdateRequest(1L);
+        PointSaveRule existingRule = new PointSaveRule("TestRule", 10, PointSaveType.INTEGER);
+        existingRule.setPointSaveRuleIsSelected(true); // 이미 선택된 상태
 
+        when(pointSaveRuleRepository.findById(1L)).thenReturn(Optional.of(existingRule));
+        when(pointSaveRuleRepository.save(any(PointSaveRule.class))).thenReturn(existingRule);
+
+        PointSaveRule result = pointSaveRuleService.updatePointSaveRule(request);
+
+        assertNotNull(result);
+        assertFalse(result.isPointSaveRuleIsSelected()); // 선택 해제 상태로 변경되어야 함
+        verify(pointSaveRuleRepository).findById(1L);
+        verify(pointSaveRuleRepository).save(existingRule);
+    }
+
+    @Test
+    void testCreatePointSaveRule_MultipleRules() {
+        PointSaveRuleCreateRequest request = new PointSaveRuleCreateRequest();
+        request.setPointSaveRuleName("ThirdRule");
+        request.setPointSaveAmount(30);
+        request.setPointSaveType(PointSaveType.PERCENT);
+
+        PointSaveRule savedRule = new PointSaveRule("ThirdRule", 30, PointSaveType.PERCENT);
+        savedRule.setPointSaveRuleIsSelected(false); // 기본적으로 선택되지 않음
+
+        PointSaveRuleGetResponse existingRule = new PointSaveRuleGetResponse();
+
+        PointSaveRuleServiceImpl spyService = Mockito.spy(pointSaveRuleService);
+        java.util.List<PointSaveRuleGetResponse> existingRules = java.util.Arrays.asList(
+                existingRule);
+
+        doReturn(existingRules).when(spyService).getAllPointSaveRules();
+        when(pointSaveRuleRepository.save(any(PointSaveRule.class))).thenReturn(savedRule);
+
+        PointSaveRule result = spyService.createPointSaveRule(request);
+
+        assertNotNull(result);
+        assertEquals("ThirdRule", result.getPointSaveRuleName());
+        assertEquals(30, result.getPointSaveAmount());
+        assertFalse(result.isPointSaveRuleIsSelected()); // 선택되지 않음
+        verify(spyService).getAllPointSaveRules();
+        verify(pointSaveRuleRepository).save(any(PointSaveRule.class));
+    }
+
+//    @Test
+//    void testGetPointSaveRuleByRuleNameThrowsNotFoundExceptionWhenPointSaveRuleIsNull() {
+//        // Given: 테스트에 사용할 ruleName 설정
+//        String pointSaveRuleName = "NonExistentRule";
+//
+//        // When: pointSaveRuleRepository에서 해당 ruleName에 대한 정책을 찾을 수 없을 때
+//        when(pointSaveRuleRepository.findByPointSaveRuleNameAndPointSaveRuleIsSelectedTrue(pointSaveRuleName))
+//                .thenReturn(null);
+//
+//        // Then: NotFoundException이 발생하는지 검증
+//        NotFoundException thrown = assertThrows(NotFoundException.class, () -> {
+//            pointSaveRuleService.getPointSaveRuleByRuleName(pointSaveRuleName);
+//        });
+//
+//        // 예외 메시지가 예상한 대로 나오나 확인
+//        assertEquals("'NonExistentRule' 정책을 찾을 수 없습니다.", thrown.getMessage());
+//
+//        // pointSaveRuleRepository.findByPointSaveRuleNameAndPointSaveRuleIsSelectedTrue가 호출되었는지 확인
+//        verify(pointSaveRuleRepository).findByPointSaveRuleNameAndPointSaveRuleIsSelectedTrue(pointSaveRuleName);
+//    }
 }

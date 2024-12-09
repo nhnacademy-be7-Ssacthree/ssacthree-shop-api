@@ -102,10 +102,22 @@ public class OrderDetailServiceImpl implements OrderDetailService {
         }
 
         //주문 상세 저장
-        orderDetailRepository.saveAll(orderDetails);
+        try {
+            orderDetailRepository.saveAll(orderDetails);
+            log.info("주문 상세 정보 저장 성공: {}", orderDetails);
+        } catch (Exception e) {
+            log.error("주문 상세 정보 저장 실패", e);
+            throw e;
+        }
 
         // 포장 정보 저장 - null이면?
-        orderDetailPackagingRepository.saveAll(orderDetailPackagingList);
+        try {
+            orderDetailPackagingRepository.saveAll(orderDetailPackagingList);
+            log.info("포장 상세 정보 저장 성공: {}", orderDetails);
+        } catch (Exception e) {
+            log.error("포장 상세 정보 저장 실패", e);
+            throw e;
+        }
 
         //주문 상세 저장 후 뭐 반환?
 
