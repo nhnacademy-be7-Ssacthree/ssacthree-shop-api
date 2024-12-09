@@ -6,8 +6,6 @@ import com.nhnacademy.ssacthree_shop_api.orderset.order.domain.Order;
 import com.nhnacademy.ssacthree_shop_api.orderset.order.service.OrderService;
 import com.nhnacademy.ssacthree_shop_api.orderset.orderstatus.domain.OrderStatus;
 import com.nhnacademy.ssacthree_shop_api.orderset.orderstatus.domain.repository.OrderStatusRepository;
-import com.nhnacademy.ssacthree_shop_api.orderset.order.repository.OrderRepository;
-import com.nhnacademy.ssacthree_shop_api.orderset.ordertostatusmapping.OrderStatusEnum;
 import com.nhnacademy.ssacthree_shop_api.orderset.ordertostatusmapping.OrderToStatusMapping;
 import com.nhnacademy.ssacthree_shop_api.orderset.ordertostatusmapping.repository.OrderToStatusMappingRepository;
 import com.nhnacademy.ssacthree_shop_api.orderset.payment.domain.Payment;
@@ -19,6 +17,7 @@ import com.nhnacademy.ssacthree_shop_api.orderset.payment.domain.repository.Paym
 import com.nhnacademy.ssacthree_shop_api.orderset.payment.domain.repository.PaymentTypeRepository;
 import com.nhnacademy.ssacthree_shop_api.orderset.payment.domain.service.PaymentService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,6 +34,7 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class PaymentServiceImpl implements PaymentService {
 
     private final PaymentRepository paymentRepository;
@@ -63,7 +63,13 @@ public class PaymentServiceImpl implements PaymentService {
                 paymentStatusEnum
         );
 
-        paymentRepository.save(payment);
+        try {
+            paymentRepository.save(payment);
+            log.info("결제 정보 저장 성공: {}", payment);
+        } catch (Exception e) {
+            log.error("결제 정보 저장 실패", e);
+            throw e;
+        }
         return null;
     }
 
