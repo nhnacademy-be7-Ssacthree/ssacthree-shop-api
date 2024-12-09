@@ -2,6 +2,7 @@ package com.nhnacademy.ssacthree_shop_api.orderset.ordertostatusmapping;
 
 import jakarta.persistence.Embeddable;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
@@ -9,6 +10,7 @@ import java.util.Objects;
 
 @AllArgsConstructor
 @NoArgsConstructor
+@Getter
 @Embeddable
 public class OrderToStatusMappingId implements Serializable {
     private Long order_id;

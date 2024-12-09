@@ -1,4 +1,4 @@
-package com.nhnacademy.ssacthree_shop_api.orderdetail.service;
+package com.nhnacademy.ssacthree_shop_api.orderset.orderdetail.service;
 
 
 import com.nhnacademy.ssacthree_shop_api.bookset.author.domain.Author;
@@ -367,7 +367,6 @@ class OrderDetailServiceImplTest {
     // Verify interactions with repositories
     verify(orderDetailRepository, times(1)).findByOrderId(orderId);
     verify(paymentRepository, times(1)).findByOrder(mockOrder);
-//    verify(deliveryRuleRepository, times(1)).findById(mockDeliveryRule.getDeliveryRuleId());
   }
 
 
