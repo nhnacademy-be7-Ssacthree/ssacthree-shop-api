@@ -1,4 +1,4 @@
-package com.nhnacademy.ssacthree_shop_api.orderdetail.controller;
+package com.nhnacademy.ssacthree_shop_api.orderset.orderdetail.controller;
 
 
 import com.nhnacademy.ssacthree_shop_api.orderset.orderdetail.controller.OrderDetailController;
