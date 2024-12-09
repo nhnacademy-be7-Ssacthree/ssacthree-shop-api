@@ -90,7 +90,13 @@ public class OrderServiceImpl implements OrderService {
                 orderSaveRequest.getDeliveryDate(),
                 null
         );
-        orderRepository.save(order); // 주문후 줘야하는 정보.. 상세 ; orderKey랑 결제 key랑 결제 금액
+        try {
+            orderRepository.save(order); // 주문후 줘야하는 정보.. 상세 ; orderKey랑 결제 key랑 결제 금액
+            log.info("주문 저장 성공: {}", order);
+        } catch (Exception e) {
+            log.error("주문 저장 실패", e);
+            throw e;
+        }
 
         // TODO : 주문 상세 생성 - 리스트 돌면서 하나씩 생성 .. 응답값 생각하기, 최대한 db접근 최소화
         try {
@@ -107,7 +113,14 @@ public class OrderServiceImpl implements OrderService {
                 orderStatus,
                 LocalDateTime.now()
         );
-        orderToStatusMappingRepository.save(orderToStatusMapping);
+
+        try {
+            orderToStatusMappingRepository.save(orderToStatusMapping);
+            log.info("주문 상태 저장 성공: {}", orderToStatusMapping);
+        } catch (Exception e) {
+            log.error("주문 상태 저장 실패", e);
+            throw e;
+        }
 
         // TODO : 포인트 적립, 사용 내역 생성 - 포인트 서비스 - 하나로 묶기 ?
         Optional<Member> optionalMember = memberRepository.findById(orderSaveRequest.getCustomerId());
@@ -123,6 +136,7 @@ public class OrderServiceImpl implements OrderService {
                     member,
                     new PointHistorySaveRequest(orderSaveRequest.getPointToSave(), pointSaveRule.getPointSaveRuleName()));
             pointOrderRepository.save(new PointOrder(savePointHistory, order));
+            log.info("포인트 적립 성공");
             pointHistory += savePointHistory.getPointAmount();
 
             if (0 < orderSaveRequest.getPointToUse() && orderSaveRequest.getPointToUse() <= member.getMemberPoint() ) {
@@ -132,6 +146,7 @@ public class OrderServiceImpl implements OrderService {
                         new PointHistorySaveRequest((-1) * orderSaveRequest.getPointToUse(), "도서 포인트 결제")
                 );
                 pointOrderRepository.save(new PointOrder(usePointHistory, order));
+                log.info("포인트 결제 성공");
                 pointHistory += usePointHistory.getPointAmount();
             }
             member.setMemberPoint(member.getMemberPoint() + pointHistory);
