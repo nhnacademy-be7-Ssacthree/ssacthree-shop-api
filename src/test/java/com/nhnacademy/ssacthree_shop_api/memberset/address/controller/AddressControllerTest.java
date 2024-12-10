@@ -1,16 +1,12 @@
-package com.nhnacademy.ssacthree_shop_api.memberset.address.Controller;
+package com.nhnacademy.ssacthree_shop_api.memberset.address.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.nhnacademy.ssacthree_shop_api.memberset.address.controller.AddressController;
 import com.nhnacademy.ssacthree_shop_api.memberset.address.dto.AddressCreateRequest;
 import com.nhnacademy.ssacthree_shop_api.memberset.address.dto.AddressResponse;
 import com.nhnacademy.ssacthree_shop_api.memberset.address.service.AddressService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
