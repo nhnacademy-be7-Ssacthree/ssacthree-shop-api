@@ -22,6 +22,7 @@ import com.nhnacademy.ssacthree_shop_api.orderset.order.repository.OrderReposito
 import com.nhnacademy.ssacthree_shop_api.orderset.order.repository.OrderRepositoryCustom;
 import com.nhnacademy.ssacthree_shop_api.orderset.order.service.OrderService;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
@@ -165,10 +166,16 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public OrderResponseWithCount getOrdersByCustomerAndDate(Long customerId, int page, int size, LocalDateTime startDate, LocalDateTime endDate) {
         Pageable pageable = PageRequest.of(page, size);
-
+        if (size < 1) {
+            throw new IllegalArgumentException("Page size must not be less than one");
+        }
         // 주문 조회 (상태 포함)
         Page<OrderListResponse> orderPage = orderRepositoryCustom.findOrdersByCustomerAndDate(customerId, startDate, endDate, pageable);
 
+        // orderPage가 null일 경우를 방어적으로 처리
+        if (orderPage == null || orderPage.isEmpty()) {
+            return new OrderResponseWithCount(List.of(), 0);  // 빈 리스트와 0개 카운트를 반환
+        }
 
         orderPage.getContent().forEach(order ->
                 log.info("Order ID: {}, Order Date: {}, Total Price: {}, Order Status: {}",
