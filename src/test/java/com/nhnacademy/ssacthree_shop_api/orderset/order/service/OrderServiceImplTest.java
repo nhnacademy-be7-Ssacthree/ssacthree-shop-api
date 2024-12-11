@@ -32,7 +32,6 @@ import com.nhnacademy.ssacthree_shop_api.orderset.ordertostatusmapping.OrderStat
 import com.nhnacademy.ssacthree_shop_api.orderset.ordertostatusmapping.OrderToStatusMapping;
 import com.nhnacademy.ssacthree_shop_api.orderset.ordertostatusmapping.repository.OrderToStatusMappingRepository;
 import java.time.LocalDate;
-import java.util.Collections;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
@@ -48,7 +47,6 @@ import static org.junit.jupiter.api.Assertions.*;
 import com.nhnacademy.ssacthree_shop_api.customer.domain.Customer;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
 @Slf4j
