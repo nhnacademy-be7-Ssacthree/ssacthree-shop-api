@@ -3,7 +3,6 @@ package com.nhnacademy.ssacthree_shop_api.orderset.order.repository.impl;
 import com.nhnacademy.ssacthree_shop_api.orderset.order.domain.QOrder;
 import com.nhnacademy.ssacthree_shop_api.orderset.order.dto.AdminOrderListResponse;
 import com.nhnacademy.ssacthree_shop_api.orderset.order.dto.OrderListResponse;
-import com.nhnacademy.ssacthree_shop_api.orderset.order.dto.OrderResponse;
 import com.nhnacademy.ssacthree_shop_api.orderset.order.repository.OrderRepositoryCustom;
 import com.nhnacademy.ssacthree_shop_api.orderset.orderstatus.domain.QOrderStatus;
 import com.nhnacademy.ssacthree_shop_api.orderset.ordertostatusmapping.QOrderToStatusMapping;
