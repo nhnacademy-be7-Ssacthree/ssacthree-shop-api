@@ -13,6 +13,8 @@ import com.nhnacademy.ssacthree_shop_api.memberset.pointsaverule.repository.Poin
 import com.nhnacademy.ssacthree_shop_api.orderset.deliveryrule.domain.DeliveryRule;
 import com.nhnacademy.ssacthree_shop_api.orderset.deliveryrule.repository.DeliveryRuleRepository;
 import com.nhnacademy.ssacthree_shop_api.orderset.order.domain.Order;
+import com.nhnacademy.ssacthree_shop_api.orderset.order.dto.AdminOrderListResponse;
+import com.nhnacademy.ssacthree_shop_api.orderset.order.dto.AdminOrderResponseWithCount;
 import com.nhnacademy.ssacthree_shop_api.orderset.order.dto.OrderDetailSaveRequest;
 import com.nhnacademy.ssacthree_shop_api.orderset.order.dto.OrderListResponse;
 import com.nhnacademy.ssacthree_shop_api.orderset.order.dto.OrderResponse;
@@ -376,6 +378,116 @@ class OrderServiceImplTest {
         // Act & Assert
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
             orderService.getOrdersByCustomerAndDate(customerId, page, size, startDate, endDate);
+        });
+
+        assertEquals("Page size must not be less than one", exception.getMessage()); // Assert the exception message
+    }
+
+
+
+
+    // AdminGetALlOrders 테스트 //
+    @Test
+    void testAdminGetAllOrders() {
+        // Arrange
+        int page = 0;
+        int size = 10;
+        LocalDateTime startDateTime = LocalDateTime.now().minusDays(30);
+        LocalDateTime endDateTime = LocalDateTime.now();
+
+        // Create mock responses with the updated AdminOrderListResponse
+        AdminOrderListResponse order1 = new AdminOrderListResponse(
+            1L,
+            LocalDate.now().minusDays(5),
+            20000,
+            "COMPLETED",
+            LocalDate.now().minusDays(5),
+            "John Buyer",
+            "ORD123",
+            "INV123"
+        );
+
+        AdminOrderListResponse order2 = new AdminOrderListResponse(
+            2L,
+            LocalDate.now().minusDays(3),
+            15000,
+            "SHIPPED",
+            LocalDate.now().minusDays(3),
+            "Jane Smith",
+            "ORD124",
+            "INV124"
+        );
+
+        // Mock Page behavior with a list of orders
+        Page<AdminOrderListResponse> mockPage = new PageImpl<>(List.of(order1, order2));
+
+        // Mock repository
+        when(orderRepositoryCustom.adminFindAllOrders(eq(startDateTime), eq(endDateTime), any(Pageable.class)))
+            .thenReturn(mockPage);
+
+        // Act
+        AdminOrderResponseWithCount response = orderService.adminGetAllOrders(page, size, startDateTime, endDateTime);
+
+        // Assert
+        assertNotNull(response);
+        assertEquals(2, response.getOrders().size()); // 2 orders should be returned
+        assertEquals(2, response.getTotalOrders()); // Total count should be 2
+
+        // Assert the order details
+        AdminOrderListResponse firstOrder = response.getOrders().getFirst();
+        assertEquals(1L, firstOrder.getOrderId());
+        assertEquals(LocalDate.now().minusDays(5), firstOrder.getOrderDate());
+        assertEquals(20000, firstOrder.getTotalPrice());
+        assertEquals("COMPLETED", firstOrder.getOrderStatus());
+        assertEquals("John Buyer", firstOrder.getCustomerName());
+        assertEquals("ORD123", firstOrder.getOrderNumber());
+        assertEquals("INV123", firstOrder.getInvoiceNumber());
+
+        AdminOrderListResponse secondOrder = response.getOrders().get(1);
+        assertEquals(2L, secondOrder.getOrderId());
+        assertEquals(LocalDate.now().minusDays(3), secondOrder.getOrderDate());
+        assertEquals(15000, secondOrder.getTotalPrice());
+        assertEquals("SHIPPED", secondOrder.getOrderStatus());
+        assertEquals("Jane Smith", secondOrder.getCustomerName());
+        assertEquals("ORD124", secondOrder.getOrderNumber());
+        assertEquals("INV124", secondOrder.getInvoiceNumber());
+    }
+
+    @Test
+    void testAdminGetAllOrdersWithEmptyResult() {
+        // Arrange
+        int page = 0;
+        int size = 10;
+        LocalDateTime startDateTime = LocalDateTime.now().minusDays(30);
+        LocalDateTime endDateTime = LocalDateTime.now().minusDays(10);
+
+        // Mock Page behavior (empty list, no orders)
+        Page<AdminOrderListResponse> mockPage = new PageImpl<>(List.of());
+
+        // Mock repository
+        when(orderRepositoryCustom.adminFindAllOrders(eq(startDateTime), eq(endDateTime), any(Pageable.class)))
+            .thenReturn(mockPage);
+
+        // Act
+        AdminOrderResponseWithCount response = orderService.adminGetAllOrders(page, size, startDateTime, endDateTime);
+
+        // Assert
+        assertNotNull(response);
+        assertTrue(response.getOrders().isEmpty()); // No orders should be returned
+        assertEquals(0, response.getTotalOrders()); // Total count should be 0
+    }
+
+    @Test
+    void testAdminGetAllOrdersWithInvalidPageSize() {
+        // Arrange
+        int page = 0;
+        int size = 0;  // Invalid page size (should be >= 1)
+        LocalDateTime startDateTime = LocalDateTime.now().minusDays(30);
+        LocalDateTime endDateTime = LocalDateTime.now();
+
+        // Act & Assert
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            orderService.adminGetAllOrders(page, size, startDateTime, endDateTime);
         });
 
         assertEquals("Page size must not be less than one", exception.getMessage()); // Assert the exception message

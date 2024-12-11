@@ -208,7 +208,8 @@ public class OrderServiceImpl implements OrderService {
                         order.getOrderNumber()));
 
         // 상태를 포함한 주문 리스트를 생성하여 반환
-        return new AdminOrderResponseWithCount(orderPage.getContent(), orderPage.getTotalElements());    }
+        return new AdminOrderResponseWithCount(orderPage.getContent(), orderPage.getTotalElements());
+    }
 
     @Override
     public boolean updateOrderStatus(Long orderId, String status) {
