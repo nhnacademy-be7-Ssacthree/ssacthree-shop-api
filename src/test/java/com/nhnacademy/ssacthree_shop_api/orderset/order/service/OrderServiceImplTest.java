@@ -20,6 +20,7 @@ import com.nhnacademy.ssacthree_shop_api.orderset.order.dto.OrderListResponse;
 import com.nhnacademy.ssacthree_shop_api.orderset.order.dto.OrderResponse;
 import com.nhnacademy.ssacthree_shop_api.orderset.order.dto.OrderResponseWithCount;
 import com.nhnacademy.ssacthree_shop_api.orderset.order.dto.OrderSaveRequest;
+import com.nhnacademy.ssacthree_shop_api.orderset.order.exception.NotFoundOrderException;
 import com.nhnacademy.ssacthree_shop_api.orderset.order.repository.OrderRepository;
 import com.nhnacademy.ssacthree_shop_api.orderset.order.repository.OrderRepositoryCustom;
 import com.nhnacademy.ssacthree_shop_api.orderset.order.service.impl.OrderServiceImpl;
@@ -27,9 +28,11 @@ import com.nhnacademy.ssacthree_shop_api.orderset.orderdetail.service.OrderDetai
 import com.nhnacademy.ssacthree_shop_api.memberset.pointhistory.service.PointHistoryService;
 import com.nhnacademy.ssacthree_shop_api.orderset.orderstatus.domain.OrderStatus;
 import com.nhnacademy.ssacthree_shop_api.orderset.orderstatus.domain.repository.OrderStatusRepository;
+import com.nhnacademy.ssacthree_shop_api.orderset.ordertostatusmapping.OrderStatusEnum;
 import com.nhnacademy.ssacthree_shop_api.orderset.ordertostatusmapping.OrderToStatusMapping;
 import com.nhnacademy.ssacthree_shop_api.orderset.ordertostatusmapping.repository.OrderToStatusMappingRepository;
 import java.time.LocalDate;
+import java.util.Collections;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
@@ -45,6 +48,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import com.nhnacademy.ssacthree_shop_api.customer.domain.Customer;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
 @Slf4j
@@ -493,6 +497,168 @@ class OrderServiceImplTest {
         assertEquals("Page size must not be less than one", exception.getMessage()); // Assert the exception message
     }
 
+
+
+
+
+
+    // updateOrderStatus 테스트 코드 //
+
+    @Test
+    void testUpdateOrderStatusNotFound() {
+        // Arrange
+        Long orderId = 1L;
+        String status = "start";
+
+        // Mock the repository to return an empty list for order status
+        when(orderToStatusMappingRepository.findByOrderIdOrderByOrderStatusCreatedAtDesc(eq(orderId), any()))
+            .thenReturn(List.of()); // Return an empty list
+
+        // Act & Assert
+        NotFoundOrderException thrown = assertThrows(NotFoundOrderException.class, () -> {
+            orderService.updateOrderStatus(orderId, status);
+        });
+
+        assertEquals("주문을 찾을 수 없습니다.", thrown.getMessage()); // Verify the exception message
+    }
+
+
+
+    @Test
+    void testUpdateOrderStatusToStartValid() {
+        // Arrange
+        Long orderId = 1L;
+        String status = "start";
+        Customer mockCustomer = new Customer();
+
+        // Create mock Order and Customer
+        Order mockOrder = new Order(1L, mockCustomer, null
+            , LocalDateTime.now(), 10000, "ORD123"
+            , null, "John Doe", "010-1234-5678"
+            , "12345", "Seoul", "Seoul"
+            , "Special request", LocalDate.now(), null);
+
+        // Mock OrderStatusRepository to return PENDING status (OrderStatusEnum.PENDING)
+        OrderStatus mockStatus = new OrderStatus(1L, OrderStatusEnum.PENDING);
+        when(orderStatusRepository.findById(2L)).thenReturn(Optional.of(mockStatus));
+
+        // Mock the latest OrderStatus mapping with the PENDING status
+        OrderToStatusMapping mockOrderStatus = new OrderToStatusMapping(mockOrder, mockStatus, LocalDateTime.now());
+        when(orderToStatusMappingRepository.findByOrderIdOrderByOrderStatusCreatedAtDesc(eq(orderId), any(Pageable.class)))
+            .thenReturn(List.of(mockOrderStatus));
+
+        // Mock orderRepository to return mockOrder (Make sure it's not Optional.empty())
+        when(orderRepository.findById(orderId)).thenReturn(Optional.of(mockOrder));  // Return a non-empty Optional
+
+        // Act
+        boolean result = orderService.updateOrderStatus(orderId, status);  // Should succeed in changing status to 'start'
+
+        // Assert
+        assertTrue(result);
+        // Add further assertions to check that the status has been updated and invoice number is generated
+    }
+
+    @Test
+    void testUpdateOrderStatusToStartAlreadyShipping() {
+        // Arrange
+        Long orderId = 1L;
+        String status = "start";
+
+        // Mock Order and related entities
+        Customer mockCustomer = new Customer();
+        DeliveryRule mockDeliveryRule = new DeliveryRule();
+        OrderSaveRequest request = new OrderSaveRequest(
+            null, 1L, "John Buyer", "john.buyer@example.com", "1234567890",
+            "Jane Doe", "9876543210", "12345", "123 Main Street",
+            "Apt 101", "Leave at the door", LocalDate.now().plusDays(2),
+            100, 50, 20000, 1L, "ORD12345"
+        );
+
+        Order mockOrder = new Order(
+            1L, // Order ID
+            mockCustomer,
+            null, // 배송 관련 필드
+            LocalDateTime.now(),
+            request.getTotalPrice(),
+            request.getOrderNumber(),
+            mockDeliveryRule,
+            request.getRecipientName(),
+            request.getRecipientPhone(),
+            request.getPostalCode(),
+            request.getRoadAddress(),
+            request.getDetailAddress(),
+            request.getOrderRequest(),
+            request.getDeliveryDate(),
+            null
+        );
+
+        // Mock the order repository to return the mockOrder
+        when(orderRepository.findById(orderId)).thenReturn(Optional.of(mockOrder));
+
+        // Mock the latest OrderStatus mapping to be IN_SHOPPING (already shipped)
+        OrderStatus mockStatus = new OrderStatus(2L, OrderStatusEnum.IN_SHOPPING);  // Mock the "shipping" status
+        when(orderStatusRepository.findById(2L)).thenReturn(Optional.of(mockStatus));  // Mocking the repository response
+        OrderToStatusMapping mockOrderStatus = new OrderToStatusMapping(mockOrder, mockStatus, LocalDateTime.now());
+        when(orderToStatusMappingRepository.findByOrderIdOrderByOrderStatusCreatedAtDesc(eq(orderId), any(Pageable.class)))
+            .thenReturn(List.of(mockOrderStatus));
+
+        // Act & Assert
+        assertThrows(RuntimeException.class, () -> {
+            orderService.updateOrderStatus(orderId, status);  // Should throw exception as the order is already in shipping
+        });
+    }
+
+
+    @Test
+    void testUpdateOrderStatusToStartAlreadyCompleted() {
+        // Arrange
+        Long orderId = 1L;
+        String status = "start";
+
+        // Mock Order and related entities
+        Customer mockCustomer = new Customer();
+        DeliveryRule mockDeliveryRule = new DeliveryRule();
+        OrderSaveRequest request = new OrderSaveRequest(
+            null, 1L, "John Buyer", "john.buyer@example.com", "1234567890",
+            "Jane Doe", "9876543210", "12345", "123 Main Street",
+            "Apt 101", "Leave at the door", LocalDate.now().plusDays(2),
+            100, 50, 20000, 1L, "ORD12345"
+        );
+
+        Order mockOrder = new Order(
+            1L, // Order ID
+            mockCustomer,
+            null, // 배송 관련 필드
+            LocalDateTime.now(),
+            request.getTotalPrice(),
+            request.getOrderNumber(),
+            mockDeliveryRule,
+            request.getRecipientName(),
+            request.getRecipientPhone(),
+            request.getPostalCode(),
+            request.getRoadAddress(),
+            request.getDetailAddress(),
+            request.getOrderRequest(),
+            request.getDeliveryDate(),
+            null
+        );
+
+        // Mock the order repository to return the mockOrder
+        when(orderRepository.findById(orderId)).thenReturn(Optional.of(mockOrder));
+
+        // Mock the latest OrderStatus mapping to be COMPLETED (order is already completed)
+        OrderStatus mockStatus = new OrderStatus(3L, OrderStatusEnum.COMPLETED);  // COMPLETED status
+        OrderToStatusMapping mockOrderStatus = new OrderToStatusMapping(mockOrder, mockStatus, LocalDateTime.now());
+        when(orderToStatusMappingRepository.findByOrderIdOrderByOrderStatusCreatedAtDesc(eq(orderId), any(Pageable.class)))
+            .thenReturn(List.of(mockOrderStatus));
+
+        // Act & Assert
+        assertThrows(RuntimeException.class, () -> {
+            orderService.updateOrderStatus(orderId, status);  // Should throw exception as the order is already completed
+        });
+    }
+
+    // END UpdateOrderStatus 테스트 코드 //
 
 
 

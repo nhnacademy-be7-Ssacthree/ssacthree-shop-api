@@ -215,7 +215,7 @@ public class OrderServiceImpl implements OrderService {
     public boolean updateOrderStatus(Long orderId, String status) {
         // 주문의 제일 최신 상태 가져오기
         Optional<OrderToStatusMapping> order = orderToStatusMappingRepository.findByOrderIdOrderByOrderStatusCreatedAtDesc(Long.valueOf(orderId), PageRequest.of(0, 1)).stream().findFirst();
-        if (Objects.isNull(order)) {
+        if (Objects.isNull(order) || order.isEmpty()) {
             throw new NotFoundOrderException("주문을 찾을 수 없습니다.");
         }
 
