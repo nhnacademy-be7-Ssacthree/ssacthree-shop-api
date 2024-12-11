@@ -1,5 +1,6 @@
 package com.nhnacademy.ssacthree_shop_api.orderset.order.service;
 
+import com.nhnacademy.ssacthree_shop_api.commons.exception.NotFoundException;
 import com.nhnacademy.ssacthree_shop_api.customer.repository.CustomerRepository;
 import com.nhnacademy.ssacthree_shop_api.memberset.member.domain.Member;
 import com.nhnacademy.ssacthree_shop_api.memberset.member.repository.MemberRepository;
@@ -657,6 +658,41 @@ class OrderServiceImplTest {
     }
 
     // END UpdateOrderStatus 테스트 코드 //
+
+
+    @Test
+    void testGetOrderSuccess() {
+        // Arrange
+        Long orderId = 1L;
+        Customer mockCustomer = new Customer();
+        Order mockOrder = new Order(1L, mockCustomer, null, LocalDateTime.now()
+            , 10000, "ORD123", null, "John Doe"
+            , "010-1234-5678", "12345", "Seoul"
+            , "Seoul", "Special request", LocalDate.now(), null);
+
+        // Mock the repository to return a valid Order
+        when(orderRepository.findById(orderId)).thenReturn(Optional.of(mockOrder));
+
+        // Act
+        Order result = orderService.getOrder(orderId);
+
+        // Assert
+        assertNotNull(result);
+        assertEquals(orderId, result.getId());
+        assertEquals("John Doe", result.getReceiverName());
+    }
+
+    @Test
+    void testGetOrderNotFound() {
+        // Arrange
+        Long orderId = 99L;
+
+        // Mock the repository to return an empty Optional
+        when(orderRepository.findById(orderId)).thenReturn(Optional.empty());
+
+        // Act & Assert
+        assertThrows(NotFoundException.class, () -> orderService.getOrder(orderId));
+    }
 
 
 
