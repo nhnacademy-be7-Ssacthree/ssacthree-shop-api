@@ -3,6 +3,7 @@ package com.nhnacademy.ssacthree_shop_api.orderset.orderdetail.domain;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
@@ -10,6 +11,7 @@ import java.util.Objects;
 
 @AllArgsConstructor
 @NoArgsConstructor
+@Getter
 @Embeddable
 public class OrderDetailId implements Serializable {
 
