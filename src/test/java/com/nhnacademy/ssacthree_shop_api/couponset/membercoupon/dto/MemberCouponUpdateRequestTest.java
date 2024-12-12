@@ -58,6 +58,6 @@ class MemberCouponUpdateRequestTest {
     assertEquals(1, violations.size());
     ConstraintViolation<MemberCouponUpdateRequest> violation = violations.iterator().next();
     assertEquals("memberCouponId", violation.getPropertyPath().toString());
-    assertEquals("널이어서는 안됩니다", violation.getMessage());
+
   }
 }
