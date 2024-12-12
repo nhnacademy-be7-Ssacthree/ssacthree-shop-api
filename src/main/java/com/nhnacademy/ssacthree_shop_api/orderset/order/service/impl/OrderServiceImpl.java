@@ -22,6 +22,7 @@ import com.nhnacademy.ssacthree_shop_api.orderset.order.repository.OrderReposito
 import com.nhnacademy.ssacthree_shop_api.orderset.order.repository.OrderRepositoryCustom;
 import com.nhnacademy.ssacthree_shop_api.orderset.order.service.OrderService;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
@@ -165,10 +166,16 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public OrderResponseWithCount getOrdersByCustomerAndDate(Long customerId, int page, int size, LocalDateTime startDate, LocalDateTime endDate) {
         Pageable pageable = PageRequest.of(page, size);
-
+        if (size < 1) {
+            throw new IllegalArgumentException("Page size must not be less than one");
+        }
         // 주문 조회 (상태 포함)
         Page<OrderListResponse> orderPage = orderRepositoryCustom.findOrdersByCustomerAndDate(customerId, startDate, endDate, pageable);
 
+        // orderPage가 null일 경우를 방어적으로 처리
+        if (orderPage == null || orderPage.isEmpty()) {
+            return new OrderResponseWithCount(List.of(), 0);  // 빈 리스트와 0개 카운트를 반환
+        }
 
         orderPage.getContent().forEach(order ->
                 log.info("Order ID: {}, Order Date: {}, Total Price: {}, Order Status: {}",
@@ -201,13 +208,14 @@ public class OrderServiceImpl implements OrderService {
                         order.getOrderNumber()));
 
         // 상태를 포함한 주문 리스트를 생성하여 반환
-        return new AdminOrderResponseWithCount(orderPage.getContent(), orderPage.getTotalElements());    }
+        return new AdminOrderResponseWithCount(orderPage.getContent(), orderPage.getTotalElements());
+    }
 
     @Override
     public boolean updateOrderStatus(Long orderId, String status) {
         // 주문의 제일 최신 상태 가져오기
         Optional<OrderToStatusMapping> order = orderToStatusMappingRepository.findByOrderIdOrderByOrderStatusCreatedAtDesc(Long.valueOf(orderId), PageRequest.of(0, 1)).stream().findFirst();
-        if (Objects.isNull(order)) {
+        if (Objects.isNull(order) || order.isEmpty()) {
             throw new NotFoundOrderException("주문을 찾을 수 없습니다.");
         }
 
