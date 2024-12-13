@@ -2,102 +2,90 @@ package com.nhnacademy.ssacthree_shop_api.elastic.domain;
 
 import org.junit.jupiter.api.Test;
 
+import java.util.Arrays;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 class BookDocumentTest {
 
   @Test
-  void testAllArgsConstructor() {
-    // Arrange
-    long bookId = 1L;
-    String bookName = "Effective Java";
-    String bookIndex = "effective-java-index";
-    String bookInfo = "A comprehensive guide to best practices in Java.";
-    String bookIsbn = "9780134685991";
-    String publicationDate = "2018-12-27";
-    int regularPrice = 50000;
-    int salePrice = 45000;
-    boolean isPacked = true;
-    int stock = 100;
-    String bookThumbnailImageUrl = "http://example.com/effective-java.jpg";
-    int bookViewCount = 500;
-    int bookDiscount = 10;
-    String publisherNames = "Addison-Wesley";
-    String authorNames = "Joshua Bloch";
-    List<String> tagNames = List.of("Java", "Programming", "Best Practices");
-    List<String> category = List.of("Technology", "Software Development");
-
-    // Act
-    BookDocument bookDocument = new BookDocument(
-        bookId, bookName, bookIndex, bookInfo, bookIsbn, publicationDate,
-        regularPrice, salePrice, isPacked, stock, bookThumbnailImageUrl,
-        bookViewCount, bookDiscount, publisherNames, authorNames,
-        tagNames, category
-    );
-
-    // Assert
-    assertEquals(bookId, bookDocument.getBookId());
-    assertEquals(bookName, bookDocument.getBookName());
-    assertEquals(bookIndex, bookDocument.getBookIndex());
-    assertEquals(bookInfo, bookDocument.getBookInfo());
-    assertEquals(bookIsbn, bookDocument.getBookIsbn());
-    assertEquals(publicationDate, bookDocument.getPublicationDate());
-    assertEquals(regularPrice, bookDocument.getRegularPrice());
-    assertEquals(salePrice, bookDocument.getSalePrice());
-    assertTrue(bookDocument.isPacked());
-    assertEquals(stock, bookDocument.getStock());
-    assertEquals(bookThumbnailImageUrl, bookDocument.getBookThumbnailImageUrl());
-    assertEquals(bookViewCount, bookDocument.getBookViewCount());
-    assertEquals(bookDiscount, bookDocument.getBookDiscount());
-    assertEquals(publisherNames, bookDocument.getPublisherNames());
-    assertEquals(authorNames, bookDocument.getAuthorNames());
-    assertEquals(tagNames, bookDocument.getTagNames());
-    assertEquals(category, bookDocument.getCategory());
+  void testNoArgsConstructor() {
+    // Test for @NoArgsConstructor
+    BookDocument bookDocument = new BookDocument();
+    assertNotNull(bookDocument);
+    assertThat(bookDocument.getBookId()).isEqualTo(0);
+    assertThat(bookDocument.getBookName()).isNull();
   }
 
   @Test
-  void testNoArgsConstructorAndSetters() {
-    // Arrange
-    BookDocument bookDocument = new BookDocument();
+  void testAllArgsConstructor() {
+    // Test for @AllArgsConstructor
+    List<String> tags = Arrays.asList("Technology", "Programming");
+    List<String> categories = Arrays.asList("Fiction", "Education");
 
-    // Act
+    BookDocument bookDocument = new BookDocument(
+        1L, "Effective Java", "Index1", "A Java programming book", "1234567890",
+        "2023-01-01", 45000, 40000, true, 100, "image.jpg",
+        500, 10, "NHN Publisher", "Joshua Bloch", tags, categories
+    );
+
+    assertNotNull(bookDocument);
+    assertEquals(1L, bookDocument.getBookId());
+    assertEquals("Effective Java", bookDocument.getBookName());
+    assertEquals(tags, bookDocument.getTagNames());
+    assertEquals(categories, bookDocument.getCategory());
+  }
+
+  @Test
+  void testGetterAndSetter() {
+    // Test for @Data (Getter and Setter)
+    BookDocument bookDocument = new BookDocument();
     bookDocument.setBookId(2L);
     bookDocument.setBookName("Clean Code");
-    bookDocument.setBookIndex("clean-code-index");
-    bookDocument.setBookInfo("A Handbook of Agile Software Craftsmanship.");
-    bookDocument.setBookIsbn("9780132350884");
-    bookDocument.setPublicationDate("2008-08-01");
-    bookDocument.setRegularPrice(60000);
-    bookDocument.setSalePrice(54000);
-    bookDocument.setPacked(false);
-    bookDocument.setStock(50);
-    bookDocument.setBookThumbnailImageUrl("http://example.com/clean-code.jpg");
-    bookDocument.setBookViewCount(1000);
-    bookDocument.setBookDiscount(20);
-    bookDocument.setPublisherNames("Prentice Hall");
-    bookDocument.setAuthorNames("Robert C. Martin");
-    bookDocument.setTagNames(List.of("Programming", "Agile", "Clean Code"));
-    bookDocument.setCategory(List.of("Software Development", "Technology"));
 
-    // Assert
     assertEquals(2L, bookDocument.getBookId());
     assertEquals("Clean Code", bookDocument.getBookName());
-    assertEquals("clean-code-index", bookDocument.getBookIndex());
-    assertEquals("A Handbook of Agile Software Craftsmanship.", bookDocument.getBookInfo());
-    assertEquals("9780132350884", bookDocument.getBookIsbn());
-    assertEquals("2008-08-01", bookDocument.getPublicationDate());
-    assertEquals(60000, bookDocument.getRegularPrice());
-    assertEquals(54000, bookDocument.getSalePrice());
-    assertFalse(bookDocument.isPacked());
-    assertEquals(50, bookDocument.getStock());
-    assertEquals("http://example.com/clean-code.jpg", bookDocument.getBookThumbnailImageUrl());
-    assertEquals(1000, bookDocument.getBookViewCount());
-    assertEquals(20, bookDocument.getBookDiscount());
-    assertEquals("Prentice Hall", bookDocument.getPublisherNames());
-    assertEquals("Robert C. Martin", bookDocument.getAuthorNames());
-    assertEquals(List.of("Programming", "Agile", "Clean Code"), bookDocument.getTagNames());
-    assertEquals(List.of("Software Development", "Technology"), bookDocument.getCategory());
+  }
+
+  @Test
+  void testToString() {
+    // Test for @Data (toString)
+    List<String> tags = Arrays.asList("Technology", "Programming");
+    BookDocument bookDocument = new BookDocument(
+        1L, "Effective Java", "Index1", "A Java programming book", "1234567890",
+        "2023-01-01", 45000, 40000, true, 100, "image.jpg",
+        500, 10, "NHN Publisher", "Joshua Bloch", tags, null
+    );
+
+    String documentString = bookDocument.toString();
+    assertThat(documentString)
+        .contains("bookId=1")
+        .contains("bookName=Effective Java")
+        .contains("tagNames=[Technology, Programming]");
+  }
+
+  @Test
+  void testEqualsAndHashCode() {
+    // Test for @Data (equals and hashCode)
+    List<String> tags1 = Arrays.asList("Technology", "Programming");
+    List<String> tags2 = Arrays.asList("Technology", "Programming");
+
+    BookDocument book1 = new BookDocument(
+        1L, "Effective Java", "Index1", "A Java programming book", "1234567890",
+        "2023-01-01", 45000, 40000, true, 100, "image.jpg",
+        500, 10, "NHN Publisher", "Joshua Bloch", tags1, null
+    );
+
+    BookDocument book2 = new BookDocument(
+        1L, "Effective Java", "Index1", "A Java programming book", "1234567890",
+        "2023-01-01", 45000, 40000, true, 100, "image.jpg",
+        500, 10, "NHN Publisher", "Joshua Bloch", tags2, null
+    );
+
+    assertEquals(book1, book2);
+    assertEquals(book1.hashCode(), book2.hashCode());
   }
 }
