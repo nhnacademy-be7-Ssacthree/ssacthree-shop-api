@@ -7,6 +7,7 @@ import com.nhnacademy.ssacthree_shop_api.bookset.category.dto.response.CategoryI
 import com.nhnacademy.ssacthree_shop_api.bookset.category.exception.*;
 import com.nhnacademy.ssacthree_shop_api.bookset.category.repository.CategoryRepository;
 import com.nhnacademy.ssacthree_shop_api.bookset.category.service.CategoryService;
+import jakarta.ws.rs.NotFoundException;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -16,7 +17,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -36,50 +36,66 @@ public class CategoryServiceImpl implements CategoryService {
      */
     @Override
     public CategoryInfoResponse saveCategory(CategorySaveRequest categorySaveRequest) {
-
         // CategorySaveRequest를 Category 엔티티로 변환
         Category category = new Category();
+        if(categorySaveRequest.getCategoryName().trim().isEmpty() || categorySaveRequest.getCategoryName().trim().isBlank()) {
+            throw new InvalidCategoryNameException("카테고리 이름은 1글자 이상이어야 합니다.");
+        }
         category.setCategoryName(categorySaveRequest.getCategoryName());
         category.setCategoryIsUsed(true);
 
-        // 상위 카테고리가 있는 경우
+        // 상위 카테고리 설정
         if (categorySaveRequest.getSuperCategoryId() != null) {
-            // 상위 카테고리 ID로 조회
-            Category superCategory = categoryRepository.findById(categorySaveRequest.getSuperCategoryId())
-                    .orElseThrow(() -> new IllegalArgumentException("상위 카테고리를 찾을 수 없습니다."));
-
-            // 상위 카테고리가 사용중이지 않을 경우 상위 카테고리로 설정 불가능
-            if (!superCategory.getCategoryIsUsed()) {
-                throw new CategoryNotUsableException(superCategory.getCategoryId());
-            }
-
-            // 모든 상위 계층 카테고리 이름과 비교하여 중복 여부 확인
-            checkNameConflictWithSuperCategories(superCategory, category.getCategoryName());
-
-            // 같은 상위 카테고리 아래에서 이름 중복 확인
-            Category duplicateNameCategory = categoryRepository.findBySuperCategoryAndCategoryName(superCategory, category.getCategoryName());
-            if (duplicateNameCategory != null) {
-                throw new DuplicateCategoryNameException("같은 상위 카테고리 아래에 같은 이름의 카테고리가 존재합니다.");
-            }
-
-
-            category.setSuperCategory(superCategory); // 상위 카테고리 설정
-        } else {
-            // 상위 카테고리가 없는 경우
-            List<Category> rootCategories = categoryRepository.findBySuperCategoryIsNull();
-
-            for (Category rootCategory : rootCategories) {
-                if (rootCategory.getCategoryIsUsed() && categorySaveRequest.getCategoryName().equals(rootCategory.getCategoryName())) {
-                    throw new DuplicateCategoryNameException(categorySaveRequest.getCategoryName() + "과 이름이 같은 최상위 카테고리가 이미 존재합니다.");
-                }
-            }
+            Category superCategory = getSuperCategory(categorySaveRequest.getSuperCategoryId());
+            category.setSuperCategory(superCategory);
         }
+
+        // 이름 중복 체크
+        checkDuplicateCategoryName(category);
 
         // 카테고리 저장
         Category savedCategory = categoryRepository.save(category);
 
         return new CategoryInfoResponse(savedCategory);
     }
+
+    private Category getSuperCategory(Long superCategoryId) {
+        Category category = categoryRepository.findByCategoryIdAndCategoryIsUsedTrue(superCategoryId);
+        if (category == null) {
+            throw new NotFoundException("해당하는 상위 카테고리가 존재하지 않습니다.");
+        }
+        return category;
+    }
+
+    private void checkDuplicateCategoryName(Category category) {
+        String categoryName = category.getCategoryName();
+
+        if (category.getSuperCategory() == null) {
+            // 루트 카테고리의 경우
+            List<Category> rootCategories = categoryRepository.findBySuperCategoryIsNullAndCategoryIsUsed();
+
+            for (Category rootCategory : rootCategories) {
+                if (categoryName.equals(rootCategory.getCategoryName())) {
+                    throw new DuplicateCategoryNameException(
+                            categoryName + "과 이름이 같은 최상위 카테고리가 이미 존재합니다.");
+                }
+            }
+        } else {
+            // 상위 카테고리가 있는 경우
+            Category superCategory = category.getSuperCategory();
+
+            // 상위 카테고리와 이름 중복 체크
+            checkNameConflictWithSuperCategories(superCategory, categoryName);
+
+            // 같은 상위 카테고리 아래에서 이름 중복 확인
+            Category duplicateNameCategory = categoryRepository.findBySuperCategoryAndCategoryNameAndCategoryIsUsedTrue(superCategory, categoryName);
+            if (duplicateNameCategory != null) {
+                throw new DuplicateCategoryNameException("같은 상위 카테고리 아래에 같은 이름의 카테고리가 존재합니다.");
+            }
+        }
+    }
+
+
 
     /**
      * 상위 계층의 모든 카테고리 이름과 중복되는지 확인합니다.
@@ -113,7 +129,7 @@ public class CategoryServiceImpl implements CategoryService {
         List<CategoryInfoResponse> categoryTree = new ArrayList<>();
 
         // 최상위 카테고리부터 시작하여 트리 구조로 추가
-        List<Category> rootCategories = categoryRepository.findBySuperCategoryIsNull();
+        List<Category> rootCategories = categoryRepository.findBySuperCategoryIsNullAndCategoryIsUsed();
 
         for (Category rootCategory : rootCategories) {
             CategoryInfoResponse rootDto = new CategoryInfoResponse(rootCategory);
@@ -131,7 +147,7 @@ public class CategoryServiceImpl implements CategoryService {
      * @param parentCategory 부모 카테고리
      */
     private void loadChildCategories(CategoryInfoResponse parentDto, Category parentCategory) {
-        List<Category> children = categoryRepository.findBySuperCategory(parentCategory);
+        List<Category> children = categoryRepository.findBySuperCategoryAndCategoryIsUsedTrue(parentCategory);
         List<CategoryInfoResponse> childrenDtos = new ArrayList<>();
 
         for (Category child : children) {
@@ -170,9 +186,9 @@ public class CategoryServiceImpl implements CategoryService {
     public List<CategoryInfoResponse> getChildCategories(Long parentCategoryId) {
         Category parent = categoryRepository.findById(parentCategoryId)
                 .orElseThrow(() -> new CategoryNotFoundException(parentCategoryId));
-        return categoryRepository.findBySuperCategory(parent).stream()
+        return categoryRepository.findBySuperCategoryAndCategoryIsUsedTrue(parent).stream()
                 .map(CategoryInfoResponse::new) // DTO 변환
-                .collect(Collectors.toList());
+                .toList();
     }
 
     /**
@@ -184,9 +200,9 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     @Transactional(readOnly = true)
     public List<CategoryInfoResponse> getRootCategories() {
-        return categoryRepository.findBySuperCategoryIsNull().stream()
+        return categoryRepository.findBySuperCategoryIsNullAndCategoryIsUsed().stream()
                 .map(CategoryInfoResponse::new)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     /**
@@ -205,7 +221,7 @@ public class CategoryServiceImpl implements CategoryService {
         }
         return categories.stream()
                 .map(CategoryInfoResponse::new)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     /**
@@ -221,7 +237,7 @@ public class CategoryServiceImpl implements CategoryService {
     public List<CategoryInfoResponse> getCategoryPath(Long categoryId) {
         return categoryRepository.findCategoryPath(categoryId).stream()
                 .map(CategoryInfoResponse::new)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     /**
@@ -247,7 +263,7 @@ public class CategoryServiceImpl implements CategoryService {
         for (int i = 1; i <= depth; i++) {
             List<Category> nextLevelCategories = new ArrayList<>();
             for (Category category : currentLevelCategories) {
-                List<Category> children = categoryRepository.findBySuperCategory(category);
+                List<Category> children = categoryRepository.findBySuperCategoryAndCategoryIsUsedTrue(category);
                 nextLevelCategories.addAll(children);
             }
 
@@ -262,7 +278,7 @@ public class CategoryServiceImpl implements CategoryService {
 
         return lowerCategories.get(depth).stream()
                 .map(CategoryInfoResponse::new)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     /**
@@ -277,7 +293,7 @@ public class CategoryServiceImpl implements CategoryService {
     public List<CategoryInfoResponse> getAllDescendants(Long categoryId) {
         return categoryRepository.findAllDescendants(categoryId).stream()
                 .map(CategoryInfoResponse::new)
-                .collect(Collectors.toList());
+                .toList();
     }
 
 
@@ -290,51 +306,19 @@ public class CategoryServiceImpl implements CategoryService {
      */
     @Override
     public CategoryInfoResponse updateCategory(Long categoryId, CategoryUpdateRequest request) {
-
         // 업데이트할 카테고리 조회
-        Category category = categoryRepository.findById(categoryId)
-                .orElseThrow(() -> new CategoryNotFoundException(categoryId));
+        Category category = categoryRepository.findByCategoryIdAndCategoryIsUsedTrue(categoryId);
 
-        if (!category.getCategoryIsUsed()) {
-            throw new CategoryNotFoundException(categoryId);
+        if(category == null){
+            throw new NotFoundException("해당하는 카테고리를 찾을 수 없습니다.");
         }
 
-        // 사용중인 카테고리와 이름 중복 체크.
-        // 같은 트리 아래에 있으면 이름 중복 불가(루트 카테고리끼리, 같은 상위 카테고리를 갖은 것 끼리,
-        // 자신의 상위/하위 카테고리와 이름 중복 불가)
-        if (request.getSuperCategoryId() == null) {
-            // root 카테고리인 경우
-            List<Category> rootCategories = categoryRepository.findBySuperCategoryIsNull();
-
-            for (Category rootCategory : rootCategories) {
-                if (rootCategory.getCategoryIsUsed() && request.getCategoryName().equals(rootCategory.getCategoryName())) {
-                    throw new DuplicateCategoryNameException(request.getCategoryName() + "과 이름이 같은 최상위 카테고리가 이미 존재합니다.");
-                }
-            }
-
-        } else {
-            Category superCategory = categoryRepository.findById(request.getSuperCategoryId())
-                    .orElseThrow(() -> new IllegalArgumentException("상위 카테고리를 찾을 수 없습니다."));
-
-            // 모든 상위 계층 카테고리 이름과 비교하여 중복 확인
-            // 상위 카테고리는 하위 카테고리가 있으면 삭제 불가능함으로 상위 카테고리의 사용 여부는 무조건 true
-            checkNameConflictWithSuperCategories(superCategory, request.getCategoryName());
-
-            // 같은 상위 카테고리 아래에서 이름 중복 확인
-            Category duplicateNameCategory = categoryRepository.findBySuperCategoryAndCategoryName(superCategory, request.getCategoryName());
-            if (duplicateNameCategory != null && duplicateNameCategory.getCategoryIsUsed() && !category.getCategoryName().equals(request.getCategoryName())) {
-                throw new DuplicateCategoryNameException("같은 상위 카테고리 아래에 같은 이름의 카테고리가 존재합니다.");
-            }
+        if(request.getCategoryName().trim().isEmpty() || request.getCategoryName().trim().isBlank()) {
+            throw new InvalidCategoryNameException("카테고리 이름은 1글자 이상이어야 합니다.");
         }
 
-        // 자신의 하위 카테고리 아래에서 이름 중복 확인
-        List<Category> childrenCategories = categoryRepository.findAllDescendants(categoryId);
-
-        for (Category child : childrenCategories) {
-            if (!category.getCategoryName().equals(request.getCategoryName()) && child.getCategoryIsUsed() && request.getCategoryName().equals(child.getCategoryName())) {
-                throw new DuplicateCategoryNameException("하위 카테고리 중에 같은 이름의 카테고리가 존재합니다.");
-            }
-        }
+        // 이름 중복 체크
+        checkDuplicateCategoryNameForUpdate(category, request);
 
         // 카테고리 이름 업데이트
         category.setCategoryName(request.getCategoryName());
@@ -342,8 +326,52 @@ public class CategoryServiceImpl implements CategoryService {
         // 카테고리 저장
         Category updatedCategory = categoryRepository.save(category);
 
-        return new CategoryInfoResponse(updatedCategory); // 업데이트된 카테고리를 DTO로 반환
+        return new CategoryInfoResponse(updatedCategory);
     }
+
+    private void checkDuplicateCategoryNameForUpdate(Category category, CategoryUpdateRequest request) {
+        String newCategoryName = request.getCategoryName();
+
+        if (request.getSuperCategoryId() == null) {
+            // 루트 카테고리의 경우
+            List<Category> rootCategories = categoryRepository.findBySuperCategoryIsNullAndCategoryIsUsed();
+
+            for (Category rootCategory : rootCategories) {
+                if (newCategoryName.equals(rootCategory.getCategoryName())
+                        && !category.getCategoryName().equals(newCategoryName)) {
+                    throw new DuplicateCategoryNameException(
+                            newCategoryName + "과 이름이 같은 최상위 카테고리가 이미 존재합니다.");
+                }
+            }
+        } else {
+            // 상위 카테고리가 있는 경우
+            Category superCategory = getSuperCategory(request.getSuperCategoryId());
+
+            // 상위 카테고리와 이름 중복 체크
+            checkNameConflictWithSuperCategories(superCategory, newCategoryName);
+
+            // 같은 상위 카테고리 아래에서 이름 중복 확인
+            Category duplicateNameCategory = categoryRepository.findBySuperCategoryAndCategoryNameAndCategoryIsUsedTrue(superCategory, newCategoryName);
+            if (duplicateNameCategory != null && !category.getCategoryName().equals(newCategoryName)) {
+                throw new DuplicateCategoryNameException("같은 상위 카테고리 아래에 같은 이름의 카테고리가 존재합니다.");
+            }
+        }
+
+        // 하위 카테고리에서 이름 중복 확인
+        checkDuplicateNameInChildCategories(category.getCategoryId(), newCategoryName, category.getCategoryName());
+    }
+
+    private void checkDuplicateNameInChildCategories(Long categoryId, String newCategoryName, String currentCategoryName) {
+        List<Category> childrenCategories = categoryRepository.findAllDescendants(categoryId);
+
+        for (Category child : childrenCategories) {
+            if (newCategoryName.equals(child.getCategoryName()) && !currentCategoryName.equals(newCategoryName)) {
+                throw new DuplicateCategoryNameException("하위 카테고리 중에 같은 이름의 카테고리가 존재합니다.");
+            }
+        }
+    }
+
+
 
     /**
      * 특정 카테고리를 소프트 삭제하여 사용 여부를 false로 변경합니다.
@@ -355,11 +383,14 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public boolean deleteCategory(Long categoryId) {
         // 삭제할 카테고리 조회
-        Category category = categoryRepository.findById(categoryId)
-                .orElseThrow(() -> new CategoryNotFoundException(categoryId));
+        Category category = categoryRepository.findByCategoryIdAndCategoryIsUsedTrue(categoryId);
+
+        if(category == null){
+            throw new NotFoundException("해당하는 카테고리를 찾을 수 없습니다.");
+        }
 
         // 사용 중인 하위 카테고리가 있는지 확인
-        boolean hasUsedSubCategory = categoryRepository.findBySuperCategory(category).stream()
+        boolean hasUsedSubCategory = categoryRepository.findBySuperCategoryAndCategoryIsUsedTrue(category).stream()
                 .anyMatch(Category::getCategoryIsUsed);
 
         if (hasUsedSubCategory) {

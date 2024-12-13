@@ -1,6 +1,7 @@
 package com.nhnacademy.ssacthree_shop_api.customer.controller;
 
 import com.nhnacademy.ssacthree_shop_api.commons.dto.MessageResponse;
+import com.nhnacademy.ssacthree_shop_api.customer.domain.Customer;
 import com.nhnacademy.ssacthree_shop_api.customer.dto.CustomerCreateRequest;
 import com.nhnacademy.ssacthree_shop_api.customer.dto.CustomerGetResponse;
 import com.nhnacademy.ssacthree_shop_api.customer.dto.CustomerUpdateRequest;
@@ -18,19 +19,19 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/customers")
+@RequestMapping("/api/shop/customers")
 @RequiredArgsConstructor
 public class CustomerController {
 
     private final CustomerService customerService;
 
     @PostMapping
-    public ResponseEntity<MessageResponse> createCustomer(
+    public ResponseEntity<Long> createCustomer(
         @RequestBody CustomerCreateRequest customerCreateRequest) {
-        customerService.createCustomer(customerCreateRequest);
+        Customer customer = customerService.createCustomer(customerCreateRequest);
+        Long customerId = customer.getCustomerId();
 
-        MessageResponse messageResponse = new MessageResponse("생성 성공");
-        return ResponseEntity.status(HttpStatus.CREATED).body(messageResponse);
+        return ResponseEntity.status(HttpStatus.CREATED).body(customerId);
     }
 
     @GetMapping("/{customerId}")
@@ -48,14 +49,14 @@ public class CustomerController {
         return ResponseEntity.ok().body(messageResponse);
     }
 
-    @PutMapping("/{cusotmerId}")
+    @PutMapping("/{customerId}")
     public ResponseEntity<MessageResponse> updateCustomer(
         @PathVariable("customerId") Long customerId,
         @RequestBody CustomerUpdateRequest customerUpdateRequest) {
 
         customerService.updateCustomer(customerId, customerUpdateRequest);
-        MessageResponse MessageResponse =new MessageResponse(customerId+ "가 수정 되었습니다.");
-        return ResponseEntity.ok().body(MessageResponse);
+        MessageResponse messageResponse = new MessageResponse(customerId + "가 수정 되었습니다.");
+        return ResponseEntity.ok().body(messageResponse);
     }
 
 }

@@ -1,8 +1,6 @@
 package com.nhnacademy.ssacthree_shop_api.bookset.category.dto.request;
 
-import com.nhnacademy.ssacthree_shop_api.bookset.category.domain.Category;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

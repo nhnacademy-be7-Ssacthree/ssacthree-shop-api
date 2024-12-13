@@ -44,4 +44,9 @@ public class DeliveryRuleController {
 
         return ResponseEntity.status(HttpStatus.OK).body(messageResponse);
     }
+
+    @GetMapping("/current")
+    ResponseEntity<DeliveryRuleGetResponse> getCurrentDeliveryRule() {
+        return ResponseEntity.ok().body(deliveryRuleService.getCurrentDeliveryRule());
+    }
 }

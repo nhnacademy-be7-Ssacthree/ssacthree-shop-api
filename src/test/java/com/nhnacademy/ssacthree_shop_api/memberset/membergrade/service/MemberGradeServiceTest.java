@@ -9,7 +9,9 @@ import com.nhnacademy.ssacthree_shop_api.memberset.membergrade.dto.MemberGradeCr
 import com.nhnacademy.ssacthree_shop_api.memberset.membergrade.dto.MemberGradeGetResponse;
 import com.nhnacademy.ssacthree_shop_api.memberset.membergrade.dto.MemberGradeUpdateResponse;
 import com.nhnacademy.ssacthree_shop_api.memberset.membergrade.exception.MemberGradeNotFoundException;
+import com.nhnacademy.ssacthree_shop_api.memberset.membergrade.repository.MemberGradeCustomRepository;
 import com.nhnacademy.ssacthree_shop_api.memberset.membergrade.repository.MemberGradeRepository;
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -21,9 +23,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 
-
 @ExtendWith(MockitoExtension.class)
-public class MemberGradeServiceTest {
+class MemberGradeServiceTest {
 
     @Mock
     private MemberGradeRepository memberGradeRepository;
@@ -31,12 +32,14 @@ public class MemberGradeServiceTest {
     @InjectMocks
     private MemberGradeService memberGradeService;
 
+    @Mock
+    private MemberGradeCustomRepository memberGradeCustomRepository;
 
     @Test
     void createMemberGrade() {
 
         //given
-        MemberGradeCreateRequest dummy = new MemberGradeCreateRequest("test",true,0.01f);
+        MemberGradeCreateRequest dummy = new MemberGradeCreateRequest("test", true, 0.01f);
         //when
         memberGradeService.createMemberGrade(dummy);
         //then
@@ -48,11 +51,12 @@ public class MemberGradeServiceTest {
     void updateMemberGrade() {
         // given
         Long memberGradeId = 1L;
-        MemberGradeUpdateResponse updateRequest = new MemberGradeUpdateResponse("test2", false, 0.02f);
+        MemberGradeUpdateResponse updateRequest = new MemberGradeUpdateResponse("test2", false,
+            0.02f);
         MemberGrade existingMemberGrade = new MemberGrade("test1", true, 0.01f);
 
-        when(memberGradeRepository.findById(memberGradeId)).thenReturn(Optional.of(existingMemberGrade));
-        when(memberGradeRepository.existsById(memberGradeId)).thenReturn(true);
+        when(memberGradeRepository.findById(memberGradeId)).thenReturn(
+            Optional.of(existingMemberGrade));
 
         // when
         memberGradeService.updateMemberGrade(memberGradeId, updateRequest);
@@ -71,9 +75,9 @@ public class MemberGradeServiceTest {
             memberGradeService.updateMemberGrade(0L, null);
         });
 
+        when(memberGradeRepository.findById(1L)).thenReturn(Optional.empty());
         Assertions.assertThrows(MemberGradeNotFoundException.class, () -> {
-            when(memberGradeRepository.existsById(1L)).thenReturn(false);
-            memberGradeService.updateMemberGrade(1L, null);
+            memberGradeService.updateMemberGrade(1L, new MemberGradeUpdateResponse());
         });
     }
 
@@ -83,13 +87,14 @@ public class MemberGradeServiceTest {
         //given
         Long memberGradeId = 1L;
         MemberGrade existingMemberGrade = new MemberGrade("test1", true, 0.01f);
-        when(memberGradeRepository.existsById(memberGradeId)).thenReturn(true);
+        when(memberGradeRepository.findById(memberGradeId)).thenReturn(
+            Optional.of(existingMemberGrade));
 
         //when
         memberGradeService.deleteMemberGradeById(memberGradeId);
 
         //then
-        verify(memberGradeRepository).deleteById(memberGradeId);
+        Assertions.assertFalse(existingMemberGrade.isMemberGradeIsUsed());
     }
 
     @Test
@@ -103,7 +108,7 @@ public class MemberGradeServiceTest {
         });
 
         Assertions.assertThrows(MemberGradeNotFoundException.class, () -> {
-            when(memberGradeRepository.existsById(1L)).thenReturn(false);
+            when(memberGradeRepository.findById(1L)).thenReturn(Optional.empty());
             memberGradeService.deleteMemberGradeById(1L);
         });
     }
@@ -113,8 +118,8 @@ public class MemberGradeServiceTest {
     void getMemberGradeById() {
         Long memberGradeId = 1L;
         MemberGrade existingMemberGrade = new MemberGrade("test1", true, 0.01f);
-        when(memberGradeRepository.findById(memberGradeId)).thenReturn(Optional.of(existingMemberGrade));
-        when(memberGradeRepository.existsById(memberGradeId)).thenReturn(true);
+        when(memberGradeRepository.findById(memberGradeId)).thenReturn(
+            Optional.of(existingMemberGrade));
 
         memberGradeService.getMemberGradeById(memberGradeId);
         verify(memberGradeRepository).findById(memberGradeId);
@@ -131,20 +136,20 @@ public class MemberGradeServiceTest {
         });
 
         Assertions.assertThrows(MemberGradeNotFoundException.class, () -> {
-            when(memberGradeRepository.existsById(1L)).thenReturn(false);
-            memberGradeService.getMemberGradeById(1L);
+            when(memberGradeRepository.findById(1L)).thenReturn(Optional.empty());
+            memberGradeService.deleteMemberGradeById(1L);
         });
     }
 
     @Test
     void getAllMemberGrades() {
         // given
-        List<MemberGrade> memberGrades = Arrays.asList(
-            new MemberGrade("test1", true, 0.01f),
-            new MemberGrade("test2", true, 0.02f)
+        List<MemberGradeGetResponse> memberGrades = Arrays.asList(
+            new MemberGradeGetResponse(1L, "test1", true, LocalDateTime.now(), 0.01f),
+            new MemberGradeGetResponse(2L, "test2", true, LocalDateTime.now(), 0.02f)
         );
 
-        when(memberGradeRepository.findAll()).thenReturn(memberGrades);
+        when(memberGradeCustomRepository.findAvailableMemberGrade()).thenReturn(memberGrades);
 
         // when
         List<MemberGradeGetResponse> result = memberGradeService.getAllMemberGrades();
@@ -154,10 +159,8 @@ public class MemberGradeServiceTest {
         Assertions.assertEquals("test1", result.get(0).getMemberGradeName());
         Assertions.assertEquals(0.01f, result.get(0).getMemberGradePointSave());
 
-        verify(memberGradeRepository).findAll();
+        verify(memberGradeCustomRepository).findAvailableMemberGrade();
     }
-
-
 
 
 }

@@ -1,34 +1,39 @@
 package com.nhnacademy.ssacthree_shop_api.couponset.coupon.domain;
 
 import com.nhnacademy.ssacthree_shop_api.couponset.couponrule.domain.CouponRule;
-import com.nhnacademy.ssacthree_shop_api.couponset.membercoupon.domain.MemberCoupon;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Entity
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Coupon {
+
+    public Coupon(String couponName, String couponDescription, int couponEffectivePeriod, CouponEffectivePeriodUnit couponEffectivePeriodUnit, LocalDateTime couponExpiredAt, CouponRule couponRule) {
+        this.couponName = couponName;
+        this.couponDescription = couponDescription;
+        this.couponEffectivePeriod = couponEffectivePeriod;
+        this.couponEffectivePeriodUnit = couponEffectivePeriodUnit;
+        this.couponExpiredAt = couponExpiredAt;
+        this.couponRule = couponRule;
+    }
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="coupon_id")
-    private long couponId;
+    private Long couponId;
 
-    @NotNull
+    @NotBlank
     @Size(max = 30)
     private String couponName;
 
-    @NotNull
+    @NotBlank
     @Column(columnDefinition = "TEXT")
     private String couponDescription;
 
@@ -37,7 +42,7 @@ public class Coupon {
     private CouponEffectivePeriodUnit couponEffectivePeriodUnit;
 
     @NotNull
-    private LocalDateTime couponCreateAt;
+    private LocalDateTime couponCreateAt = LocalDateTime.now();
 
     private LocalDateTime couponExpiredAt;
 

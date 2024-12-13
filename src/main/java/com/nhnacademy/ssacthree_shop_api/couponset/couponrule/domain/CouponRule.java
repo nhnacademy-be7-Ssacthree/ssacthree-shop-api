@@ -1,27 +1,31 @@
 package com.nhnacademy.ssacthree_shop_api.couponset.couponrule.domain;
 
-import com.nhnacademy.ssacthree_shop_api.couponset.coupon.domain.Coupon;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class CouponRule {
+
+    public CouponRule(CouponType couponType, int couponMinOrderPrice, int maxDiscountPrice, int couponDiscountPrice, String couponRuleName) {
+        this.couponType = couponType;
+        this.couponMinOrderPrice = couponMinOrderPrice;
+        this.maxDiscountPrice = maxDiscountPrice;
+        this.couponDiscountPrice = couponDiscountPrice;
+        this.couponRuleName = couponRuleName;
+    }
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="coupon_rule_id")
-    private long id;
+    private Long id;
 
     @NotNull
     private CouponType couponType;
@@ -36,14 +40,15 @@ public class CouponRule {
     @NotNull
     private int couponDiscountPrice;
 
-    @NotNull
+    @NotBlank
     @Size(max = 20)
     private String couponRuleName;
 
     @NotNull
-    private boolean couponIsUsed;
+    @Setter
+    private boolean couponIsUsed = true;
 
     @NotNull
-    private LocalDateTime couponRuleCreatedAt;
+    private LocalDateTime couponRuleCreatedAt = LocalDateTime.now();
 
 }

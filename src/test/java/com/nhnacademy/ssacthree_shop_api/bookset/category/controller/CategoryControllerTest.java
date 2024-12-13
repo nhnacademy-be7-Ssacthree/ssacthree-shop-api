@@ -33,7 +33,6 @@ class CategoryControllerTest {
 
     @Test
     void createCategory() throws Exception {
-        CategorySaveRequest request = new CategorySaveRequest("문학", null);
         CategoryInfoResponse response = new CategoryInfoResponse(1L,"문학", true, new ArrayList<>());
 
         when(categoryService.saveCategory(any(CategorySaveRequest.class))).thenReturn(response);
@@ -124,7 +123,7 @@ class CategoryControllerTest {
 
     @Test
     void updateCategory() throws Exception {
-        CategoryUpdateRequest updateRequest = new CategoryUpdateRequest("문학", null);
+
         CategoryInfoResponse response = new CategoryInfoResponse(1L,"문학", true, new ArrayList<>());
 
         when(categoryService.updateCategory(anyLong(), any(CategoryUpdateRequest.class))).thenReturn(response);

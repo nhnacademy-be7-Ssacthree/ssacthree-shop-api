@@ -1,0 +1,3 @@
+###리뷰 리스트 가져오기
+GET http://localhost:8083/api/shop/books/reviews/111
+Content-Type: application/json

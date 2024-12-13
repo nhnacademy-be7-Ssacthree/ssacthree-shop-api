@@ -8,6 +8,7 @@ import lombok.Setter;
 
 @Entity
 @Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class Publisher {
@@ -18,7 +19,7 @@ public class Publisher {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long publisherId;
+    private Long publisherId;
 
     private String publisherName;
 

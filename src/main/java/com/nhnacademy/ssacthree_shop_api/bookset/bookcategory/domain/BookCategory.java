@@ -15,6 +15,7 @@ public class BookCategory {
     @EmbeddedId
     private BookCategoryId bookCategoryId;
 
+    @Setter
     @ManyToOne(fetch = FetchType.LAZY)
     @MapsId("bookId")
     @JoinColumn(name = "book_id")
@@ -22,7 +23,7 @@ public class BookCategory {
     @JsonBackReference
     private Book book;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @MapsId("categoryId")
     @JoinColumn(name = "category_id")
     private Category category;

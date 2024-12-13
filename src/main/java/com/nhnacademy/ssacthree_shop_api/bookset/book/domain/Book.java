@@ -1,14 +1,11 @@
 package com.nhnacademy.ssacthree_shop_api.bookset.book.domain;
 
 
-import com.nhnacademy.ssacthree_shop_api.bookset.author.domain.Author;
 import com.nhnacademy.ssacthree_shop_api.bookset.book.domain.converter.BookStatusConverter;
 import com.nhnacademy.ssacthree_shop_api.bookset.bookauthor.domain.BookAuthor;
 import com.nhnacademy.ssacthree_shop_api.bookset.bookcategory.domain.BookCategory;
 import com.nhnacademy.ssacthree_shop_api.bookset.booktag.domain.BookTag;
-import com.nhnacademy.ssacthree_shop_api.bookset.category.domain.Category;
 import com.nhnacademy.ssacthree_shop_api.bookset.publisher.domain.Publisher;
-import com.nhnacademy.ssacthree_shop_api.bookset.tag.domain.Tag;
 import jakarta.persistence.*; // jakarta -> javax?
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -16,7 +13,6 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import lombok.Setter;
@@ -64,14 +60,14 @@ public class Book {
     @ManyToOne
     @JoinColumn(name = "publisher_id")
     private  Publisher publisher;
-
-    @OneToMany(mappedBy="book", fetch = FetchType.LAZY)
+    //orphanRemoval = true 도서 수정 시 연결된 자식 엔티티가 부모와의 관계가 끊어졌을 때 JPA가 이를 자동으로 삭제
+    @OneToMany(mappedBy="book", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<BookCategory> bookCategories = new HashSet<>();
 
-    @OneToMany(mappedBy="book", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy="book", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<BookAuthor> bookAuthors = new HashSet<>();
 
-    @OneToMany(mappedBy="book", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy="book", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<BookTag> bookTags = new HashSet<>();
 
     public void addCategory(BookCategory bookCategory) {
@@ -94,4 +90,24 @@ public class Book {
         this.isPacked = isPacked;
     }
 
+    public void clearCategories() {
+        for (BookCategory bookCategory : bookCategories) {
+            bookCategory.setBook(null); // 부모 관계 끊기
+        }
+        bookCategories.clear(); // Set 비우기
+    }
+
+    public void clearTags() {
+        for (BookTag bookTag : bookTags) {
+            bookTag.setBook(null);
+        }
+        bookTags.clear();
+    }
+
+    public void clearAuthors() {
+        for (BookAuthor bookAuthor : bookAuthors) {
+            bookAuthor.setBook(null);
+        }
+        bookAuthors.clear();
+    }
 }

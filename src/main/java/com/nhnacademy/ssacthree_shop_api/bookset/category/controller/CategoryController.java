@@ -1,18 +1,15 @@
 package com.nhnacademy.ssacthree_shop_api.bookset.category.controller;
 
-import com.nhnacademy.ssacthree_shop_api.bookset.category.domain.Category;
 import com.nhnacademy.ssacthree_shop_api.bookset.category.dto.request.CategorySaveRequest;
 import com.nhnacademy.ssacthree_shop_api.bookset.category.dto.request.CategoryUpdateRequest;
 import com.nhnacademy.ssacthree_shop_api.bookset.category.dto.response.CategoryInfoResponse;
 import com.nhnacademy.ssacthree_shop_api.bookset.category.service.CategoryService;
-import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/shop")
@@ -34,6 +31,16 @@ public class CategoryController {
         return ResponseEntity.status(HttpStatus.CREATED).contentType(MediaType.APPLICATION_JSON)
                 .body(categoryService.saveCategory(request));
     }
+
+    /**
+     *
+     */
+    @GetMapping("/admin/categories")
+    public ResponseEntity<List<CategoryInfoResponse>> getAllCategoriesForAdmin(){
+        List<CategoryInfoResponse> categoryInfoResponses = categoryService.getAllCategories();
+        return new ResponseEntity<>(categoryInfoResponses, HttpStatus.OK);
+    }
+
 
     /**
      * 전체 카테고리 트리 조회

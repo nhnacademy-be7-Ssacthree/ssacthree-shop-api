@@ -4,10 +4,7 @@ import com.nhnacademy.ssacthree_shop_api.couponset.coupon.domain.Coupon;
 import com.nhnacademy.ssacthree_shop_api.memberset.member.domain.Member;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
@@ -16,17 +13,26 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class MemberCoupon {
+
+    public MemberCoupon(Coupon coupon, Member customer, LocalDateTime memberCouponExpiredAt) {
+        this.coupon = coupon;
+        this.customer = customer;
+        this.memberCouponExpiredAt = memberCouponExpiredAt;
+    }
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="member_coupon_id")
     private long memberCouponId;
 
     @NotNull
-    private LocalDateTime memberCouponCreatedAt;
+    private LocalDateTime memberCouponCreatedAt = LocalDateTime.now();
 
     @NotNull
+    @Setter
     private LocalDateTime memberCouponExpiredAt;
 
+    @Setter
     private LocalDateTime memberCouponUsedAt;
 
     @NotNull
@@ -38,7 +44,4 @@ public class MemberCoupon {
     @ManyToOne
     @JoinColumn(name="customerId")
     private Member customer;
-
-    //todo: orderDetail과 OneToOne 연결
-
 }
