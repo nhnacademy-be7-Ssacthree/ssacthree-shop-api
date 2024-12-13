@@ -1,87 +1,81 @@
 package com.nhnacademy.ssacthree_shop_api.elastic.dto;
 
 import com.nhnacademy.ssacthree_shop_api.elastic.domain.BookDocument;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 class SearchResponseTest {
 
-  private SearchResponse searchResponse;
-  private List<BookDocument> bookDocuments;
-
-  @BeforeEach
-  void setUp() {
-    bookDocuments = new ArrayList<>();
-    bookDocuments.add(new BookDocument(
-        1L,
-        "Effective Java",
-        "index1",
-        "A programming guide for Java developers",
-        "1234567890",
-        "2008-05-08",
-        50000,
-        45000,
-        false,
-        100,
-        "image_url",
-        200,
-        10,
-        "Publisher Name",
-        "Author Name",
-        List.of("tag1", "tag2"),
-        List.of("category1", "category2")
-    ));
-
-    searchResponse = new SearchResponse(
-        1,          // totalHits
-        bookDocuments // books
-    );
+  @Test
+  void testNoArgsConstructor() {
+    // Test for @NoArgsConstructor
+    SearchResponse response = new SearchResponse();
+    assertNotNull(response);
+    assertThat(response.getTotalHits()).isNull();
+    assertThat(response.getBooks()).isNull();
   }
 
   @Test
-  void testSearchResponseInitialization() {
-    assertThat(searchResponse.getTotalHits()).isEqualTo(1);
-    assertThat(searchResponse.getBooks()).isEqualTo(bookDocuments);
+  void testAllArgsConstructor() {
+    // Test for @AllArgsConstructor
+    List<BookDocument> books = new ArrayList<>();
+    books.add(new BookDocument(1L, "Book Title", "Index", "Info", "123456789", "2023-01-01", 20000, 18000, true, 10, "url", 100, 10, "Publisher", "Author", List.of("Tag1", "Tag2"), List.of("Category1")));
+
+    SearchResponse response = new SearchResponse(10, books);
+
+    assertNotNull(response);
+    assertEquals(10, response.getTotalHits());
+    assertEquals(books, response.getBooks());
   }
 
   @Test
-  void testSettersAndGetters() {
-    searchResponse.setTotalHits(2);
+  void testGetterAndSetter() {
+    // Test for @Data (Getter and Setter)
+    SearchResponse response = new SearchResponse();
+    List<BookDocument> books = new ArrayList<>();
+    books.add(new BookDocument(1L, "Book Title", "Index", "Info", "123456789", "2023-01-01", 20000, 18000, true, 10, "url", 100, 10, "Publisher", "Author", List.of("Tag1", "Tag2"), List.of("Category1")));
 
-    List<BookDocument> newBookDocuments = new ArrayList<>();
-    newBookDocuments.add(new BookDocument(
-        2L,
-        "Clean Code",
-        "index2",
-        "A handbook of agile software craftsmanship",
-        "0987654321",
-        "2010-10-10",
-        55000,
-        50000,
-        true,
-        50,
-        "new_image_url",
-        150,
-        15,
-        "New Publisher",
-        "New Author",
-        List.of("tag3", "tag4"),
-        List.of("category3", "category4")
-    ));
-    searchResponse.setBooks(newBookDocuments);
+    response.setTotalHits(5);
+    response.setBooks(books);
 
-    assertThat(searchResponse.getTotalHits()).isEqualTo(2);
-    assertThat(searchResponse.getBooks()).isEqualTo(newBookDocuments);
+    assertEquals(5, response.getTotalHits());
+    assertEquals(books, response.getBooks());
   }
 
   @Test
-  void testEmptyBooks() {
-    searchResponse.setBooks(new ArrayList<>());
-    assertThat(searchResponse.getBooks()).isEmpty();
+  void testToString() {
+    // Test for @Data (toString)
+    List<BookDocument> books = new ArrayList<>();
+    books.add(new BookDocument(1L, "Book Title", "Index", "Info", "123456789", "2023-01-01", 20000, 18000, true, 10, "url", 100, 10, "Publisher", "Author", List.of("Tag1", "Tag2"), List.of("Category1")));
+
+    SearchResponse response = new SearchResponse(10, books);
+    String responseString = response.toString();
+
+    assertThat(responseString)
+        .contains("totalHits=10")
+        .contains("Book Title")
+        .contains("Publisher");
+  }
+
+  @Test
+  void testEqualsAndHashCode() {
+    // Test for @Data (equals and hashCode)
+    List<BookDocument> books1 = new ArrayList<>();
+    books1.add(new BookDocument(1L, "Book Title", "Index", "Info", "123456789", "2023-01-01", 20000, 18000, true, 10, "url", 100, 10, "Publisher", "Author", List.of("Tag1", "Tag2"), List.of("Category1")));
+
+    List<BookDocument> books2 = new ArrayList<>();
+    books2.add(new BookDocument(1L, "Book Title", "Index", "Info", "123456789", "2023-01-01", 20000, 18000, true, 10, "url", 100, 10, "Publisher", "Author", List.of("Tag1", "Tag2"), List.of("Category1")));
+
+    SearchResponse response1 = new SearchResponse(10, books1);
+    SearchResponse response2 = new SearchResponse(10, books2);
+
+    assertEquals(response1, response2);
+    assertEquals(response1.hashCode(), response2.hashCode());
   }
 }
