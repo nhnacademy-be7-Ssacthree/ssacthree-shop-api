@@ -18,7 +18,6 @@ import java.util.List;
 public class PackagingController {
     private final PackagingService packagingService;
 
-    //레전드...
     @GetMapping
     public ResponseEntity<List<PackagingGetResponse>> getAllPackaging() {
         List<PackagingGetResponse> packaging= packagingService.getAllPackaging();
