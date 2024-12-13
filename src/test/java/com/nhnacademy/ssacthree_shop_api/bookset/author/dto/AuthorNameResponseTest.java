@@ -1,72 +1,103 @@
 package com.nhnacademy.ssacthree_shop_api.bookset.author.dto;
 
 import com.nhnacademy.ssacthree_shop_api.bookset.author.domain.Author;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 class AuthorNameResponseTest {
 
-  private Author mockAuthor;
-
-  @BeforeEach
-  void setUp() {
-    // Author 객체를 생성하고 초기화
-    mockAuthor = new Author(1L, "J.K. Rowling", "Info"); // Author 클래스의 생성자에 맞게 초기화
-  }
-
   @Test
   void testNoArgsConstructor() {
-    // @NoArgsConstructor로 기본 생성자를 테스트
-    AuthorNameResponse authorNameResponse = new AuthorNameResponse();
+    // Given
+    AuthorNameResponse response = new AuthorNameResponse();
 
-    // 기본 생성자로 생성된 객체의 authorId와 authorName은 null이어야 한다.
-    assertNull(authorNameResponse.getAuthorId());
-    assertNull(authorNameResponse.getAuthorName());
+    // When & Then
+    assertThat(response).isNotNull(); // 객체가 생성되었는지 확인
+    assertThat(response.getAuthorId()).isNull(); // authorId는 null로 초기화되어야 함
+    assertThat(response.getAuthorName()).isNull(); // authorName은 null로 초기화되어야 함
   }
 
   @Test
   void testAllArgsConstructor() {
-    // 모든 인자를 받는 생성자를 테스트
-    AuthorNameResponse authorNameResponse = new AuthorNameResponse(1L, "J.K. Rowling");
+    // Given
+    Long authorId = 1L;
+    String authorName = "John Doe";
 
-    // authorId와 authorName이 정상적으로 초기화되었는지 확인
-    assertEquals(1L, authorNameResponse.getAuthorId());
-    assertEquals("J.K. Rowling", authorNameResponse.getAuthorName());
+    // When
+    AuthorNameResponse response = new AuthorNameResponse(authorId, authorName);
+
+    // Then
+    assertThat(response).isNotNull();
+    assertThat(response.getAuthorId()).isEqualTo(authorId); // authorId 값 확인
+    assertThat(response.getAuthorName()).isEqualTo(authorName); // authorName 값 확인
   }
 
   @Test
-  void testConstructorWithAuthor() {
-    // Author 객체를 받는 생성자를 테스트
-    AuthorNameResponse authorNameResponse = new AuthorNameResponse(mockAuthor);
+  void testConstructorFromAuthor() {
+    // Given
+    Author author = new Author(1L, "John Doe", "Author bio");
 
-    // Author 객체에서 authorId와 authorName을 정상적으로 받아왔는지 확인
-    assertEquals(mockAuthor.getAuthorId(), authorNameResponse.getAuthorId());
-    assertEquals(mockAuthor.getAuthorName(), authorNameResponse.getAuthorName());
+    // When
+    AuthorNameResponse response = new AuthorNameResponse(author);
+
+    // Then
+    assertThat(response).isNotNull();
+    assertThat(response.getAuthorId()).isEqualTo(author.getAuthorId()); // authorId 값 확인
+    assertThat(response.getAuthorName()).isEqualTo(author.getAuthorName()); // authorName 값 확인
   }
 
   @Test
   void testConstructorWithAuthorName() {
-    // AuthorName만 받는 생성자를 테스트
-    AuthorNameResponse authorNameResponse = new AuthorNameResponse("J.K. Rowling");
+    // Given
+    String authorName = "John Doe";
 
-    // authorName만 설정되었는지 확인
-    assertNull(authorNameResponse.getAuthorId()); // authorId는 null이어야 한다.
-    assertEquals("J.K. Rowling", authorNameResponse.getAuthorName());
+    // When
+    AuthorNameResponse response = new AuthorNameResponse(authorName);
+
+    // Then
+    assertThat(response).isNotNull();
+    assertThat(response.getAuthorName()).isEqualTo(authorName); // authorName 값 확인
+    assertThat(response.getAuthorId()).isNull(); // authorId는 null로 초기화되어야 함
   }
 
   @Test
-  void testSetterAndGetter() {
-    // setter와 getter가 제대로 동작하는지 테스트
-    AuthorNameResponse authorNameResponse = new AuthorNameResponse();
+  void testGetterMethods() {
+    // Given
+    Long authorId = 1L;
+    String authorName = "John Doe";
+    AuthorNameResponse response = new AuthorNameResponse(authorId, authorName);
 
-    // setter를 사용하여 값 설정
-    authorNameResponse.setAuthorId(2L);
-    authorNameResponse.setAuthorName("George Orwell");
+    // When & Then
+    assertThat(response.getAuthorId()).isEqualTo(authorId); // getAuthorId() 값 확인
+    assertThat(response.getAuthorName()).isEqualTo(authorName); // getAuthorName() 값 확인
+  }
 
-    // getter를 사용하여 값 확인
-    assertEquals(2L, authorNameResponse.getAuthorId());
-    assertEquals("George Orwell", authorNameResponse.getAuthorName());
+  @Test
+  void testToStringMethod() {
+    // Given
+    Long authorId = 1L;
+    String authorName = "John Doe";
+    AuthorNameResponse response = new AuthorNameResponse(authorId, authorName);
+
+    // When
+    String toStringResult = response.toString();
+
+    // Then
+    assertThat(toStringResult)
+        .contains("authorId=" + authorId)
+        .contains("authorName=" + authorName);
+
+  }
+
+  @Test
+  void testEqualsAndHashCode() {
+    // Given
+    AuthorNameResponse response1 = new AuthorNameResponse(1L, "John Doe");
+    AuthorNameResponse response2 = new AuthorNameResponse(1L, "John Doe");
+
+    // When & Then
+    assertThat(response1).isEqualTo(response2); // 두 객체가 동일한지 확인
+    assertThat(response1.hashCode()).hasSameHashCodeAs(response2.hashCode()); // 두 객체의 hashCode가 동일한지 확인
   }
 }
-
