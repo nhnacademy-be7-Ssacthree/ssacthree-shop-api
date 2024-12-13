@@ -96,7 +96,8 @@ class TagInfoResponseTest {
     TagInfoResponse response2 = new TagInfoResponse(1L, "Fiction");
 
     // When & Then
-    assertThat(response1).isEqualTo(response2); // response1과 response2가 동일한지 확인
-    assertThat(response1).hasSameHashCodeAs(response2); // response1과 response2가 동일한 hashCode를 가지는지 확인
+    assertThat(response1)
+        .isEqualTo(response2)
+        .hasSameHashCodeAs(response2);
   }
 }
