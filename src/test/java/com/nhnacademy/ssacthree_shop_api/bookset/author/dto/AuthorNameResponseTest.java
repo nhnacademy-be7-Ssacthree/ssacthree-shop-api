@@ -84,8 +84,10 @@ class AuthorNameResponseTest {
     String toStringResult = response.toString();
 
     // Then
-    assertThat(toStringResult).contains("authorId=" + authorId);
-    assertThat(toStringResult).contains("authorName=" + authorName);
+    assertThat(toStringResult)
+        .contains("authorId=" + authorId)
+        .contains("authorName=" + authorName);
+
   }
 
   @Test
@@ -96,6 +98,6 @@ class AuthorNameResponseTest {
 
     // When & Then
     assertThat(response1).isEqualTo(response2); // 두 객체가 동일한지 확인
-    assertThat(response1.hashCode()).isEqualTo(response2.hashCode()); // 두 객체의 hashCode가 동일한지 확인
+    assertThat(response1.hashCode()).hasSameHashCodeAs(response2.hashCode()); // 두 객체의 hashCode가 동일한지 확인
   }
 }
